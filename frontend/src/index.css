@@ -1,0 +1,30 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+@import "tailwindcss";
+@theme {
+    --font-inter: 'Inter', 'sans-serif';
+    --font-roboto: 'Roboto', 'sans-serif';
+    --font-rm: 'Roboto Mono', monospace;
+
+        
+    --color-background: #F0F7F3;
+    --color-foreground: #0A1F14;
+    --color-card: #FFFFFF;
+    --color-card-foreground: #0A1F14;
+    --color-primary: #0E7A4F;
+    --color-primary-foreground: #FFFFFF;
+    --color-secondary: #D6EFE3;
+    --color-secondary-foreground: #0E7A4F;
+    --color-muted: #E6F2EC;
+    --color-muted-foreground: #4A7560;
+    --color-accent: #2DD483;
+    --color-accent-foreground: #0A1F14;
+    --color-border: #C4DECE;
+    --color-ring: #0E7A4F;
+}
+
+
+html{
+    scroll-behavior: smooth;
+}
