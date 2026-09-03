@@ -5,12 +5,14 @@
     import Footer from './Components/Footer';
     import { NavLink } from "react-router";
 
+
     const HowITWorks = lazy(()=> import ('./Components/HowITWorks'))
     const Features = lazy(()=> import('./Components/Features')) 
     
     const Home = () => {
         return (
             <div className=' '>
+                
                 <nav className='top-0 z-50 border-border sticky px-14 py-4 bg-background h-fit'>
                     <div className='flex justify-between items-center '>
 
