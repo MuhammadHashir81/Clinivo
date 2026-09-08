@@ -7,9 +7,9 @@ import { logIn,clearError } from '../src/store/slices/authSlice';
 import toast, { Toaster } from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 
-const SignIn = () => {
+const Signin = () => {
 
-    const {error,success} = useSelector(state => state.auth)
+    const {error,success, loading} = useSelector(state => state.auth)
     const dispatch = useDispatch()
 
 
@@ -17,6 +17,7 @@ const SignIn = () => {
         register,
         formState: { errors },
         handleSubmit,
+        reset
       } = useForm()
     
       const onSubmit = async (data) => {
@@ -27,13 +28,12 @@ const SignIn = () => {
 
 
 
-
-
   useEffect(()=>{
 
     if(success){
         toast.success(success)
         dispatch(clearError())
+        reset()
         setTimeout(() => {
         window.location.href = '/'
         }, 2000);
@@ -54,7 +54,7 @@ const SignIn = () => {
 
             <div className='flex flex-col gap-8 w-[420px]'>
 
-                <NavLink to='/' className='flex gap-2 items-center justify-center cursor-pointer'>
+                <NavLink to='/' className='flex gap-2 items-center justify-center   cursor-pointer'>
                     <div className='bg-primary w-fit px-1 py-1 rounded-lg'>
                         <Plus color='white' />
                     </div>
@@ -101,16 +101,19 @@ const SignIn = () => {
 
                         <button
                             type='submit'
+                            disabled={loading}
                             className='mt-2 bg-primary text-white font-bold font-inter text-sm rounded-xl px-5 py-3 shadow-sm hover:opacity-90 cursor-pointer'
                         >
-                            Sign in
+                            {
+                                !loading ? 'signin' : 'signingin...'
+                            }
                         </button>
 
                     </form>
 
                     <p className='font-inter text-sm text-muted-foreground text-center'>
                         Don't have an account?{' '}
-                        <NavLink to='/sign-up' className='text-primary font-semibold'>Sign up</NavLink>
+                        <a href='/sign-up' className='text-primary font-semibold'>Sign up</a>
                     </p>
 
                 </div>
@@ -120,4 +123,4 @@ const SignIn = () => {
     )
 }
 
-export default SignIn
+export default Signin

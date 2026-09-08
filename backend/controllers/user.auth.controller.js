@@ -5,7 +5,7 @@ import { cookieOptions, userAccessToken, userRefreshToken } from "../utils/Gener
 import jwt from 'jsonwebtoken'
 
 // singup controller
-export const signUp = async (req, res) => {
+export const signup = async (req, res) => {
     const { name, email, password } = req.body
 
     try {
@@ -49,9 +49,8 @@ export const signUp = async (req, res) => {
 
 }
 
-
 // login controller
-export const logIn = async (req, res) => {
+export const login = async (req, res) => {
     try {
         const { email, password } = req.body
         console.log('this is email',email)
@@ -115,7 +114,7 @@ export const refreshAccessToken = async(req,res)=>{
             })
         }
     
-        const decoded = jwt.verify(userRefreshToken, process.env.JWT_REFRESH_TOKEN)
+        const decoded = jwt.verify(incomingRefreshToken, process.env.JWT_REFRESH_TOKEN)
         const user = await User.findById(decoded.id)
 
         if(!user){

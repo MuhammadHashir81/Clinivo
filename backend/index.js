@@ -1,9 +1,9 @@
 import express from 'express';
 import { connectDB } from './config/db.js';
-import { signUp } from './controllers/auth.controller.js';
 import { configDotenv } from 'dotenv';
 import cors from 'cors'
-import { authRouter } from './routes/auth.route.js';
+import { authRouter } from './routes/user.auth.route.js';
+import { adminRouter } from './routes/admin.route.js';
 
 
 const app = express();
@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/auth',authRouter)
-
+app.use('/admin',adminRouter)
 app.listen(port, () => {
   console.log(`Clinivo is listening on port ${port}`);
 });

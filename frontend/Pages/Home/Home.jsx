@@ -48,11 +48,11 @@
                         </ul>
 
                         <div className='flex gap-3'>
-                            <NavLink
-                            to='/sign-in'
+                            <a
+                            href='/sign-in'
                                 className="text-sm font-semibold px-4 py-2 rounded-lg
                 text-primary font-inter
-                ">Sign in </NavLink>
+                ">Sign in </a>
                             <button
                 className="text-sm font-bold font-inter rounded-xl px-5 py-2.5
                 shadow-sm bg-primary hover:opacity-90 text-white cursor-pointer
@@ -89,7 +89,6 @@
                         <button 
                         className='bg-accent px-8 py-4 font-bold font-inter rounded-xl hover:opacity-90 cursor-pointer'>Start free 30-day trial</button>
                     </div>
-
                     </div>
 
 
