@@ -29,7 +29,6 @@ const Signin = () => {
 
 
   useEffect(()=>{
-
     if(success){
         toast.success(success)
         dispatch(clearError())
@@ -37,7 +36,10 @@ const Signin = () => {
         setTimeout(() => {
         window.location.href = '/'
         }, 2000);
+
     }
+
+    
     else if (error){
      toast.error(error)
      dispatch(clearError())

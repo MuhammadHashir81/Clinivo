@@ -13,18 +13,18 @@ export const DoctorFormSchema = z.object({
   role: z.string({
     error: (iss) => (iss.input === undefined ? "Role is required" : "Invalid role"),
   }),
-  phone: z.e164({
+  phone: z.string({
     error: (iss) => (iss.input === undefined ? "Phone is required" : "Invalid phone"),
   }),
   specialization: z.string({
     error: (iss) =>
       iss.input === undefined ? "Specialization is required" : "Invalid specialization",
   }),
-  experience: z.number({
+  experience: z.coerce.number({
     error: (iss) =>
       iss.input === undefined ? "Experience is required" : "Invalid experience",
   }),
-  consultationFee: z.number({
+    consultationFee: z.coerce.number({
     error: (iss) =>
       iss.input === undefined ? "Consultation fee is required" : "Invalid consultation fee",
   }),

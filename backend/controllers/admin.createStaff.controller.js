@@ -3,21 +3,15 @@ import { User } from "../models/user.schema.js";
 import { userAccessToken, userRefreshToken } from "../utils/Generate_Token.js";
 import { cookieOptions } from "../utils/Generate_Token.js";
 import { DoctorFormSchema } from "../validations/DoctorFormValidation.js";
-
+import { Doctor } from "../models/doctor.schema.js";
 
 // CREATE STAFF
 export const createStaff = async (req, res) => {
     try {
         const { name, email, password, role, phone, specialization, experience, consultationFee, bio } = req.body;
 
-        const result = DoctorFormSchema.safeParse(req.body)
+        console.log(name, email, password, role, phone, specialization, experience, consultationFee, bio)
 
-        if (!result.success) {
-            return res.status(400).json(result.error.issues)
-
-        } else {
-            console.log("Validated data:", result.data);
-        }
 
 
 
@@ -32,9 +26,9 @@ export const createStaff = async (req, res) => {
         }
 
         // Check if email already exists
-        const existingUser = await User.findOne({ email });
+        const existingWithRole = await User.findOne({ email,role });
 
-        if (existingUser) {
+        if (existingWithRole) {
             return res.status(400).json({
                 error: "This email already exists"
             });
@@ -44,20 +38,44 @@ export const createStaff = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Create staff
-        const staff = await User.create({
+        const user = await User.create({
             name,
             email,
             password: hashedPassword,
             role
         });
 
+
+
+        if (role === "doctor") {
+            const result = DoctorFormSchema.safeParse(req.body)
+
+            if (!result.success) {
+                return res.status(400).json(result.error.issues)
+
+            } else {
+                console.log("Validated data:", result.data);
+            }
+
+
+
+            await Doctor.create({
+                doctorId: user._id,
+                specialization,
+                experience,
+                consultationFee,
+                bio
+            });
+
+        }
+
         return res.status(201).json({
             success: "Staff created successfully",
             staff: {
-                id: staff._id,
-                name: staff.name,
-                email: staff.email,
-                role: staff.role
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role
             }
         });
 

@@ -89,7 +89,7 @@ export const adminLogin = createAsyncThunk('users/admin/login',
   })
 
 export const authSlice = createSlice({
-  name: 'auth',
+  name: 'auth', // here name is slice's property means redux property we give it as it is, like it is the name of slice 
   initialState: {
     loading: false,
     error: null,

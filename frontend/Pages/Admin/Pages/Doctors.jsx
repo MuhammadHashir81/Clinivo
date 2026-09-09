@@ -20,6 +20,10 @@ import {
   TextField,
   MenuItem,
 } from "@mui/material";
+
+import { api } from "../../../services/api";
+import { useEffect } from "react";
+
 const doctorsData = [
   {
     id: 1,
@@ -115,7 +119,11 @@ const specializations = [
   "Gynecologist",
 ];
 
+
+
 const Doctors = () => {
+
+  console.log('rendering....')
   const [search, setSearch] = useState("");
   const [specialization, setSpecialization] =
     useState("All Specializations");
@@ -125,12 +133,13 @@ const Doctors = () => {
   const [doctorForm, setDoctorForm] = useState({
     name: "",
     email: "",
-    phone: "",
     password: "",
+    phone: "",
     specialization: "",
     experience: "",
     consultationFee: "",
     bio: "",
+    role:"doctor"
   });
 
 
@@ -146,45 +155,35 @@ const Doctors = () => {
   const handleCloseModal = () => {
     setOpenModal(false);
 
-    setDoctorForm({
-      name: "",
-      email: "",
-      phone: "",
-      specialization: "",
-      licenseNumber: "",
-      experience: "",
-      consultationFee: "",
-      status: "Active",
-      bio: "",
-    });
+      setDoctorForm({
+        name: "",
+        email: "",
+        phone: "",
+        specialization: "",
+        licenseNumber: "",
+        experience: "",
+        consultationFee: "",
+        status: "Active",
+        bio: "",
+      });
   };
 
-  const handleCreateDoctor = (e) => {
+  const handleCreateDoctor = async (e) => {
     e.preventDefault();
 
-    console.log("Doctor Data:", doctorForm);
+    try {
+      const result = await api.post('/createStaff/create', doctorForm)
+      console.log(result)
+    } catch (error) {
+      console.log(error.response.data)
+    }
 
-    // Later:
-    // dispatch(createDoctor(doctorForm))
+
+    console.log("Doctor Data:", doctorForm);
 
     handleCloseModal();
   };
 
-
-  const filteredDoctors = doctorsData.filter((doctor) => {
-    const matchesSearch =
-      doctor.name.toLowerCase().includes(search.toLowerCase()) ||
-      doctor.email.toLowerCase().includes(search.toLowerCase()) ||
-      doctor.specialization
-        .toLowerCase()
-        .includes(search.toLowerCase());
-
-    const matchesSpecialization =
-      specialization === "All Specializations" ||
-      doctor.specialization === specialization;
-
-    return matchesSearch && matchesSpecialization;
-  });
 
   const totalDoctors = doctorsData.length;
 
@@ -208,236 +207,237 @@ const Doctors = () => {
     CREATE DOCTOR MODAL
 ================================ */}
 
-<Modal
-  open={openModal}
-  onClose={handleCloseModal}
-  aria-labelledby="create-doctor-modal"
->
-  <Box
-    sx={{
-      position: "absolute",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%)",
-      width: {
-        xs: "92%",
-        sm: "600px",
-        md: "700px",
-      },
-      maxHeight: "90vh",
-      overflowY: "auto",
-      bgcolor: "background.paper",
-      borderRadius: "12px",
-      boxShadow: 24,
-      outline: "none",
-    }}
-  >
-
-    {/* Modal Header */}
-    <div className="flex items-center justify-between px-6 py-5 border-b border-border">
-
-      <div>
-        <h2
-          id="create-doctor-modal"
-          className="text-lg font-semibold text-foreground"
-        >
-          Add New Doctor
-        </h2>
-
-        <p className="text-sm text-muted-foreground mt-1">
-          Add a new doctor.
-        </p>
-      </div>
-
-      <button
-        type="button"
-        onClick={handleCloseModal}
-        className="p-2 rounded-lg hover:bg-muted transition"
+      <Modal
+        open={openModal}
+        onClose={handleCloseModal}
+        aria-labelledby="create-doctor-modal"
       >
-        <X size={20} className="text-muted-foreground cursor-pointer" />
-      </button>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: {
+              xs: "92%",
+              sm: "600px",
+              md: "700px",
+            },
+            maxHeight: "90vh",
+            overflowY: "auto",
+            bgcolor: "background.paper",
+            borderRadius: "12px",
+            boxShadow: 24,
+            outline: "none",
+          }}
+        >
 
-    </div>
+          {/* Modal Header */}
+          <div className="flex items-center justify-between px-6 py-5 border-b border-border">
 
-    {/* Form */}
-    <form onSubmit={handleCreateDoctor}>
+            <div>
+              <h2
+                id="create-doctor-modal"
+                className="text-lg font-semibold text-foreground"
+              >
+                Add New Doctor
+              </h2>
 
-      <div className="p-6 space-y-5">
+              <p className="text-sm text-muted-foreground mt-1">
+                Add a new doctor.
+              </p>
+            </div>
 
-        {/* Basic Information */}
-
-        <div>
-          <h3 className="text-sm font-semibold text-foreground mb-4">
-            Basic Information
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-            <TextField
-              fullWidth
-              required
-              label="Doctor Name"
-              name="name"
-              value={doctorForm.name}
-              onChange={handleDoctorChange}
-              placeholder="Dr. Ali Raza"
-              size="small"
-            />
-
-            <TextField
-              fullWidth
-              required
-              type="email"
-              label="Email Address"
-              name="email"
-              value={doctorForm.email}
-              onChange={handleDoctorChange}
-              placeholder="doctor@clinivo.pk"
-              size="small"
-            />
-            
-            <TextField
-              fullWidth
-              required
-              type="password"
-              label="password"
-              name="password"
-              value={doctorForm.password}
-              onChange={handleDoctorChange}
-              placeholder="******"
-              size="small"
-            />
-
-            <TextField
-              fullWidth
-              required
-              label="Phone Number"
-              name="phone"
-              value={doctorForm.phone}
-              onChange={handleDoctorChange}
-              placeholder="+92 300 1234567"
-              size="small"
-            />
-
-            <TextField
-              select
-              fullWidth
-              required
-              label="Specialization"
-              name="specialization"
-              value={doctorForm.specialization}
-              onChange={handleDoctorChange}
-              size="small"
+            <button
+              type="button"
+              onClick={handleCloseModal}
+              className="p-2 rounded-lg hover:bg-muted transition"
             >
-              {specializations
-                .filter(
-                  (item) => item !== "All Specializations"
-                )
-                .map((item) => (
-                  <MenuItem key={item} value={item}>
-                    {item}
-                  </MenuItem>
-                ))}
-            </TextField>
+              <X size={20} className="text-muted-foreground cursor-pointer" />
+            </button>
 
           </div>
-        </div>
 
-        {/* Professional Information */}
+          {/* Form */}
+          <form onSubmit={handleCreateDoctor}>
 
-        <div>
-          <h3 className="text-sm font-semibold text-foreground mb-4">
-            Professional Information
-          </h3>
+            <div className="p-6 space-y-5">
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Basic Information */}
+
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-4">
+                  Basic Information
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                  <TextField
+                    fullWidth
+                    required
+                    label="Doctor Name"
+                    name="name"
+                    value={doctorForm.name}
+                    onChange={handleDoctorChange}
+                    placeholder="Dr. Ali Raza"
+                    size="small"
+                  />
+
+                  <TextField
+                    fullWidth
+                    required
+                    type="email"
+                    label="Email Address"
+                    name="email"
+                    value={doctorForm.email}
+                    onChange={handleDoctorChange}
+                    placeholder="doctor@clinivo.pk"
+                    size="small"
+                  />
+
+                  <TextField
+                    fullWidth
+                    required
+                    type="password"
+                    label="password"
+                    name="password"
+                    value={doctorForm.password}
+                    onChange={handleDoctorChange}
+                    placeholder="******"
+                    size="small"
+                  />
+
+                  <TextField
+                    fullWidth
+                    required
+                    type="tel"
+                    label="Phone Number"
+                    name="phone"
+                    value={doctorForm.phone}
+                    onChange={handleDoctorChange}
+                    placeholder="+92 300 1234567"
+                    size="small"
+                  />
+
+                  <TextField
+                    select
+                    fullWidth
+                    required
+                    label="Specialization"
+                    name="specialization"
+                    value={doctorForm.specialization}
+                    onChange={handleDoctorChange}
+                    size="small"
+                  >
+                    {specializations
+                      .filter(
+                        (item) => item !== "All Specializations"
+                      )
+                      .map((item) => (
+                        <MenuItem key={item} value={item}>
+                          {item}
+                        </MenuItem>
+                      ))}
+                  </TextField>
+
+                </div>
+              </div>
+
+              {/* Professional Information */}
+
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-4">
+                  Professional Information
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
 
-            <TextField
-              fullWidth
-              required
-              type="number"
-              label="Years of Experience"
-              name="experience"
-              value={doctorForm.experience}
-              onChange={handleDoctorChange}
-              placeholder="5"
-              size="small"
-            />
+                  <TextField
+                    fullWidth
+                    required
+                    type="number"
+                    label="Years of Experience"
+                    name="experience"
+                    value={doctorForm.experience}
+                    onChange={handleDoctorChange}
+                    placeholder="5"
+                    size="small"
+                  />
 
-            <TextField
-              fullWidth
-              required
-              type="number"
-              label="Consultation Fee"
-              name="consultationFee"
-              value={doctorForm.consultationFee}
-              onChange={handleDoctorChange}
-              placeholder="2500"
-              inputProps={{ min: 0 }}
-              size="small"
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <span className="mr-2 text-sm text-muted-foreground">
-                      Rs.
-                    </span>
-                  ),
-                },
-              }}
-            />
+                  <TextField
+                    fullWidth
+                    required
+                    type="number"
+                    label="Consultation Fee"
+                    name="consultationFee"
+                    value={doctorForm.consultationFee}
+                    onChange={handleDoctorChange}
+                    placeholder="2500"
+                    inputProps={{ min: 0 }}
+                    size="small"
+                    slotProps={{
+                      input: {
+                        startAdornment: (
+                          <span className="mr-2 text-sm text-muted-foreground">
+                            Rs.
+                          </span>
+                        ),
+                      },
+                    }}
+                  />
 
 
-          </div>
-        </div>
+                </div>
+              </div>
 
-        {/* Bio */}
+              {/* Bio */}
 
-        <div>
-          <h3 className="text-sm font-semibold text-foreground mb-4">
-            Additional Information
-          </h3>
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-4">
+                  Additional Information
+                </h3>
 
-          <TextField
-            fullWidth
-            multiline
-            rows={4}
-            label="Doctor Bio"
-            name="bio"
-            value={doctorForm.bio}
-            onChange={handleDoctorChange}
-            placeholder="Write a short description about the doctor..."
-          />
-        </div>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={4}
+                  label="Doctor Bio"
+                  name="bio"
+                  value={doctorForm.bio}
+                  onChange={handleDoctorChange}
+                  placeholder="Write a short description about the doctor..."
+                />
+              </div>
 
-      </div>
+            </div>
 
-      {/* Footer */}
+            {/* Footer */}
 
-      <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border bg-muted/20">
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border bg-muted/20">
 
-        <button
-          type="button"
-          onClick={handleCloseModal}
-          className="cursor-pointer h-10 px-4 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-muted transition"
-        >
-          Cancel
-        </button>
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                className="cursor-pointer h-10 px-4 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-muted transition"
+              >
+                Cancel
+              </button>
 
-        <button
-          type="submit"
-          className="cursor-pointer h-10 px-5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition inline-flex items-center gap-2"
-        >
-          <Plus size={17} />
-          Create Doctor
-        </button>
+              <button
+                type="submit"
+                className="cursor-pointer h-10 px-5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition inline-flex items-center gap-2"
+              >
+                <Plus size={17} />
+                Create Doctor
+              </button>
 
-      </div>
+            </div>
 
-    </form>
+          </form>
 
-  </Box>
-</Modal>
+        </Box>
+      </Modal>
 
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
@@ -573,8 +573,8 @@ const Doctors = () => {
 
             <tbody>
 
-              {filteredDoctors.length > 0 ? (
-                filteredDoctors.map((doctor) => (
+              {doctorsData.length > 0 ? (
+                doctorsData.map((doctor) => (
 
                   <tr
                     key={doctor.id}
@@ -723,7 +723,7 @@ const Doctors = () => {
           <p className="text-sm text-muted-foreground">
             Showing{" "}
             <span className="font-medium text-foreground">
-              {filteredDoctors.length}
+              {doctorsData.length}
             </span>{" "}
             of{" "}
             <span className="font-medium text-foreground">

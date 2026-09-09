@@ -7,6 +7,7 @@ import jwt from 'jsonwebtoken'
 // singup controller
 export const signup = async (req, res) => {
     const { name, email, password } = req.body
+    console.log(name,email,password )
 
     try {
 
@@ -19,9 +20,14 @@ export const signup = async (req, res) => {
             console.log("Validated data:", result.data);
         }
 
-        const isEmailExists = await User.findOne({ email })
 
-        if (isEmailExists) {
+
+        const isEmailExists = await User.findOne({ email })
+        const userWithRole = isEmailExists.role
+
+        const userExistsWithRole = await User.findOne({ email, userWithRole })
+
+        if (userExistsWithRole) {
             return res.status(400).json({ error: 'this email already exists' })
         }
 

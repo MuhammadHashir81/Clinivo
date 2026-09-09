@@ -3,10 +3,12 @@ import { Router } from "express";
 import { createStaff,loginStaff } from "../controllers/admin.createStaff.controller.js";
 
 
-const createStaff = Router()
+export const createStaffRouter = Router()
 
 
 //staff
-createStaff.post('/create/staff', createStaff)
-createStaff.post('/login/staff', loginStaff)
+
+createStaffRouter.post('/create', createStaff)
+createStaffRouter.post('/login', loginStaff)
+    
 //staff

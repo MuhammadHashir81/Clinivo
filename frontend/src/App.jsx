@@ -1,6 +1,8 @@
-import { lazy } from 'react'; 
+import { lazy,Suspense } from 'react'; 
 import Home from '../Pages/Home/Home'
 import { Routes, Route } from "react-router";
+import { Oval } from 'react-loader-spinner'
+
 
 
 
@@ -25,6 +27,17 @@ const SignUp = lazy( ()=>import('../Pages/Signup') )
 const App = () => {
   return (
     <div className=''>
+      <Suspense
+      fallback={
+         <div className="flex items-center justify-center min-h-screen">
+              <Oval
+              height={40}
+              width={40}
+              />
+          </div>
+      }
+      >
+
       <Routes>
         <Route path='/' element={<Home/>}/>
 
@@ -60,6 +73,8 @@ const App = () => {
 
 
               </Routes>
+      </Suspense>
+
       
     </div>
   )
