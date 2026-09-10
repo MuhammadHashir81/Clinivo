@@ -4,7 +4,7 @@ import { configDotenv } from 'dotenv';
 import cors from 'cors'
 import { authRouter } from './routes/user.auth.route.js';
 import { adminRouter } from './routes/admin.route.js';
-import { createStaffRouter } from './routes/admin.createStaff.route.js';
+import { staffRouter } from './routes/admin.staff.route.js';
 
 
 const app = express();
@@ -31,7 +31,7 @@ app.get('/', (req, res) => {
 
 app.use('/auth',authRouter)
 app.use('/admin',adminRouter)
-app.use('/createStaff',createStaffRouter)
+app.use('/staff',staffRouter)
 
 app.listen(port, () => {
   console.log(`Clinivo is listening on port ${port}`);

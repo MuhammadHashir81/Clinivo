@@ -9,6 +9,7 @@ import { Doctor } from "../models/doctor.schema.js";
 export const createStaff = async (req, res) => {
     try {
         const { name, email, password, role, phone, specialization, experience, consultationFee, bio } = req.body;
+        console.log('this is request body', req.body)
 
         console.log(name, email, password, role, phone, specialization, experience, consultationFee, bio)
 
@@ -26,7 +27,7 @@ export const createStaff = async (req, res) => {
         }
 
         // Check if email already exists
-        const existingWithRole = await User.findOne({ email,role });
+        const existingWithRole = await User.findOne({ email, role });
 
         if (existingWithRole) {
             return res.status(400).json({
@@ -162,3 +163,44 @@ export const loginStaff = async (req, res) => {
         });
     }
 };
+
+
+
+// get all doctors
+
+export const getAllDoctors = async (req, res) => {
+    try {
+        const { userId } = req
+
+        const doctors = await User.aggregate([
+            {
+                $sort: { createdAt: -1 }
+            },
+            {
+                $match: { userId: userId },
+            },
+            {
+                $lookup: {
+                    from: 'doctors',
+                    localField: '_id',
+                    foreignField: 'doctorId',
+                    as: 'doctors'
+                },
+
+            },
+            // {
+                // $unwind: '$doctors'
+            }
+        ])
+
+
+        return res.status(200).json({ doctors })
+    } catch (error) {
+        return res.status(500).json({ error: error })
+    }
+
+}
+
+
+
+

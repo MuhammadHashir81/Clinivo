@@ -16,20 +16,25 @@ export const signup = async (req, res) => {
         if (!result.success) {
             return res.status(400).json(result.error.issues)
 
-        } else {
+        } else {    
             console.log("Validated data:", result.data);
         }
 
 
 
         const isEmailExists = await User.findOne({ email })
-        const userWithRole = isEmailExists.role
 
-        const userExistsWithRole = await User.findOne({ email, userWithRole })
+        if(isEmailExists){
+            const userWithRole = isEmailExists.role
+            const userExistsWithRole = await User.findOne({ email, userWithRole })
 
-        if (userExistsWithRole) {
-            return res.status(400).json({ error: 'this email already exists' })
+            if (userExistsWithRole) {
+                return res.status(400).json({ error: 'this email already exists' })
+            }
+
         }
+
+
 
         const hashedPassword = await bcrypt.hash(password, 10)
 

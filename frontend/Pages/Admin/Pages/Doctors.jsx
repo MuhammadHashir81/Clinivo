@@ -13,7 +13,7 @@ import {
   X,
 } from "lucide-react";
 
-
+import toast, {Toaster} from 'react-hot-toast';
 import {
   Modal,
   Box,
@@ -122,11 +122,10 @@ const specializations = [
 
 
 const Doctors = () => {
-
-  console.log('rendering....')
   const [search, setSearch] = useState("");
-  const [specialization, setSpecialization] =
-    useState("All Specializations");
+  const [specialization, setSpecialization] = useState("All Specializations");
+  const [doctors,setDoctors] = useState([])
+
 
   const [openModal, setOpenModal] = useState(false);
 
@@ -135,12 +134,13 @@ const Doctors = () => {
     email: "",
     password: "",
     phone: "",
-    specialization: "",
+    specialization: "", 
     experience: "",
     consultationFee: "",
     bio: "",
     role:"doctor"
   });
+
 
 
   const handleDoctorChange = (e) => {
@@ -159,22 +159,46 @@ const Doctors = () => {
         name: "",
         email: "",
         phone: "",
+        password:'',
         specialization: "",
         licenseNumber: "",
         experience: "",
         consultationFee: "",
         status: "Active",
         bio: "",
+        role:"doctor"
       });
   };
 
+
+
+  // get all doctors 
+
+  const handleGetAllDoctors = async() => {  
+    try {
+      const response = await api.get('/staff/get-all/doctors')
+      setDoctors(response.doctors)
+      console.log(response)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+
+  useEffect(() => {
+    handleGetAllDoctors()
+  }, [])
+  
+
+  // create doctor
   const handleCreateDoctor = async (e) => {
     e.preventDefault();
 
     try {
-      const result = await api.post('/createStaff/create', doctorForm)
-      console.log(result)
+      const response = await api.post('/staff/create', doctorForm)
+      toast.success(response.success)
     } catch (error) {
+      toast.error(error.response.data.error)
       console.log(error.response.data)
     }
 
@@ -185,15 +209,15 @@ const Doctors = () => {
   };
 
 
-  const totalDoctors = doctorsData.length;
+  const totalDoctors = doctors.length;
 
-  const activeDoctors = doctorsData.filter(
-    (doctor) => doctor.status === "Active"
-  ).length;
+  // const activeDoctors = doctorsData.filter(
+  //   (doctor) => doctor.status === "Active"
+  // ).length;
 
-  const inactiveDoctors = doctorsData.filter(
-    (doctor) => doctor.status === "Inactive"
-  ).length;
+  // const inactiveDoctors = doctorsData.filter(
+  //   (doctor) => doctor.status === "Inactive"
+  // ).length;
 
   const totalAppointments = doctorsData.reduce(
     (total, doctor) => total + doctor.appointments,
@@ -202,6 +226,8 @@ const Doctors = () => {
 
   return (
     <div className="w-full min-h-screen bg-background p-6 lg:p-8">
+      <Toaster/>
+
 
       {/* ================================
     CREATE DOCTOR MODAL
@@ -374,7 +400,6 @@ const Doctors = () => {
                     value={doctorForm.consultationFee}
                     onChange={handleDoctorChange}
                     placeholder="2500"
-                    inputProps={{ min: 0 }}
                     size="small"
                     slotProps={{
                       input: {
@@ -472,13 +497,13 @@ const Doctors = () => {
 
         <StatCard
           title="Active Doctors"
-          value={activeDoctors}
+          value={"activeDoctors"}
           icon={UserCheck}
         />
 
         <StatCard
           title="Inactive Doctors"
-          value={inactiveDoctors}
+          value={"inactiveDoctors"}
           icon={UserX}
         />
 
@@ -573,11 +598,11 @@ const Doctors = () => {
 
             <tbody>
 
-              {doctorsData.length > 0 ? (
-                doctorsData.map((doctor) => (
+              {doctors.length > 0 ? (
+                doctors.map((doctor) => (
 
                   <tr
-                    key={doctor.id}
+                    key={doctor._id}
                     className="border-b border-border last:border-none hover:bg-muted/40 transition"
                   >
 
@@ -596,7 +621,7 @@ const Doctors = () => {
                           </p>
 
                           <p className="text-xs text-muted-foreground mt-0.5">
-                            ID: DOC-{String(doctor.id).padStart(4, "0")}
+                            {doctor.email}
                           </p>
                         </div>
 
@@ -761,10 +786,10 @@ const Doctors = () => {
 /* ==========================================
    STAT CARD
 ========================================== */
-
 const StatCard = ({ title, value, icon: Icon }) => {
   return (
     <div className="bg-card border border-border rounded-xl p-5">
+    
 
       <div className="flex items-start justify-between">
 

@@ -20,9 +20,14 @@ const UserSchema = new Schema({
         type:String,
         enum:['patient','admin','receptionalist','doctor'],
         default:'patient'
-    }
+    },
 
-})
+
+},
+
+    {
+        timestamps:true
+    })
 
 const User =  mongoose.model('User',UserSchema)
 
