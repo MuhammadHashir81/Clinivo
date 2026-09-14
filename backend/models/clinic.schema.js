@@ -4,7 +4,6 @@ import { Schema } from "mongoose"
 const clinicSchema = new Schema({
     name: {
         type: String,
-        required: true
     },
 
     address: {
