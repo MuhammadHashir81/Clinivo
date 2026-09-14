@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken'
 // singup controller
 export const signup = async (req, res) => {
     const { name, email, password } = req.body
-    console.log(name,email,password )
+    console.log(name, email, password)
 
     try {
 
@@ -16,23 +16,18 @@ export const signup = async (req, res) => {
         if (!result.success) {
             return res.status(400).json(result.error.issues)
 
-        } else {    
+        } else {
             console.log("Validated data:", result.data);
         }
 
 
 
-        const isEmailExists = await User.findOne({ email })
-
+        const isEmailExists = await User.findOne({ email, role:'patient' })
+        
         if(isEmailExists){
-            const userWithRole = isEmailExists.role
-            const userExistsWithRole = await User.findOne({ email, userWithRole })
-
-            if (userExistsWithRole) {
-                return res.status(400).json({ error: 'this email already exists' })
-            }
-
+            return res.status(400).json({success:'this email already exists'})
         }
+
 
 
 
@@ -64,7 +59,7 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body
-        console.log('this is email',email)
+        console.log('this is email', email)
 
 
         const user = await User.findOne({ email })
@@ -74,16 +69,16 @@ export const login = async (req, res) => {
 
             if (isPasswordMatch) {
 
-                const accessToken = userAccessToken(user._id,user.role)
-                const refreshToken = userRefreshToken(user._id,user.role)
-                
-                res.cookie('accessToken', accessToken,{...cookieOptions, maxAge: 15 * 60 * 1000})
+                const accessToken = userAccessToken(user._id, user.role)
+                const refreshToken = userRefreshToken(user._id, user.role)
+
+                res.cookie('accessToken', accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 })
                 res.cookie('refreshToken', refreshToken, cookieOptions)
 
                 return res.status(200).json({
-                     success: 'login successfully',
-                     role:user.role
-                     })
+                    success: 'login successfully',
+                    role: user.role
+                })
             }
 
             else {
@@ -114,63 +109,75 @@ export const logoutUser = (req, res) => {
 
 
 // refresh access token 
-export const refreshAccessToken = async(req,res)=>{
+export const refreshAccessToken = async (req, res) => {
     try {
-        const incomingRefreshToken = req.cookies.refreshToken 
+        const incomingRefreshToken = req.cookies.refreshToken
 
-        if(!incomingRefreshToken){
+        if (!incomingRefreshToken) {
             return res.status(401).json({
-                error:'login please',
-                tokenExpired:true
+                error: 'login please',
             })
         }
-    
+
         const decoded = jwt.verify(incomingRefreshToken, process.env.JWT_REFRESH_TOKEN)
         const user = await User.findById(decoded.id)
 
-        if(!user){
+
+        if (!user) {
             return res.status(401).json({
-                error:'login please',
-                tokenExpired:true
+                error: 'login please',
+                tokenExpired: true
             })
         }
 
-        const accessToken = userAccessToken(user._id,user.role)
+        const accessToken = userAccessToken(user._id, user.role)
 
-        res.cookie('accessToken',accessToken,{...cookieOptions, maxAge: 15 * 60 *  1000})
+        res.cookie('accessToken', accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 })
 
-        
+
         return res.status(200).json({
             success: 'token refreshed'
         })
 
 
     } catch (error) {
-        return res.status(500).json({ error:error.message })
-        
+          return res.status(401).json({
+            error: 'login please',
+            tokenExpired: true
+        });
+
     }
 }
 
 
 // checking user on every refresh
-export const checkingUserAuth = async(req,res)=>{
+export const checkingUserAuth = async (req, res) => {
     try {
         const { userId } = req
 
         const user = await User.findById(userId)
 
-        if(!user){
+        const refreshToken = req.cookies.refreshToken
+
+        if (!refreshToken) {
             return res.status(401).json({
-                error:'please login',
-                tokenExpired:true
-                })
+                error: 'please login',
+                tokenExpired: true
+            })
         }
 
-        return res.status(200).json({user})
+        if (!user) {
+            return res.status(401).json({
+                error: 'please login',
+                tokenExpired: true
+            })
+        }
+
+        return res.status(200).json({ user })
 
     } catch (error) {
-        
-        return res.status(500).json({error:error.message})
-        
+
+        return res.status(500).json({ error: error.message })
+
     }
 }

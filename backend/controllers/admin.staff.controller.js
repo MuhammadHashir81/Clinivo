@@ -188,8 +188,8 @@ export const getAllDoctors = async (req, res) => {
                 },
 
             },
-            // {
-                // $unwind: '$doctors'
+            {
+                $unwind: '$doctors'
             }
         ])
 

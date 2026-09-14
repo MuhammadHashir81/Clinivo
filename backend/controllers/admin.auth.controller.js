@@ -8,18 +8,9 @@ import { cookieOptions } from "../utils/Generate_Token.js";
 // CREATE  ADMIN
 export const signupAdmin = async (req, res) => {
     try {
-        const { name, email, password, setupKey } = req.body;
-        console.log(name,email,password,setupKey);
+        const { name, email, password } = req.body;
+        console.log(name,email,password);
         
-
-
-        if (!setupKey || setupKey !== process.env.ADMIN_SETUP_KEY) {
-            return res.status(403).json({
-                error: "Invalid or missing setup key"
-            });
-        }
-
-
         // Check if an admin already exists
         const existingAdmin = await User.findOne({ role: "admin" });
 
@@ -74,7 +65,7 @@ export const loginAdmin = async (req, res) => {
         });
 
         if (!admin) {
-            return res.status(401).json({
+            return res.status(400).json({
                 error: "Invalid admin email or password"
             });
         }
@@ -86,7 +77,7 @@ export const loginAdmin = async (req, res) => {
         );
 
         if (!isPasswordMatch) {
-            return res.status(401).json({
+            return res.status(400).json({
                 error: "Invalid admin email or password"
             });
         }
@@ -128,6 +119,7 @@ export const loginAdmin = async (req, res) => {
         });
 
     } catch (error) {
+        console.log(error)
         return res.status(500).json({
             error: error.message
         });

@@ -10,9 +10,10 @@ export const userAccessToken = (userId,role) => {
 }
 
 
-export const userRefreshToken = (userId) => {
+export const userRefreshToken = (userId,role) => {
     return jwt.sign({
-        userId, userId
+        id: userId,
+        role:role
     }, process.env.JWT_REFRESH_TOKEN, { expiresIn:'7d' })
 
 }
