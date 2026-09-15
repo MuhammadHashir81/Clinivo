@@ -4,17 +4,12 @@ import { userAccessToken, userRefreshToken } from "../utils/Generate_Token.js";
 import { cookieOptions } from "../utils/Generate_Token.js";
 import { DoctorFormSchema } from "../validations/DoctorFormValidation.js";
 import { Doctor } from "../models/doctor.schema.js";
+import { Clinic } from "../models/clinic.schema.js";
 
 // CREATE STAFF
 export const createStaff = async (req, res) => {
     try {
         const { name, email, password, role, phone, specialization, experience, consultationFee, bio } = req.body;
-        console.log('this is request body', req.body)
-
-        console.log(name, email, password, role, phone, specialization, experience, consultationFee, bio)
-
-
-
 
 
         // Only doctor and receptionist can be created as staff
@@ -54,14 +49,15 @@ export const createStaff = async (req, res) => {
             if (!result.success) {
                 return res.status(400).json(result.error.issues)
 
-            } else {
-                console.log("Validated data:", result.data);
             }
 
 
+            const clinic = await Clinic.findOne({ownerId: req.userId})
+
 
             await Doctor.create({
-                doctorId: user._id,
+                userId: user._id,
+                clinicId: clinic._id,
                 specialization,
                 experience,
                 consultationFee,
@@ -81,13 +77,12 @@ export const createStaff = async (req, res) => {
         });
 
     } catch (error) {
+        console.log(error)
         return res.status(500).json({
             error: error.message
         });
     }
 };
-
-
 
 
 // LOGIN STAFF
@@ -172,24 +167,19 @@ export const getAllDoctors = async (req, res) => {
     try {
         const { userId } = req
 
-        const doctors = await User.aggregate([
+        const doctors = await Clinic.aggregate([
             {
-                $sort: { createdAt: -1 }
+                $match:{
+                    ownerId:new mongoose.Types.ObjectId(userId)
+                }
             },
-            {
-                $match: { userId: userId },
-            },
-            {
-                $lookup: {
-                    from: 'doctors',
-                    localField: '_id',
-                    foreignField: 'doctorId',
-                    as: 'doctors'
-                },
 
-            },
             {
-                $unwind: '$doctors'
+                $lookup:{
+                from:'doctors',
+                localField:'_id',
+                foreignField:'clinicId',
+                }
             }
         ])
 

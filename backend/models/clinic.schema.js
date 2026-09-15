@@ -2,6 +2,13 @@ import mongoose from "mongoose"
 import { Schema } from "mongoose"
 
 const clinicSchema = new Schema({
+    
+    ownerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+        unique: true
+    },
     name: {
         type: String,
     },
@@ -12,7 +19,8 @@ const clinicSchema = new Schema({
 
     phone: {
         type: String
-    }
+    },
+
 }, {
     timestamps: true
 })

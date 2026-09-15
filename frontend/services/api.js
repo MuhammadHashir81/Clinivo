@@ -26,6 +26,17 @@
         failedQueue = [];
     };
 
+    const redirectToSignin = () => {
+  const path = window.location.pathname;
+  console.log(path)
+
+  if (path.startsWith("/admin")) {
+    window.location.href = "/admin/sign-in";
+  } else {
+    window.location.href = "/sign-in";
+  }
+};
+
     // Response interceptor
     api.interceptors.response.use(
         (response) => response.data,
@@ -60,7 +71,7 @@
 
                 try {
                     // Call refresh endpoint
-                    const fetching = await api.post('/api/auth/refresh-access-token');
+                    const fetching = await api.post('/auth/refresh-access-token');
                     console.log(fetching)
                     console.log("your token has been refreshed")
                     
@@ -70,15 +81,16 @@
                     // Retry the original request
                     return api(originalRequest);
 
-                } catch (refreshError) {
-                    processQueue(refreshError);
-                    isRefreshing = false;
+                    } catch (refreshError) {
+                        processQueue(refreshError);
+                        isRefreshing = false;
+                        
 
-                    // Redirect to login or dispatch logout action
-                    window.location.href = '/sign-in';
-                    
-                    return Promise.reject(refreshError);
-                }
+                        // Redirect to sign-in or dispatch logout action
+                        redirectToSignin()
+                        
+                        return Promise.reject(refreshError);
+                    }
             }
 
             return Promise.reject(error);

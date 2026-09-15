@@ -3,14 +3,20 @@ const { Schema } = mongoose
 
 const DoctorSchema = new Schema({
 
-    doctorId:{
+    userId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User',
         reqruired:true
     },
    
+    clinicId:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Clinic',
+    required:true
+    },
+
     phone:{
-     type:Number
+     type:String
     },
 
     specialization:{

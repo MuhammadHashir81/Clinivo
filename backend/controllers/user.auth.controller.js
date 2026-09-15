@@ -112,7 +112,7 @@ export const logoutUser = (req, res) => {
 export const refreshAccessToken = async (req, res) => {
     try {
         const incomingRefreshToken = req.cookies.refreshToken
-
+        
         if (!incomingRefreshToken) {
             return res.status(401).json({
                 error: 'login please',
@@ -121,6 +121,7 @@ export const refreshAccessToken = async (req, res) => {
 
         const decoded = jwt.verify(incomingRefreshToken, process.env.JWT_REFRESH_TOKEN)
         const user = await User.findById(decoded.id)
+
 
 
         if (!user) {

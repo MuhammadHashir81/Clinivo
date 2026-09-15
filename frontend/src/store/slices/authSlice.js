@@ -39,7 +39,7 @@ export const checkingAuth = createAsyncThunk('users/checkingAuth',
   async (_, { rejectWithValue }) => {
     try {
 
-      const response = await api.get('/api/auth/check')
+      const response = await api.get('/auth/check')
       console.log("checking if the user is logged in or not ", response)
       return response
 

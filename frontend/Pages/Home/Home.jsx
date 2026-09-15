@@ -45,6 +45,12 @@
                                 Pricing
                                 </a>
                                 </li>
+                                
+                                <li>
+                                <a href="/admin/create-clinic">
+                                Create Clinic
+                                </a>
+                                </li>
                         </ul>
 
                         <div className='flex gap-3'>

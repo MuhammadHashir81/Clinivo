@@ -12,11 +12,11 @@ export const signupAdmin = async (req, res) => {
         console.log(name,email,password);
         
         // Check if an admin already exists
-        const existingAdmin = await User.findOne({ role: "admin" });
+        const existingAdmin = await User.findOne({name:name, role: "admin" });
 
         if (existingAdmin) {
             return res.status(400).json({
-                error: "admin is signedup already."
+                error: "email has been taken already"
             });
         }
 

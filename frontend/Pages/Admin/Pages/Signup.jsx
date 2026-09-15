@@ -102,17 +102,7 @@ const Signup = () => {
 
                         </div>
 
-                        <div className='flex flex-col gap-1.5'>
-                            <label className='font-inter text-sm font-medium text-foreground'>secret key</label>
-                            <input
-                                type='password'
-                                placeholder='••••••••'
-                                className='font-inter text-sm px-4 py-3 rounded-lg border border-border bg-background text-foreground outline-none focus:ring-2 focus:ring-ring'
-                                {...register("setupKey", { required: 'setupkey is required' })}
-                                />
-                            <p className='text-red-500'>{errors.setupKey?.message}</p>
-
-                        </div>
+                        
 
                         
 
