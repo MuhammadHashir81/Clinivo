@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { LogOut } from "lucide-react";
-import axios from "axios";
-
+import { api } from "../../../services/api";
 // ---------- Sidebar ----------
 
 const navItems = [
@@ -18,8 +17,15 @@ function Sidebar() {
 
   // ---------- Logout ----------
 
-  const handleLogout = ()=>{ 
-    console.log("this is logout")
+  const handleLogout = async () => { 
+    try {
+      const response = await api.post('/auth/logout')
+      console.log(response)
+      window.location.href = '/admin/sign-in'
+    } catch (error) {
+      console.log(error)
+      
+    }
     
   }
 
@@ -67,7 +73,7 @@ function Sidebar() {
         <button
           onClick={handleLogout}
           disabled={loading}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-500/10 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className=" cursor-pointer w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-500/10 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
 
           <LogOut size={18} />

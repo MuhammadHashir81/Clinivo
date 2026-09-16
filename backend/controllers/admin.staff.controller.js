@@ -5,10 +5,14 @@ import { cookieOptions } from "../utils/Generate_Token.js";
 import { DoctorFormSchema } from "../validations/DoctorFormValidation.js";
 import { Doctor } from "../models/doctor.schema.js";
 import { Clinic } from "../models/clinic.schema.js";
+import mongoose from "mongoose";
+
 
 // CREATE STAFF
 export const createStaff = async (req, res) => {
     try {
+
+        const { userId } = req
         const { name, email, password, role, phone, specialization, experience, consultationFee, bio } = req.body;
 
 
@@ -33,14 +37,6 @@ export const createStaff = async (req, res) => {
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create staff
-        const user = await User.create({
-            name,
-            email,
-            password: hashedPassword,
-            role
-        });
-
 
 
         if (role === "doctor") {
@@ -52,7 +48,25 @@ export const createStaff = async (req, res) => {
             }
 
 
-            const clinic = await Clinic.findOne({ownerId: req.userId})
+            const clinic = await Clinic.findOne({ ownerId: req.userId })
+            console.log('this is clinic', clinic)
+
+
+
+            if (!clinic) {
+                return res.status(400).json({ error: 'please create clinic before creating a doctor' })
+            }
+
+
+            // Create staff
+            const user = await User.create({
+                name,
+                email,
+                password: hashedPassword,
+                role
+            });
+
+
 
 
             await Doctor.create({
@@ -61,20 +75,24 @@ export const createStaff = async (req, res) => {
                 specialization,
                 experience,
                 consultationFee,
-                bio
+                bio,
+                phone
+            });
+
+            return res.status(201).json({
+                success: "Doctor created successfully",
+                staff: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role
+                }
             });
 
         }
 
-        return res.status(201).json({
-            success: "Staff created successfully",
-            staff: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role
-            }
-        });
+
+
 
     } catch (error) {
         console.log(error)
@@ -169,16 +187,46 @@ export const getAllDoctors = async (req, res) => {
 
         const doctors = await Clinic.aggregate([
             {
-                $match:{
-                    ownerId:new mongoose.Types.ObjectId(userId)
+                $match: {
+                    ownerId: new mongoose.Types.ObjectId(userId)
                 }
             },
 
+
             {
-                $lookup:{
-                from:'doctors',
-                localField:'_id',
-                foreignField:'clinicId',
+                $lookup: {
+                    from: 'doctors',
+                    localField: '_id',
+                    foreignField: 'clinicId',
+                    as: 'doctorDetails'
+                }
+            },
+            {
+                $unwind: '$doctorDetails'
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'doctorDetails.userId',
+                    foreignField: '_id',
+                    as: 'doctors'
+                },
+
+            },
+            {
+                $unwind: '$doctors'
+            },
+
+            {
+                $project:{
+                   _id:'$doctors._id',
+                   'name':'$doctors.name',
+                   'email':'$doctors.email',
+                   'phone':'$doctorDetails.phone',
+                   'consultationFee':'$doctorDetails.consultationFee',
+                   'specialization':'$doctorDetails.specialization',
+                   'experience':'$doctorDetails.experience',
+                   'date':'$doctors.createdAt',
                 }
             }
         ])
@@ -186,6 +234,7 @@ export const getAllDoctors = async (req, res) => {
 
         return res.status(200).json({ doctors })
     } catch (error) {
+        console.log(error)
         return res.status(500).json({ error: error })
     }
 

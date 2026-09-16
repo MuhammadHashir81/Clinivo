@@ -1,0 +1,3 @@
+SOLVE THE PROBLEM:
+
+When I am deleting user from DB while access and refresh tokens are in the cookies. The api tries to refresh the access token and it is causing a deadlock

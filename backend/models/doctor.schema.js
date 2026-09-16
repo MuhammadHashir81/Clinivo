@@ -30,8 +30,13 @@ const DoctorSchema = new Schema({
     consultationFee:{
         type:Number
     },
+
     
-})
+},  
+  {
+    timeStamps:true
+  }
+)
 
 const Doctor =  mongoose.model('Doctor',DoctorSchema)
 

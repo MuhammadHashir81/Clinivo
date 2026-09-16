@@ -8,8 +8,8 @@ export const staffRouter = Router()
 
 //staff
 
-staffRouter.post('/create',   createStaff)
+staffRouter.post('/create', verifyUser,  createStaff)
 staffRouter.post('/login',   loginStaff) 
-staffRouter.get('/get-all/doctors', getAllDoctors)    
+staffRouter.get('/get-all/doctors', verifyUser, getAllDoctors)    
     
 //staff

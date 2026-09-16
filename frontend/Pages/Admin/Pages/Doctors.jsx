@@ -24,88 +24,7 @@ import {
 import { api } from "../../../services/api";
 import { useEffect } from "react";
 
-const doctorsData = [
-  {
-    id: 1,
-    name: "Dr. Ali Raza",
-    email: "ali.raza@clinivo.pk",
-    phone: "+92 300 1234567",
-    specialization: "General Physician",
-    appointments: 142,
-    status: "Active",
-    joined: "Jan 12, 2026",
-  },
-  {
-    id: 2,
-    name: "Dr. Sara Ahmed",
-    email: "sara.ahmed@clinivo.pk",
-    phone: "+92 301 9876543",
-    specialization: "Dentist",
-    appointments: 128,
-    status: "Active",
-    joined: "Feb 04, 2026",
-  },
-  {
-    id: 3,
-    name: "Dr. Hamza Shah",
-    email: "hamza.shah@clinivo.pk",
-    phone: "+92 302 4567890",
-    specialization: "Cardiologist",
-    appointments: 116,
-    status: "Active",
-    joined: "Feb 18, 2026",
-  },
-  {
-    id: 4,
-    name: "Dr. Maria Khan",
-    email: "maria.khan@clinivo.pk",
-    phone: "+92 303 2345678",
-    specialization: "Dermatologist",
-    appointments: 98,
-    status: "Active",
-    joined: "Mar 02, 2026",
-  },
-  {
-    id: 5,
-    name: "Dr. Usman Tariq",
-    email: "usman.tariq@clinivo.pk",
-    phone: "+92 304 7654321",
-    specialization: "Neurologist",
-    appointments: 87,
-    status: "Inactive",
-    joined: "Mar 19, 2026",
-  },
-  {
-    id: 6,
-    name: "Dr. Ayesha Malik",
-    email: "ayesha.malik@clinivo.pk",
-    phone: "+92 305 3456789",
-    specialization: "Pediatrician",
-    appointments: 76,
-    status: "Active",
-    joined: "Apr 11, 2026",
-  },
-  {
-    id: 7,
-    name: "Dr. Fahad Ahmed",
-    email: "fahad.ahmed@clinivo.pk",
-    phone: "+92 306 8765432",
-    specialization: "Orthopedic",
-    appointments: 64,
-    status: "Active",
-    joined: "May 06, 2026",
-  },
-  {
-    id: 8,
-    name: "Dr. Noor Fatima",
-    email: "noor.fatima@clinivo.pk",
-    phone: "+92 307 5678901",
-    specialization: "Gynecologist",
-    appointments: 59,
-    status: "Inactive",
-    joined: "May 21, 2026",
-  },
-];
+
 
 const specializations = [
   "All Specializations",
@@ -197,6 +116,7 @@ const Doctors = () => {
     try {
       const response = await api.post('/staff/create', doctorForm)
       toast.success(response.success)
+      handleGetAllDoctors()
     } catch (error) {
       toast.error(error.response.data.error)
       console.log(error.response.data)
@@ -219,10 +139,6 @@ const Doctors = () => {
   //   (doctor) => doctor.status === "Inactive"
   // ).length;
 
-  const totalAppointments = doctorsData.reduce(
-    (total, doctor) => total + doctor.appointments,
-    0
-  );
 
   return (
     <div className="w-full min-h-screen bg-background p-6 lg:p-8">
@@ -509,7 +425,7 @@ const Doctors = () => {
 
         <StatCard
           title="Total Appointments"
-          value={totalAppointments}
+          value={"totalAppointments"}
           icon={CalendarDays}
         />
 
@@ -578,13 +494,6 @@ const Doctors = () => {
                   Contact
                 </th>
 
-                <th className="px-5 py-3 font-medium text-muted-foreground">
-                  Appointments
-                </th>
-
-                <th className="px-5 py-3 font-medium text-muted-foreground">
-                  Status
-                </th>
 
                 <th className="px-5 py-3 font-medium text-muted-foreground">
                   Joined
@@ -662,47 +571,11 @@ const Doctors = () => {
 
                     </td>
 
-                    {/* Appointments */}
-                    <td className="px-5 py-4">
-
-                      <div className="flex items-center gap-2">
-
-                        <CalendarDays
-                          size={15}
-                          className="text-muted-foreground"
-                        />
-
-                        <span className="font-medium text-foreground">
-                          {doctor.appointments}
-                        </span>
-
-                      </div>
-
-                    </td>
-
-                    {/* Status */}
-                    <td className="px-5 py-4">
-
-                      <StatusBadge status={doctor.status} />
-
-                    </td>
-
                     {/* Joined */}
                     <td className="px-5 py-4 text-muted-foreground">
-                      {doctor.joined}
+                      {doctor.date}
                     </td>
 
-                    {/* Actions */}
-                    <td className="px-5 py-4">
-
-                      <button className="p-2 rounded-lg hover:bg-muted transition">
-                        <MoreHorizontal
-                          size={18}
-                          className="text-muted-foreground"
-                        />
-                      </button>
-
-                    </td>
 
                   </tr>
 
@@ -748,7 +621,7 @@ const Doctors = () => {
           <p className="text-sm text-muted-foreground">
             Showing{" "}
             <span className="font-medium text-foreground">
-              {doctorsData.length}
+              {doctors.length}
             </span>{" "}
             of{" "}
             <span className="font-medium text-foreground">

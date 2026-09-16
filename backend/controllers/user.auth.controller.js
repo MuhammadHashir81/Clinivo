@@ -159,6 +159,7 @@ export const checkingUserAuth = async (req, res) => {
         const user = await User.findById(userId)
 
         const refreshToken = req.cookies.refreshToken
+        const accessToken = req.cookies.accessToken
 
         if (!refreshToken) {
             return res.status(401).json({
@@ -177,6 +178,8 @@ export const checkingUserAuth = async (req, res) => {
         return res.status(200).json({ user })
 
     } catch (error) {
+
+        console.log('catch block in check auth',error)
 
         return res.status(500).json({ error: error.message })
 

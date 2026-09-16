@@ -57,6 +57,7 @@
                 !originalRequest._retry) {
                 // If already refreshing, queue this request
                 if (isRefreshing) {
+                    console.log('is refreshing block....')
                     return new Promise((resolve, reject) => {
                         failedQueue.push({ resolve, reject });  
                     }).then(() => {
@@ -71,6 +72,8 @@
 
                 try {
                     // Call refresh endpoint
+                    console.log('calling refresh access token...')
+
                     const fetching = await api.post('/auth/refresh-access-token');
                     console.log(fetching)
                     console.log("your token has been refreshed")
@@ -83,6 +86,7 @@
 
                     } catch (refreshError) {
                         processQueue(refreshError);
+                        console.log('refresh access token failed...')
                         isRefreshing = false;
                         
 
@@ -97,4 +101,7 @@
         }
     );
 
+
+
+    
 

@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { api } from '../../../services/api'
+import { data } from 'react-router-dom'
 
 
 
@@ -86,7 +87,9 @@ export const adminLogin = createAsyncThunk('users/admin/login',
 
     }
 
-  })
+})
+
+
 
 export const authSlice = createSlice({
   name: 'auth', // here name is slice's property means redux property we give it as it is, like it is the name of slice 
@@ -187,6 +190,8 @@ export const authSlice = createSlice({
         state.loading = false
         state.error = action.payload
       })
+
+      
   }
 
 })
