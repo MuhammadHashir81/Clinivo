@@ -111,6 +111,7 @@ const Doctors = () => {
 
   // create doctor
   const handleCreateDoctor = async (e) => {
+    console.log("doctors")
     e.preventDefault();
 
     try {

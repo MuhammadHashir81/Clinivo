@@ -13,6 +13,7 @@ export const createStaff = async (req, res) => {
     try {
 
         const { userId } = req
+        
         const { name, email, password, role, phone, specialization, experience, consultationFee, bio } = req.body;
 
 
@@ -25,72 +26,57 @@ export const createStaff = async (req, res) => {
             });
         }
 
-        // Check if email already exists
-        const existingWithRole = await User.findOne({ email, role });
 
-        if (existingWithRole) {
-            return res.status(400).json({
-                error: "This email already exists"
-            });
-        }
-
-        // Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-
-
-        if (role === "doctor") {
-            const result = DoctorFormSchema.safeParse(req.body)
-
-            if (!result.success) {
-                return res.status(400).json(result.error.issues)
-
-            }
-
-
-            const clinic = await Clinic.findOne({ ownerId: req.userId })
-            console.log('this is clinic', clinic)
-
+            const clinic = await Clinic.findOne({ ownerId: userId })
 
 
             if (!clinic) {
                 return res.status(400).json({ error: 'please create clinic before creating a doctor' })
             }
 
+            const existingUser = await User.findOne({ email,role })
+            console.log(existingUser)
 
-            // Create staff
-            const user = await User.create({
-                name,
-                email,
-                password: hashedPassword,
-                role
-            });
+            if(existingUser){
 
+                const findDoctor = await Doctor.findOne({
+                    userId:userId,
+                    clinicId:clinic._id
+                })
 
-
-
-            await Doctor.create({
-                userId: user._id,
-                clinicId: clinic._id,
-                specialization,
-                experience,
-                consultationFee,
-                bio,
-                phone
-            });
-
-            return res.status(201).json({
-                success: "Doctor created successfully",
-                staff: {
-                    id: user._id,
-                    name: user.name,
-                    email: user.email,
-                    role: user.role
+                if(existingUser){
+                    return res.status(200).json({
+                        error:'doctor already exists'
+                    })
                 }
-            });
 
-        }
+            }
 
+            if(role === 'doctor'){
+
+                const hashedPassword = await bcrypt.hash(password,10)
+                const user = await User.create({
+                    name,
+                    email,
+                    password:hashedPassword
+                })
+
+                const doctor = await Doctor.create({
+                    userId:user._id,
+                    clinicId:userId,
+                    phone,
+                    specialization,
+                    experience,
+                    consultationFee
+                })
+
+                return res.status(201).json({
+                    success:'doctor created',
+                    doctor
+                })
+
+                
+            }
 
 
 
@@ -101,6 +87,7 @@ export const createStaff = async (req, res) => {
         });
     }
 };
+
 
 
 // LOGIN STAFF

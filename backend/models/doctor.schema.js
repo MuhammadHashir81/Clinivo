@@ -38,6 +38,6 @@ const DoctorSchema = new Schema({
   }
 )
 
-const Doctor =  mongoose.model('Doctor',DoctorSchema)
+export const Doctor =  mongoose.model('Doctor',DoctorSchema)
 
-export { Doctor }
+
