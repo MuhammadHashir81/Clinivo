@@ -16,6 +16,8 @@ export const createStaff = async (req, res) => {
         
         const { name, email, password, role, phone, specialization, experience, consultationFee, bio } = req.body;
 
+        console.log('this is role',role)    
+
 
         // Only doctor and receptionist can be created as staff
         const allowedRoles = ["doctor", "receptionalist"];
@@ -27,25 +29,27 @@ export const createStaff = async (req, res) => {
         }
 
 
-            const clinic = await Clinic.findOne({ ownerId: userId })
+        const clinic = await Clinic.findOne({ ownerId: userId })
 
 
-            if (!clinic) {
-                return res.status(400).json({ error: 'please create clinic before creating a doctor' })
-            }
+        if (!clinic) {
+
+        return res.status(400).json({ error: 'please create clinic before creating a doctor' })
+
+        }
 
             const existingUser = await User.findOne({ email,role })
             console.log(existingUser)
 
-            if(existingUser){
+            if(existingUser) {
 
-                const findDoctor = await Doctor.findOne({
+                const doctorAlreadyInClinic = await Doctor.findOne({
                     userId:userId,
                     clinicId:clinic._id
                 })
 
-                if(existingUser){
-                    return res.status(200).json({
+                if(doctorAlreadyInClinic){
+                    return res.status(400).json({
                         error:'doctor already exists'
                     })
                 }
@@ -58,6 +62,7 @@ export const createStaff = async (req, res) => {
                 const user = await User.create({
                     name,
                     email,
+                    role,
                     password:hashedPassword
                 })
 
@@ -67,7 +72,7 @@ export const createStaff = async (req, res) => {
                     phone,
                     specialization,
                     experience,
-                    consultationFee
+                    consultationFee,
                 })
 
                 return res.status(201).json({

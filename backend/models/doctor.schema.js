@@ -6,7 +6,7 @@ const DoctorSchema = new Schema({
     userId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User',
-        reqruired:true
+        required:true
     },
    
     clinicId:{
@@ -34,7 +34,7 @@ const DoctorSchema = new Schema({
     
 },  
   {
-    timeStamps:true
+    timestamps:true
   }
 )
 
