@@ -20,9 +20,10 @@ const UserSchema = new Schema({
 
     role:{
         type:String,
-        enum:['patient','admin','receptionalist','doctor'],
+        enum:['patient','admin','receptionist','doctor'],
         default:'patient'
     },
+    
 
 
 },

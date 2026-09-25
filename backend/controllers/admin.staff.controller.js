@@ -6,100 +6,13 @@ import { DoctorFormSchema } from "../validations/DoctorFormValidation.js";
 import { Doctor } from "../models/doctor.schema.js";
 import { Clinic } from "../models/clinic.schema.js";
 import mongoose from "mongoose";
-
-
-// CREATE STAFF
-// export const createStaff = async (req, res) => {
-//     try {
-
-//         const { userId } = req
-
-//         const { name, email, password, role, phone, specialization, experience, consultationFee, bio } = req.body;
-
-//         console.log('this is role',role)    
-
-
-//         // Only doctor and receptionist can be created as staff
-//         const allowedRoles = ["doctor", "receptionalist"];
-
-//         if (!allowedRoles.includes(role)) {
-//             return res.status(400).json({
-//                 error: "Invalid staff role"
-//             });
-//         }
-
-
-//         const clinic = await Clinic.findOne({ ownerId: userId })
-
-
-//         if (!clinic) {
-
-//         return res.status(400).json({ error: 'please create clinic before creating a doctor' })
-
-//           }
-
-//             const existingUser = await User.findOne({ email,role })
-
-//             if(existingUser) {
-
-//             const doctorAlreadyInClinic = await Doctor.findOne({
-//             userId:existingUser._id,
-//             clinicId:clinic._id
-
-//             })
-
-//                 if(doctorAlreadyInClinic){
-//                     return res.status(400).json({
-//                         error:'doctor already exists'
-//                     })
-//                 }
-
-//             }
-
-//             if(role === 'doctor'){
-
-//                 const hashedPassword = await bcrypt.hash(password,10)
-//                 const user = await User.create({
-//                     name,
-//                     email,
-//                     role,
-//                     password:hashedPassword
-//                 })
-
-//                 const doctor = await Doctor.create({
-//                     userId:user._id,
-//                     clinicId:clinic._id,
-//                     phone,
-//                     specialization,
-//                     experience,
-//                     consultationFee,
-//                     bio
-//                 })
-
-//                 return res.status(201).json({
-//                     success:'doctor created',
-//                     doctor
-//                 })
-
-
-//             }
-
-
-
-//     } catch (error) {
-//         console.log(error)
-//         return res.status(500).json({
-//             error: error.message
-//         });
-//     }
-// };
-
-
+import {Receptionist} from "../models/receptionist.schema.js";
 
 export const createStaff = async (req, res) => {
     try {
         const { userId } = req;
 
+        
         const {
             name,
             email,
@@ -109,9 +22,12 @@ export const createStaff = async (req, res) => {
             experience,
             role,
             consultationFee,
-            bio
+            bio,
+            shift
         } = req.body;
+         
 
+        console.log(req.body)
         // Find the clinic owned by the logged-in admin
         const clinic = await Clinic.findOne({
             ownerId: userId
@@ -132,16 +48,31 @@ export const createStaff = async (req, res) => {
         // Check whether this doctor already ex`ists in THIS clinic
         for (const existingUser of existingUsers) {
 
-            const doctorAlreadyExists = await Doctor.findOne({
+            let staffAlreadyExists;
+
+            if(role === "doctor"){
+
+                staffAlreadyExists = await Doctor.findOne({
                 userId: existingUser._id,
                 clinicId: clinic._id
-            });
 
-            if (doctorAlreadyExists) {
-                return res.status(400).json({
-                    error: "Doctor with this email already exists"
+            });
+        }
+           if (role === "receptionist") {
+
+                staffAlreadyExists = await Receptionist.findOne({
+                    userId: existingUser._id,
+                    clinicId: clinic._id
+                    
                 });
             }
+
+             if (staffAlreadyExists) {
+                return res.status(400).json({
+                    error: `${role} with this email already exists`
+                });
+            }
+
         }
 
         // Create a NEW User for this clinic
@@ -152,23 +83,44 @@ export const createStaff = async (req, res) => {
             email: email.toLowerCase(),
             password: hashedPassword,
             role: role
+
         });
 
-        // Link the new User to this clinic
-        const doctor = await Doctor.create({
-            userId: user._id,
-            clinicId: clinic._id,
-            phone,
-            specialization,
-            experience,
-            consultationFee,
-            bio
-        });
 
-        return res.status(201).json({
-            success: "Doctor created",
-            doctor
-        });
+        let staff;
+
+
+          if (role === "doctor") {
+            staff = await Doctor.create({
+                userId: user._id,
+                clinicId: clinic._id,
+                phone,  
+                specialization,
+                experience,
+                consultationFee,
+                bio
+            });
+        }
+
+
+
+
+          // Create Receptionist
+        if (role === "receptionist") {
+            staff = await Receptionist.create({
+                userId: user._id,
+                clinicId: clinic._id,
+                phone,
+                shift
+            });
+        }
+
+         return res.status(201).json({
+            success: `${role} created`,
+            staff
+        }); 
+
+
 
     } catch (error) {
         console.log(error);
@@ -189,7 +141,7 @@ export const loginStaff = async (req, res) => {
         const staff = await User.findOne({
             email,
             role: {
-                $in: ["doctor", "receptionalist"]
+                $in: ["doctor", "receptionist"]
             }
         });
 
@@ -257,7 +209,6 @@ export const loginStaff = async (req, res) => {
 
 
 // get all doctors
-
 export const getAllDoctors = async (req, res) => {
     try {
         const { userId } = req;
@@ -380,4 +331,33 @@ export const getAllDoctors = async (req, res) => {
         });
     }
 };
+
+
+export const getAllReceptionists = async(req,res)=>{
+    try {
+        const { userId } = req
+        
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const search = req.query.search || "";
+
+        const result = await Clinic.aggregate([
+            {
+                $match:{
+                    ownerId: new mongoose.Types.ObjectId(userId)
+                },
+
+                
+            }
+        ])
+
+
+    } catch (error) {
+        
+    }
+}
+
+
 

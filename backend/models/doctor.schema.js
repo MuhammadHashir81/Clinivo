@@ -18,7 +18,7 @@ const DoctorSchema = new Schema({
     phone:{
      type:String
     },
-
+    
     specialization:{
         type:String
     },
