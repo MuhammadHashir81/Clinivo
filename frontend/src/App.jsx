@@ -22,8 +22,6 @@ const Clinic = lazy(()=>import('../Pages/Admin/Pages/Clinic'))
 
 
 // sign in - sign up
-const SignIn = lazy(() => import('../Pages/Signin'))
-const SignUp = lazy(() => import('../Pages/Signup'))
 const App = () => {
   return (
     <div className=''>
@@ -46,7 +44,7 @@ const App = () => {
           <Route path='/doctor' element={<Doctor />} />
           <Route path='/receptionist' element={<Receptionist />} />
 
-          {/* admin routes */}
+          {/* admin routes */}  
           <Route path='/admin' element={
             <ProtectedRoute loginPath='/admin/sign-in'>
               <Admin />
@@ -59,17 +57,7 @@ const App = () => {
           </Route>
 
 
-          {/* login - signup */}
-
-          <Route path='/sign-in' element={<SignIn />} />
-          <Route path='/sign-up' element={<SignUp />} />
-
-          {/* login - signup */}
-
-
-
           {/* admin signup - login  */}
-
           <Route path='/admin/sign-up' element={<AdminSignup />} />
           <Route path='/admin/sign-in' element={<AdminSignin />} />
 

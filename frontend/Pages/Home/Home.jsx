@@ -55,10 +55,10 @@
 
                         <div className='flex gap-3'>
                             <a
-                            href='/sign-in'
+                            href='/admin/sign-in'
                                 className="text-sm font-semibold px-4 py-2 rounded-lg
                 text-primary font-inter
-                ">Sign in </a>
+                ">sign in </a>
                             <button
                 className="text-sm font-bold font-inter rounded-xl px-5 py-2.5
                 shadow-sm bg-primary hover:opacity-90 text-white cursor-pointer
@@ -68,7 +68,6 @@
 
                         </div>
                     </div>
-
 
 
                 </nav>

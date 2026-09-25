@@ -62,7 +62,7 @@ const Signin = () => {
                 <div className='bg-card border border-border rounded-2xl shadow-sm px-10 py-10 flex flex-col gap-6'>
 
                     <div className='flex flex-col gap-2 text-center'>
-                        <h1 className='font-inter font-bold text-2xl text-foreground tracking-tight'>Admin Login</h1>
+                        <h1 className='font-inter font-bold text-2xl text-foreground tracking-tight'>welcome back</h1>
                         <p className='font-inter text-sm text-muted-foreground'>Sign in to your Clinivo account</p>
                     </div>
 

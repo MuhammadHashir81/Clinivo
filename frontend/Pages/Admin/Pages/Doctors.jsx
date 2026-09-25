@@ -44,6 +44,10 @@ const Doctors = () => {
   const [search, setSearch] = useState("");
   const [specialization, setSpecialization] = useState("All Specializations");
   const [doctors,setDoctors] = useState([])
+  const [totalPages,setTotalPages] = useState(0)
+  const [page,setPage] = useState(1)
+  const [totalDoctors,setTotalDoctors] = useState(0)
+  const limit = 10
 
 
   const [openModal, setOpenModal] = useState(false);
@@ -90,13 +94,24 @@ const Doctors = () => {
   };
 
 
+  // previous-next pages
+
+  const previousPage = () => {
+    setPage(page - 1)
+  }
+
+  const nextPage = () => {
+    setPage(page + 1 )
+  }
 
   // get all doctors 
 
   const handleGetAllDoctors = async() => {  
     try {
-      const response = await api.get('/staff/get-all/doctors')
+      const response = await api.get(`/staff/get-all/doctors?page=${page}&limit=${limit}&search=${search}`)
       setDoctors(response.doctors)
+      setTotalPages(response.totalPages)
+      setTotalDoctors(response.totalDoctors)
       console.log(response)
     } catch (error) {
       console.log(error)
@@ -105,8 +120,15 @@ const Doctors = () => {
 
 
   useEffect(() => {
-    handleGetAllDoctors()
-  }, [])
+    const timer = setTimeout(()=>{
+
+      handleGetAllDoctors()
+
+    },500)
+
+    return ()=>clearTimeout(timer)
+
+  }, [page,search])
   
 
   // create doctor
@@ -130,16 +152,9 @@ const Doctors = () => {
   };
 
 
-  const totalDoctors = doctors.length;
 
-  // const activeDoctors = doctorsData.filter(
-  //   (doctor) => doctor.status === "Active"
-  // ).length;
 
-  // const inactiveDoctors = doctorsData.filter(
-  //   (doctor) => doctor.status === "Inactive"
-  // ).length;
-
+  
 
   return (
     <div className="w-full min-h-screen bg-background p-6 lg:p-8">
@@ -574,7 +589,7 @@ const Doctors = () => {
 
                     {/* Joined */}
                     <td className="px-5 py-4 text-muted-foreground">
-                      {doctor.date}
+                      {new Date(doctor.date).toLocaleDateString("en-GB")}
                     </td>
 
 
@@ -634,17 +649,21 @@ const Doctors = () => {
           <div className="flex items-center gap-2">
 
             <button
-              disabled
+              disabled={page === 1}
+              onClick={previousPage}
               className="h-9 px-3 rounded-lg border border-border text-sm text-muted-foreground disabled:opacity-50"
             >
               Previous
             </button>
 
             <button className="h-9 min-w-9 px-3 rounded-lg bg-primary text-primary-foreground text-sm">
-              1
+              {page}
             </button>
 
-            <button className="h-9 px-3 rounded-lg border border-border text-sm hover:bg-muted">
+            <button 
+              onClick={nextPage}
+            disabled={page === totalPages}
+            className="h-9 px-3 rounded-lg border border-border text-sm text-muted-foreground disabled:opacity-50">
               Next
             </button>
 

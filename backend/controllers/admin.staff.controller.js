@@ -9,90 +9,175 @@ import mongoose from "mongoose";
 
 
 // CREATE STAFF
+// export const createStaff = async (req, res) => {
+//     try {
+
+//         const { userId } = req
+
+//         const { name, email, password, role, phone, specialization, experience, consultationFee, bio } = req.body;
+
+//         console.log('this is role',role)    
+
+
+//         // Only doctor and receptionist can be created as staff
+//         const allowedRoles = ["doctor", "receptionalist"];
+
+//         if (!allowedRoles.includes(role)) {
+//             return res.status(400).json({
+//                 error: "Invalid staff role"
+//             });
+//         }
+
+
+//         const clinic = await Clinic.findOne({ ownerId: userId })
+
+
+//         if (!clinic) {
+
+//         return res.status(400).json({ error: 'please create clinic before creating a doctor' })
+
+//           }
+
+//             const existingUser = await User.findOne({ email,role })
+
+//             if(existingUser) {
+
+//             const doctorAlreadyInClinic = await Doctor.findOne({
+//             userId:existingUser._id,
+//             clinicId:clinic._id
+
+//             })
+
+//                 if(doctorAlreadyInClinic){
+//                     return res.status(400).json({
+//                         error:'doctor already exists'
+//                     })
+//                 }
+
+//             }
+
+//             if(role === 'doctor'){
+
+//                 const hashedPassword = await bcrypt.hash(password,10)
+//                 const user = await User.create({
+//                     name,
+//                     email,
+//                     role,
+//                     password:hashedPassword
+//                 })
+
+//                 const doctor = await Doctor.create({
+//                     userId:user._id,
+//                     clinicId:clinic._id,
+//                     phone,
+//                     specialization,
+//                     experience,
+//                     consultationFee,
+//                     bio
+//                 })
+
+//                 return res.status(201).json({
+//                     success:'doctor created',
+//                     doctor
+//                 })
+
+
+//             }
+
+
+
+//     } catch (error) {
+//         console.log(error)
+//         return res.status(500).json({
+//             error: error.message
+//         });
+//     }
+// };
+
+
+
 export const createStaff = async (req, res) => {
     try {
+        const { userId } = req;
 
-        const { userId } = req
-        
-        const { name, email, password, role, phone, specialization, experience, consultationFee, bio } = req.body;
+        const {
+            name,
+            email,
+            password,
+            phone,
+            specialization,
+            experience,
+            role,
+            consultationFee,
+            bio
+        } = req.body;
 
-        console.log('this is role',role)    
+        // Find the clinic owned by the logged-in admin
+        const clinic = await Clinic.findOne({
+            ownerId: userId
+        });
 
-
-        // Only doctor and receptionist can be created as staff
-        const allowedRoles = ["doctor", "receptionalist"];
-
-        if (!allowedRoles.includes(role)) {
+        if (!clinic) {
             return res.status(400).json({
-                error: "Invalid staff role"
+                error: "Please create a clinic before creating a doctor"
             });
         }
 
+        // Find doctor users with this email
+        const existingUsers = await User.find({
+            email: email,
+            role: role
+        });
 
-        const clinic = await Clinic.findOne({ ownerId: userId })
+        // Check whether this doctor already ex`ists in THIS clinic
+        for (const existingUser of existingUsers) {
 
+            const doctorAlreadyExists = await Doctor.findOne({
+                userId: existingUser._id,
+                clinicId: clinic._id
+            });
 
-        if (!clinic) {
-
-        return res.status(400).json({ error: 'please create clinic before creating a doctor' })
-
+            if (doctorAlreadyExists) {
+                return res.status(400).json({
+                    error: "Doctor with this email already exists"
+                });
+            }
         }
 
-            const existingUser = await User.findOne({ email,role })
-            console.log(existingUser)
+        // Create a NEW User for this clinic
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-            if(existingUser) {
+        const user = await User.create({
+            name,
+            email: email.toLowerCase(),
+            password: hashedPassword,
+            role: role
+        });
 
-                const doctorAlreadyInClinic = await Doctor.findOne({
-                    userId:userId,
-                    clinicId:clinic._id
-                })
+        // Link the new User to this clinic
+        const doctor = await Doctor.create({
+            userId: user._id,
+            clinicId: clinic._id,
+            phone,
+            specialization,
+            experience,
+            consultationFee,
+            bio
+        });
 
-                if(doctorAlreadyInClinic){
-                    return res.status(400).json({
-                        error:'doctor already exists'
-                    })
-                }
-
-            }
-
-            if(role === 'doctor'){
-
-                const hashedPassword = await bcrypt.hash(password,10)
-                const user = await User.create({
-                    name,
-                    email,
-                    role,
-                    password:hashedPassword
-                })
-
-                const doctor = await Doctor.create({
-                    userId:user._id,
-                    clinicId:userId,
-                    phone,
-                    specialization,
-                    experience,
-                    consultationFee,
-                })
-
-                return res.status(201).json({
-                    success:'doctor created',
-                    doctor
-                })
-
-                
-            }
-
-
+        return res.status(201).json({
+            success: "Doctor created",
+            doctor
+        });
 
     } catch (error) {
-        console.log(error)
+        console.log(error);
+
         return res.status(500).json({
             error: error.message
         });
     }
 };
-
 
 
 // LOGIN STAFF
@@ -175,63 +260,124 @@ export const loginStaff = async (req, res) => {
 
 export const getAllDoctors = async (req, res) => {
     try {
-        const { userId } = req
+        const { userId } = req;
 
-        const doctors = await Clinic.aggregate([
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const search = req.query.search || "";
+
+        const result = await Clinic.aggregate([
             {
                 $match: {
                     ownerId: new mongoose.Types.ObjectId(userId)
                 }
             },
 
-
             {
                 $lookup: {
-                    from: 'doctors',
-                    localField: '_id',
-                    foreignField: 'clinicId',
-                    as: 'doctorDetails'
+                    from: "doctors",
+                    localField: "_id",
+                    foreignField: "clinicId",
+                    as: "doctorDetails"
                 }
             },
+
             {
-                $unwind: '$doctorDetails'
+                $unwind: "$doctorDetails"
             },
+
             {
                 $lookup: {
-                    from: 'users',
-                    localField: 'doctorDetails.userId',
-                    foreignField: '_id',
-                    as: 'doctors'
-                },
-
-            },
-            {
-                $unwind: '$doctors'
+                    from: "users",
+                    localField: "doctorDetails.userId",
+                    foreignField: "_id",
+                    as: "doctors"
+                }
             },
 
             {
-                $project:{
-                   _id:'$doctors._id',
-                   'name':'$doctors.name',
-                   'email':'$doctors.email',
-                   'phone':'$doctorDetails.phone',
-                   'consultationFee':'$doctorDetails.consultationFee',
-                   'specialization':'$doctorDetails.specialization',
-                   'experience':'$doctorDetails.experience',
-                   'date':'$doctors.createdAt',
+                $unwind: "$doctors"
+            },
+
+            // Search
+            ...(search
+                ? [
+                    {
+                        $match: {
+                            $or: [
+                                {
+                                    "doctors.name": {
+                                        $regex: search,
+                                        $options: "i"
+                                    }
+                                },
+                                {
+                                    "doctors.email": {
+                                        $regex: search,
+                                        $options: "i"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+                : []),
+
+            // Pagination + Count
+            {
+                $facet: {
+                    doctors: [
+                        {
+                            $project: {
+                                _id: "$doctors._id",
+                                name: "$doctors.name",
+                                email: "$doctors.email",
+                                phone: "$doctorDetails.phone",
+                                consultationFee: "$doctorDetails.consultationFee",
+                                specialization: "$doctorDetails.specialization",
+                                experience: "$doctorDetails.experience",
+                                date: "$doctors.createdAt"
+                            }
+                        },
+
+                        {
+                            $skip: skip
+                        },
+
+                        {
+                            $limit: limit
+                        }
+                    ],
+
+                    total: [
+                        {
+                            $count: "count"
+                        }
+                    ]
                 }
             }
-        ])
+        ]);
 
+        const doctors = result[0]?.doctors || [];
 
-        return res.status(200).json({ doctors })
+        const totalDoctors = result[0]?.total[0]?.count || 0;
+
+        const totalPages = Math.ceil(totalDoctors / limit);
+
+        return res.status(200).json({
+            doctors,
+            totalDoctors,
+            totalPages
+        });
+
     } catch (error) {
-        console.log(error)
-        return res.status(500).json({ error: error })
+        console.log(error);
+
+        return res.status(500).json({
+            error: error.message
+        });
     }
-
-}
-
-
-
+};
 

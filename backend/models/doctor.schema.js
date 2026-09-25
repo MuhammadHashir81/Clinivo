@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 const { Schema } = mongoose 
 
 const DoctorSchema = new Schema({
-
+    
     userId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User',
@@ -30,6 +30,9 @@ const DoctorSchema = new Schema({
     consultationFee:{
         type:Number
     },
+    bio:{
+        type:String
+    }
 
     
 },  
