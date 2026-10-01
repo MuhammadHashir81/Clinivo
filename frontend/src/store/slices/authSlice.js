@@ -41,8 +41,11 @@ export const checkingAuth = createAsyncThunk('users/checkingAuth',
     try {
 
       const response = await api.get('/auth/check')
-      console.log("checking if the user is logged in or not ", response)
-      return response
+      console.log("checking if the user is logged in or not ", response.user)
+      return {
+        name:response.user.name,
+        role:response.user.role
+      }
 
     } catch (error) {
 
@@ -50,9 +53,10 @@ export const checkingAuth = createAsyncThunk('users/checkingAuth',
 
     }
 
-  })
+})
 
 
+// admin signup 
 export const adminSignup = createAsyncThunk('users/admin/signup',
   async (data, { rejectWithValue }) => {
     console.log(data)
@@ -68,10 +72,11 @@ export const adminSignup = createAsyncThunk('users/admin/signup',
 
     }
 
-  })
+
+})
 
 
-
+// admin login
 export const adminLogin = createAsyncThunk('users/admin/login',
   async (data, { rejectWithValue }) => {
     console.log(data)
@@ -90,6 +95,24 @@ export const adminLogin = createAsyncThunk('users/admin/login',
 })
 
 
+// staff login 
+export const staffLogin = createAsyncThunk('users/staff/login',async (data,{ rejectWithValue }) => {
+  try {
+    const result = await api.post('/staff/login',data)
+    console.log(result)
+    return {
+          success:result.success,
+          role:result.user.role      
+  }
+
+  } catch (error) {
+    console.log(error?.response?.data?.error);
+    
+    return rejectWithValue(error?.response?.data?.error)
+  }
+
+})
+
 
 export const authSlice = createSlice({
   name: 'auth', // here name is slice's property means redux property we give it as it is, like it is the name of slice 
@@ -99,7 +122,8 @@ export const authSlice = createSlice({
     success: null,
     checkAuth: true,
     isAuthenticated: false,
-    role: null
+    role: null,
+    user:null
 
   },
   reducers: {
@@ -149,6 +173,8 @@ export const authSlice = createSlice({
         state.loading = false
         state.checkAuth = false
         state.isAuthenticated = true
+        state.role = action.payload.role
+        state.user = action.payload.name
       })
 
       .addCase(checkingAuth.rejected, (state, action) => {
@@ -175,22 +201,43 @@ export const authSlice = createSlice({
       })
 
       // admin login
-
-
       .addCase(adminLogin.pending, (state, action) => {
         state.loading = true
+        state.isAuthenticated = false
       })
 
       .addCase(adminLogin.fulfilled, (state, action) => {
         state.loading = false
         state.success = action.payload.success
+        state.isAuthenticated = true
       })
 
       .addCase(adminLogin.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload
+        state.isAuthenticated = false
       })
 
+
+      // staff login 
+
+      .addCase(staffLogin.pending, (state, action) => {
+        state.loading = true
+        state.isAuthenticated = false
+      })
+
+      .addCase(staffLogin.fulfilled, (state, action) => {
+        state.loading = false
+        state.success = action.payload.success
+        state.role = action.payload.role
+        state.isAuthenticated = true
+      })
+
+      .addCase(staffLogin.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload
+        state.isAuthenticated = false
+      })
       
   }
 

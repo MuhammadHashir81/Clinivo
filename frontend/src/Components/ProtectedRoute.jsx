@@ -4,16 +4,17 @@ import { Oval } from 'react-loader-spinner'
 import { checkingAuth } from "../store/slices/authSlice"
 import { useEffect } from "react"
 
-const ProtectedRoute = ({children,loginPath}) => {
+const ProtectedRoute = ({ children, loginPath, allowedRoles }) => {
 
   const dispatch = useDispatch()
 
    useEffect(()=>{
-    console.log('checking auth...')
     dispatch(checkingAuth())
    },[])
 
-  const {checkAuth, isAuthenticated } = useSelector((state) => state.auth)
+  const {role, checkAuth, isAuthenticated } = useSelector((state) => state.auth)
+
+  console.log('this is role',role)
 
   // Still checking authentication
   if (checkAuth) {
@@ -25,15 +26,23 @@ const ProtectedRoute = ({children,loginPath}) => {
 
   }
 
+
+
   // Authentication check finished but user isn't logged in
   if (!isAuthenticated) {
     return <Navigate to={loginPath} replace />
   }
 
+
+
+  // allowed roles
+  if (!allowedRoles.includes(role)) {
+  return <Navigate to="/unauthorized" replace />;
+}
+
   // User is authenticated
   if (isAuthenticated) {
     return children
-    
   }
   
 }

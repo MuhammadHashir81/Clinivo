@@ -4,9 +4,11 @@ import bcrypt from 'bcryptjs'
 import { cookieOptions, userAccessToken, userRefreshToken } from "../utils/Generate_Token.js";
 import jwt from 'jsonwebtoken'
 
-// singup controller
+// signup controller
 export const signup = async (req, res) => {
+
     const { name, email, password } = req.body
+
     console.log(name, email, password)
 
     try {
@@ -149,6 +151,8 @@ export const refreshAccessToken = async (req, res) => {
 
     }
 }
+    
+
 
 
 // checking user on every refresh

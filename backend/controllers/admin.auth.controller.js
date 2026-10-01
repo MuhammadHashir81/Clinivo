@@ -10,9 +10,11 @@ export const signupAdmin = async (req, res) => {
     try {
         const { name, email, password } = req.body;
         console.log(name,email,password);
+
+         const normalizedEmail = email.toLowerCase().trim();
         
         // Check if an admin already exists
-        const existingAdmin = await User.findOne({name:name, role: "admin" });
+        const existingAdmin = await User.findOne({ email:normalizedEmail });
 
         if (existingAdmin) {
             return res.status(400).json({
@@ -34,7 +36,7 @@ export const signupAdmin = async (req, res) => {
         });
 
         return res.status(201).json({
-            success: "Admin created successfully",
+            success: "sign up successfully",
             admin: {
                 id: admin._id,
                 name: admin.name,
@@ -109,7 +111,7 @@ export const loginAdmin = async (req, res) => {
         );
 
         return res.status(200).json({
-            success: "Admin login successful",
+            success: "login successfully",
             user: {
                 id: admin._id,
                 name: admin.name,

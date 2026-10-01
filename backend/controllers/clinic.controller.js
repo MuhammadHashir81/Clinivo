@@ -5,7 +5,7 @@ import { User } from "../models/user.schema.js"
 export const createClinic = async(req,res)=>{
     try {
 
-        const {userId} = req
+        const { userId } = req
 
 
         const clinicOwner = await User.findById(userId)
@@ -35,13 +35,7 @@ export const createClinic = async(req,res)=>{
             return res.status(400).json({error:`you have already created clinic '${isOwnerExists.name}'`})
         }
         
-        const isNameExists = await Clinic.findOne({name})
-
-
-        if(isNameExists){
-            return res.status(400).json({error:'this clinic name has been taken already'})
-        }
-
+        
         const clinic = await Clinic.create({
             name,
             address,

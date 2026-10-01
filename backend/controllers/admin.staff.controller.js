@@ -6,13 +6,15 @@ import { DoctorFormSchema } from "../validations/DoctorFormValidation.js";
 import { Doctor } from "../models/doctor.schema.js";
 import { Clinic } from "../models/clinic.schema.js";
 import mongoose from "mongoose";
-import {Receptionist} from "../models/receptionist.schema.js";
+import { Receptionist } from "../models/receptionist.schema.js";
 
+
+// create staff
 export const createStaff = async (req, res) => {
     try {
         const { userId } = req;
 
-        
+
         const {
             name,
             email,
@@ -25,7 +27,7 @@ export const createStaff = async (req, res) => {
             bio,
             shift
         } = req.body;
-         
+
 
         console.log(req.body)
         // Find the clinic owned by the logged-in admin
@@ -39,40 +41,15 @@ export const createStaff = async (req, res) => {
             });
         }
 
-        // Find doctor users with this email
-        const existingUsers = await User.find({
-            email: email,
-            role: role
+
+        const existingUser = await User.findOne({
+            email: email
         });
 
-        // Check whether this doctor already ex`ists in THIS clinic
-        for (const existingUser of existingUsers) {
-
-            let staffAlreadyExists;
-
-            if(role === "doctor"){
-
-                staffAlreadyExists = await Doctor.findOne({
-                userId: existingUser._id,
-                clinicId: clinic._id
-
+        if (existingUser) {
+            return res.status(400).json({
+                error: "An account with this email already exists"
             });
-        }
-           if (role === "receptionist") {
-
-                staffAlreadyExists = await Receptionist.findOne({
-                    userId: existingUser._id,
-                    clinicId: clinic._id
-                    
-                });
-            }
-
-             if (staffAlreadyExists) {
-                return res.status(400).json({
-                    error: `${role} with this email already exists`
-                });
-            }
-
         }
 
         // Create a NEW User for this clinic
@@ -80,7 +57,7 @@ export const createStaff = async (req, res) => {
 
         const user = await User.create({
             name,
-            email: email.toLowerCase(),
+            email: email.toLowerCase().trim(),
             password: hashedPassword,
             role: role
 
@@ -90,11 +67,11 @@ export const createStaff = async (req, res) => {
         let staff;
 
 
-          if (role === "doctor") {
+        if (role === "doctor") {
             staff = await Doctor.create({
                 userId: user._id,
                 clinicId: clinic._id,
-                phone,  
+                phone,
                 specialization,
                 experience,
                 consultationFee,
@@ -105,7 +82,7 @@ export const createStaff = async (req, res) => {
 
 
 
-          // Create Receptionist
+        // Create Receptionist
         if (role === "receptionist") {
             staff = await Receptionist.create({
                 userId: user._id,
@@ -115,10 +92,10 @@ export const createStaff = async (req, res) => {
             });
         }
 
-         return res.status(201).json({
+        return res.status(201).json({
             success: `${role} created`,
             staff
-        }); 
+        });
 
 
 
@@ -132,8 +109,9 @@ export const createStaff = async (req, res) => {
 };
 
 
-// LOGIN STAFF
+// login staff
 export const loginStaff = async (req, res) => {
+
     try {
         const { email, password } = req.body;
 
@@ -147,7 +125,7 @@ export const loginStaff = async (req, res) => {
 
         if (!staff) {
             return res.status(401).json({
-                error: "Invalid staff email or password"
+                error: "Invalid email or password"
             });
         }
 
@@ -159,9 +137,32 @@ export const loginStaff = async (req, res) => {
 
         if (!isPasswordMatch) {
             return res.status(401).json({
-                error: "Invalid staff email or password"
+                error: "Invalid email or password"
             });
         }
+
+
+
+        let staffDetails;
+
+        if (staff.role === 'doctor') {
+            staffDetails = await Doctor.findOne({
+                userId: staff._id,
+            })
+        }
+        else {
+            staffDetails = await Receptionist.findOne({
+                userId: staff._id
+            })
+        }
+
+
+        if (!staffDetails) {
+            return res.status(403).json({
+                error: "this account is not associated with a clinic"
+            });
+        }
+
 
         // Generate tokens
         const accessToken = userAccessToken(
@@ -200,12 +201,12 @@ export const loginStaff = async (req, res) => {
         });
 
     } catch (error) {
+        console.log(error)
         return res.status(500).json({
             error: error.message
         });
     }
 };
-
 
 
 // get all doctors
@@ -332,11 +333,11 @@ export const getAllDoctors = async (req, res) => {
     }
 };
 
-
-export const getAllReceptionists = async(req,res)=>{
+// get all receptionists
+export const getAllReceptionists = async (req, res) => {
     try {
         const { userId } = req
-        
+
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
         const skip = (page - 1) * limit;
@@ -345,19 +346,115 @@ export const getAllReceptionists = async(req,res)=>{
 
         const result = await Clinic.aggregate([
             {
-                $match:{
+                $match: {
                     ownerId: new mongoose.Types.ObjectId(userId)
                 },
+            },
+            {
+                $lookup: {
+                    from: 'receptionists',
+                    localField: '_id',
+                    foreignField: 'clinicId',
+                    as: 'receptionistDetails'
 
-                
+                }
+            },
+
+
+            {
+                $unwind: "$receptionistDetails"
+            },
+
+
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "receptionistDetails.userId",
+                    foreignField: "_id",
+                    as: "receptionists"
+                }
+            },
+
+            {
+                $unwind: "$receptionists"
+            },
+
+
+            ...(search
+                ? [
+                    {
+                        $match: {
+                            $or: [
+                                {
+                                    "receptionists.name": {
+                                        $regex: search,
+                                        $options: "i"
+                                    }
+                                },
+                                {
+                                    "receptionists.email": {
+                                        $regex: search,
+                                        $options: "i"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+                : []),
+
+            {
+                $facet: {
+                    receptionists: [
+                        {
+                            $project: {
+                                _id: "$receptionists._id",
+                                name: "$receptionists.name",
+                                email: "$receptionists.email",
+                                date: "$receptionists.createdAt",
+                                phone: "$receptionistDetails.phone",
+                                shift: "$receptionistDetails.shift",
+
+                            }
+                        },
+
+                        {
+                            $skip: skip
+                        },
+
+                        {
+                            $limit: limit
+                        }
+                    ],
+
+                    total: [
+                        {
+                            $count: "count"
+                        }
+                    ]
+                }
             }
+
         ])
 
 
+        const receptionists = result[0]?.receptionists || [];
+
+        const totalReceptionists = result[0]?.total[0]?.count || 0;
+
+        const totalPages = Math.ceil(totalReceptionists / limit);
+
+
+        return res.status(200).json({
+            receptionists,
+            totalReceptionists,
+            totalPages
+        })
+
+
     } catch (error) {
-        
+        console.log(error)
+        res.status(500).json({ error: error })
+
     }
 }
-
-
-

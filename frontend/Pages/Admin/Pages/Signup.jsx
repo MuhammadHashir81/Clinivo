@@ -10,12 +10,11 @@ import { clearError,adminSignup} from '../../../src/store/slices/authSlice';
 const Signup = () => {
     const dispatch = useDispatch()
 
-    const { success ,error,loading } = useSelector(state => state.auth)
+    const { success, error, loading } = useSelector(state => state.auth)
     console.log(success,error)
-
     
     
-     const {
+    const {
     register,
     formState: { errors },
     handleSubmit,
@@ -24,7 +23,7 @@ const Signup = () => {
 
   const onSubmit = async (data) => {
     console.log('this is data',data)
-     dispatch(adminSignup(data))
+    dispatch(adminSignup(data))
   }
 
   useEffect(()=>{

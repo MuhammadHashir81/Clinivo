@@ -6,12 +6,11 @@ import ProtectedRoute from "./Components/ProtectedRoute";
 
 
 
-const Patient = lazy(() => import('../Pages/Patient/Patient'))
-const Doctor = lazy(() => import('../Pages/Doctor/Doctor'))
 const Receptionist = lazy(() => import('../Pages/Receptionist/Receptionist'))
 
+
 // admin import 
-const Admin = lazy(() => import('../Pages/Admin/Pages/Admin'))
+const Admin = lazy(() => import('../Pages/Admin/Admin'))
 const AdminSignin = lazy(() => import('../Pages/Admin/Pages/Signin'))
 const AdminSignup = lazy(() => import('../Pages/Admin/Pages/Signup'))
 const Dashboard = lazy(() => import('../Pages/Admin/Pages/Dashboard'))
@@ -19,6 +18,14 @@ const Doctors = lazy(() => import('../Pages/Admin/Pages/Doctors'))
 const Receptionists = lazy(() => import('../Pages/Admin/Pages/Receptionists'))
 const Appointments = lazy(() => import('../Pages/Admin/Pages/Appointments'))
 const Clinic = lazy(()=>import('../Pages/Admin/Pages/Clinic'))
+
+// doctor imports
+const DoctorSignin = lazy(()=>import('../Pages/Doctor/Pages/Signin'))
+const Doctor = lazy(()=>import('../Pages/Doctor/Doctor')) 
+
+
+// receptionist imports 
+const ReceptionistSignin = lazy(()=>import('../Pages/Receptionist/Pages/Signin'))
 
 
 // sign in - sign up
@@ -40,13 +47,10 @@ const App = () => {
           <Route path='/' element={<Home />} />
 
 
-          <Route path='/patient' element={<Patient />} />
-          <Route path='/doctor' element={<Doctor />} />
-          <Route path='/receptionist' element={<Receptionist />} />
 
           {/* admin routes */}  
           <Route path='/admin' element={
-            <ProtectedRoute loginPath='/admin/sign-in'>
+            <ProtectedRoute  loginPath='/admin/sign-in' allowedRoles={['admin']}>
               <Admin />
             </ProtectedRoute>}
           >
@@ -65,6 +69,33 @@ const App = () => {
 
                {/* create clinic */}
           <Route path='/admin/create-clinic' element={<Clinic />} />
+
+
+
+          {/* doctor sign in */}
+          <Route path='/doctor/sign-in' element={<DoctorSignin/>}/>
+
+
+          {/* doctor routes */}
+          <Route path='/doctor'
+          element={
+            <ProtectedRoute role='doctor' loginPath='/doctor/sign-in' allowedRoles={['doctor']}> 
+            <Doctor/>
+            </ProtectedRoute>
+            
+          }/>
+
+
+
+          {/* receptionist routes */}
+          <Route path='/receptionist' 
+          element={
+            <ProtectedRoute role='doctor' loginPath='/doctor/sign-in' allowedRoles={['doctor']}> 
+            <Doctor/>
+            </ProtectedRoute>
+          }
+           />
+          <Route path='/receptionist/sign-in' element={<ReceptionistSignin />} />
 
 
         </Routes>

@@ -13,7 +13,7 @@ import {
   X,
 } from "lucide-react";
 
-import toast, {Toaster} from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import {
   Modal,
   Box,
@@ -661,7 +661,7 @@ const Doctors = () => {
             </button>
 
             <button 
-              onClick={nextPage}
+            onClick={nextPage}
             disabled={page === totalPages}
             className="h-9 px-3 rounded-lg border border-border text-sm text-muted-foreground disabled:opacity-50">
               Next

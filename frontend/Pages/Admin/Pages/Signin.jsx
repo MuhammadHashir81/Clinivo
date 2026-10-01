@@ -10,9 +10,9 @@ import { useSelector } from 'react-redux';
 
 const Signin = () => {
 
-    const { error,success,loading } = useSelector(state => state.auth)
+    const { error, success, loading } = useSelector(state => state.auth)
     const dispatch = useDispatch()
-
+    
 
          const {
         register,

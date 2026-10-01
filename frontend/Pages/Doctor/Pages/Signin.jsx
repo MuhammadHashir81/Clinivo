@@ -1,45 +1,41 @@
-import React from 'react'
-import { useState } from 'react'
-import toast, { Toaster } from 'react-hot-toast';
-import { NavLink } from 'react-router-dom';
-import { useForm } from "react-hook-form"
 import { Plus } from 'lucide-react';
-import { api } from '../../../services/api';
+import { NavLink } from 'react-router';
+import { useEffect } from 'react';
+import { useForm } from "react-hook-form"
+import toast, { Toaster } from 'react-hot-toast';
+import { useDispatch, useSelector } from 'react-redux';
+import { staffLogin } from '../../../src/store/slices/authSlice';
 
-const Clinic = () => {
+const Signin = () => {
+    
+    const dispatch = useDispatch()
 
-   const [loading,setLoading ] = useState(false)
-
-            const {
-           register,
-           formState: { errors },
-           handleSubmit,
-           reset
-         } = useForm()
-       
-         const onSubmit = async (data) => {
-            setLoading(true)
-            try {
-                const result = await api.post('/clinic/create',data)
-                console.log(result)
-                toast.success(result.success)
-
-                setLoading(false)
-                window.location.href='/admin/dashboard'
-                
-                
-
-            } catch (error) {
-                toast.error(error.response.data.error)
-                setLoading(false)
-
-            }
-         }
+    const { loading, error } = useSelector((state) => state.auth)
+    console.log(error,loading)
+        const {
+        register,
+        formState: { errors },
+        handleSubmit,
+        reset
+      } = useForm()
+    
+      const onSubmit = async (data) => {
+        console.log(data)   
+        dispatch(staffLogin(data))
+        window.location.href = '/doctor'
+      }
 
 
-   
+      useEffect(()=>{
 
- return (
+        if(error){
+            toast.error(error)
+        }
+
+      },[error])
+
+
+    return (
         <div className='flex items-center justify-center h-screen bg-background '>
             <Toaster/>
 
@@ -55,34 +51,22 @@ const Clinic = () => {
                 <div className='bg-card border border-border rounded-2xl shadow-sm px-10 py-10 flex flex-col gap-6'>
 
                     <div className='flex flex-col gap-2 text-center'>
-                        <h1 className='font-inter font-bold text-2xl text-foreground tracking-tight'>Create Clinic</h1>
+                        <h1 className='font-inter font-bold text-2xl text-foreground tracking-tight'>welcome back doctor</h1>
+                        <p className='font-inter text-sm text-muted-foreground'>Sign in to your Clinivo account</p>
                     </div>
 
                     <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
 
                         <div className='flex flex-col gap-1.5'>
-                            <label className='font-inter text-sm font-medium text-foreground'>Clinic name</label>
+                            <label className='font-inter text-sm font-medium text-foreground'>Email</label>
                             <input
-                                type='text'
-                                placeholder='clinic name'
+                                type='email'
+                                placeholder='doctor@gmail.com'
                                 className='font-inter text-sm px-4 py-3 rounded-lg border border-border bg-background text-foreground outline-none focus:ring-2 focus:ring-ring'
-                                {...register("name", { required: 'clinic name is required' })}
+                                {...register("email", { required: 'email is required' })}
                             />
 
-                            <p className='text-red-500'>{errors.name?.message}</p>
-
-                        </div>
-
-                        <div className='flex flex-col gap-1.5'>
-                            <label className='font-inter text-sm font-medium text-foreground'>address</label>
-                            <input
-                                type='text'
-                                placeholder='address'
-                                className='font-inter text-sm px-4 py-3 rounded-lg border border-border bg-background text-foreground outline-none focus:ring-2 focus:ring-ring'
-                                {...register("address", { required: 'please enter address' })}
-                            />
-
-                            <p className='text-red-500'>{errors.address?.message}</p>
+                            <p className='text-red-500'>{errors.email?.message}</p>
 
                         </div>
 
@@ -108,12 +92,16 @@ const Clinic = () => {
                                 ${loading ? 'disabled' : ''}`}
                         >
                             {
-                                !loading ? 'create' : 'create...'
+                                !loading ? 'signin' : 'signin...'
                             }
                         </button>
 
                     </form>
 
+                    <p className='font-inter text-sm text-muted-foreground text-center'>
+                        Did not sign up yet?{' '}
+                        <a href='/admin/sign-up' className='text-primary font-semibold'>Sign up</a>
+                    </p>
 
                 </div>
 
@@ -122,4 +110,4 @@ const Clinic = () => {
     )
 }
 
-export default Clinic
+export default Signin

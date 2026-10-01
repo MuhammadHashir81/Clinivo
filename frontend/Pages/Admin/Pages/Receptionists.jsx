@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   Search,
@@ -20,103 +20,12 @@ import {
   TextField,
   MenuItem,
 } from "@mui/material";
+import { api } from "../../../services/api";
+import toast, {Toaster} from 'react-hot-toast';
 
-/* =========================================================
-   RECEPTIONISTS DATA
-========================================================= */
 
-const receptionistsData = [
-  {
-    id: 1,
-    name: "Ayesha Malik",
-    email: "ayesha.malik@clinivo.pk",
-    phone: "+92 300 1234567",
-    shift: "Morning",
-    appointments: 186,
-    status: "Active",
-    joined: "Jan 08, 2026",
-  },
-  {
-    id: 2,
-    name: "Hassan Ahmed",
-    email: "hassan.ahmed@clinivo.pk",
-    phone: "+92 301 9876543",
-    shift: "Evening",
-    appointments: 164,
-    status: "Active",
-    joined: "Jan 22, 2026",
-  },
-  {
-    id: 3,
-    name: "Fatima Noor",
-    email: "fatima.noor@clinivo.pk",
-    phone: "+92 302 4567890",
-    shift: "Morning",
-    appointments: 152,
-    status: "Active",
-    joined: "Feb 14, 2026",
-  },
-  {
-    id: 4,
-    name: "Usman Tariq",
-    email: "usman.tariq@clinivo.pk",
-    phone: "+92 303 2345678",
-    shift: "Evening",
-    appointments: 139,
-    status: "Active",
-    joined: "Feb 27, 2026",
-  },
-  {
-    id: 5,
-    name: "Maryam Khan",
-    email: "maryam.khan@clinivo.pk",
-    phone: "+92 304 7654321",
-    shift: "Morning",
-    appointments: 121,
-    status: "Inactive",
-    joined: "Mar 11, 2026",
-  },
-  {
-    id: 6,
-    name: "Bilal Shah",
-    email: "bilal.shah@clinivo.pk",
-    phone: "+92 305 3456789",
-    shift: "Night",
-    appointments: 108,
-    status: "Active",
-    joined: "Apr 05, 2026",
-  },
-  {
-    id: 7,
-    name: "Sara Khan",
-    email: "sara.khan@clinivo.pk",
-    phone: "+92 306 8765432",
-    shift: "Morning",
-    appointments: 94,
-    status: "Active",
-    joined: "Apr 23, 2026",
-  },
-  {
-    id: 8,
-    name: "Hamza Ali",
-    email: "hamza.ali@clinivo.pk",
-    phone: "+92 307 5678901",
-    shift: "Evening",
-    appointments: 82,
-    status: "Inactive",
-    joined: "May 17, 2026",
-  },
-];
 
-/* =========================================================
-   SHIFTS
-========================================================= */
 
-const shifts = [
-  "Morning",
-  "Evening",
-  "Night",
-];
 
 /* =========================================================
    RECEPTIONISTS COMPONENT
@@ -124,94 +33,93 @@ const shifts = [
 
 const Receptionists = () => {
 
-  /* =======================================================
-     STATES
-  ======================================================= */
-
   const [search, setSearch] = useState("");
+  const [receptionists,setReceptionists] = useState([])
+  const [page,setPage] = useState(1)
+  const [totalPages,setTotalPages] = useState(0)
+  const [totalReceptionists,setTotalReceptionists] = useState(0)
 
   const [statusFilter, setStatusFilter] =
     useState("All Status");
 
+    const shifts = [
+  "morning",
+  "evening",
+];
+
+
+const limit = 10
+
   const [openModal, setOpenModal] =
     useState(false);
 
-  const [receptionistForm, setReceptionistForm] =
-    useState({
+
+      const [receptionistForm, setReceptionistForm] = useState({
       name: "",
       email: "",
+      password: "",
       phone: "",
       shift: "",
-      status: "Active",
+      role:"receptionist"
     });
 
 
-  /* =======================================================
-     FILTER RECEPTIONISTS
-  ======================================================= */
+    console.log(receptionistForm)
 
-  const filteredReceptionists =
-    receptionistsData.filter((receptionist) => {
+const handleCreateReceptionist = async (e) => {
 
-      const matchesSearch =
-        receptionist.name
-          .toLowerCase()
-          .includes(search.toLowerCase()) ||
+    e.preventDefault();
 
-        receptionist.email
-          .toLowerCase()
-          .includes(search.toLowerCase()) ||
+    try {
+      const response = await api.post('/staff/create', receptionistForm)
+      getAllRecepitonists()
+      toast.success(response.success)
+    } catch (error) {
+      toast.error(error.response.data.error)
+      console.log(error.response.data)
+    }
 
-        receptionist.phone
-          .toLowerCase()
-          .includes(search.toLowerCase());
+    console.log(receptionistForm)
 
 
-      const matchesStatus =
-        statusFilter === "All Status" ||
-        receptionist.status === statusFilter;
+
+    handleCloseModal();
+};
 
 
-      return (
-        matchesSearch &&
-        matchesStatus
-      );
-    });
+
+ const getAllRecepitonists = async () => {
+  try {
+    const result = await api.get(`/staff/get-all-receptionists?page=${page}&limit=${limit}&search=${search}`)
+    setReceptionists(result.receptionists)
+    setTotalReceptionists(result.totalReceptionists)
+    setTotalPages(result.totalPages)
+    console.log(result)
+  } catch (error) {
+    console.log(error)
+    
+  }
+}
 
 
-  /* =======================================================
-     STATISTICS
-  ======================================================= */
-
-  const totalReceptionists =
-    receptionistsData.length;
+useEffect(()=>{
+   getAllRecepitonists()
+},[search,page])
 
 
-  const activeReceptionists =
-    receptionistsData.filter(
-      (receptionist) =>
-        receptionist.status === "Active"
-    ).length;
 
 
-  const inactiveReceptionists =
-    receptionistsData.filter(
-      (receptionist) =>
-        receptionist.status === "Inactive"
-    ).length;
 
+      // previous-next pages
 
-  const totalAppointments =
-    receptionistsData.reduce(
-      (total, receptionist) =>
-        total + receptionist.appointments,
-      0
-    );
+  const previousPage = () => {
+    setPage(page - 1)
+  }
 
+  const nextPage = () => {
+    setPage(page + 1 )
+  }
 
-  /* =======================================================
-     FORM CHANGE
-  ======================================================= */
 
   const handleReceptionistChange = (e) => {
 
@@ -241,46 +149,18 @@ const Receptionists = () => {
       email: "",
       phone: "",
       shift: "",
-      status: "Active",
+      password:"",
+      role:"receptionist"
     });
   };
 
 
-  /* =======================================================
-     CREATE RECEPTIONIST
-  ======================================================= */
 
-  const handleCreateReceptionist = (e) => {
-
-    e.preventDefault();
-
-
-    console.log(
-      "Receptionist Data:",
-      receptionistForm
-    );
-
-
-    /*
-      Later connect this with Redux/API:
-
-      dispatch(
-        createReceptionist(receptionistForm)
-      );
-    */
-
-
-    handleCloseModal();
-  };
-
-
-  /* =======================================================
-     RETURN
-  ======================================================= */
 
   return (
 
     <div className="w-full min-h-screen bg-background p-6 lg:p-8">
+      <Toaster/>
 
       {/* ===================================================
           HEADER
@@ -305,7 +185,7 @@ const Receptionists = () => {
 
         <button
           onClick={() => setOpenModal(true)}
-          className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition"
+          className="cursor-pointer inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition"
         >
 
           <Plus size={18} />
@@ -333,21 +213,21 @@ const Receptionists = () => {
 
         <StatCard
           title="Active Receptionists"
-          value={activeReceptionists}
+          value={"activeReceptionists"}
           icon={UserCheck}
         />
 
 
         <StatCard
           title="Inactive Receptionists"
-          value={inactiveReceptionists}
+          value={"inactiveReceptionists"}
           icon={UserX}
         />
 
 
         <StatCard
           title="Appointments Handled"
-          value={totalAppointments}
+          value={"totalAppointments"}
           icon={CalendarDays}
         />
 
@@ -393,29 +273,6 @@ const Receptionists = () => {
             </div>
 
 
-            {/* STATUS FILTER */}
-
-            <select
-              value={statusFilter}
-              onChange={(e) =>
-                setStatusFilter(e.target.value)
-              }
-              className="h-10 rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary"
-            >
-
-              <option>
-                All Status
-              </option>
-
-              <option>
-                Active
-              </option>
-
-              <option>
-                Inactive
-              </option>
-
-            </select>
 
           </div>
 
@@ -469,6 +326,7 @@ const Receptionists = () => {
 
 
                 <th className="px-5 py-3">
+                  actions
                 </th>
 
 
@@ -482,13 +340,13 @@ const Receptionists = () => {
             <tbody>
 
 
-              {filteredReceptionists.length > 0 ? (
+              {receptionists.length > 0 ? (
 
-                filteredReceptionists.map(
+                receptionists.map(
                   (receptionist) => (
 
                     <tr
-                      key={receptionist.id}
+                      key={receptionist._id}
                       className="border-b border-border last:border-none hover:bg-muted/40 transition"
                     >
 
@@ -518,7 +376,7 @@ const Receptionists = () => {
                             <p className="text-xs text-muted-foreground mt-0.5">
                               ID: REC-
                               {String(
-                                receptionist.id
+                                receptionist._id
                               ).padStart(4, "0")}
                             </p>
 
@@ -617,7 +475,7 @@ const Receptionists = () => {
 
                       <td className="px-5 py-4 text-muted-foreground">
 
-                        {receptionist.joined}
+                        {new Date(receptionist.date).toLocaleDateString('en-GB')}
 
                       </td>
 
@@ -706,7 +564,7 @@ const Receptionists = () => {
 
             <span className="font-medium text-foreground">
 
-              {filteredReceptionists.length}
+              {receptionists.length}
 
             </span>{" "}
 
@@ -727,7 +585,8 @@ const Receptionists = () => {
 
 
             <button
-              disabled
+              disabled={page === 1}
+              onClick={previousPage}
               className="h-9 px-3 rounded-lg border border-border text-sm text-muted-foreground disabled:opacity-50"
             >
               Previous
@@ -735,11 +594,16 @@ const Receptionists = () => {
 
 
             <button className="h-9 min-w-9 px-3 rounded-lg bg-primary text-primary-foreground text-sm">
-              1
+              {page}
             </button>
 
 
-            <button className="h-9 px-3 rounded-lg border border-border text-sm hover:bg-muted">
+            <button 
+            className="h-9 px-3 rounded-lg border border-border text-sm hover:bg-muted"
+            onClick={nextPage}
+            disabled={page === totalPages}
+            >
+
               Next
             </button>
 
@@ -821,7 +685,7 @@ const Receptionists = () => {
 
               <X
                 size={20}
-                className="text-muted-foreground"
+                className="text-muted-foreground cursor-pointer cursor-pointer"
               />
 
             </button>
@@ -869,7 +733,7 @@ const Receptionists = () => {
                     onChange={
                       handleReceptionistChange
                     }
-                    placeholder="Ayesha Malik"
+                    placeholder="receptionist"
                     size="small"
                   />
 
@@ -907,6 +771,21 @@ const Receptionists = () => {
                       handleReceptionistChange
                     }
                     placeholder="+92 300 1234567"
+                    size="small"
+                  />
+
+                  <TextField
+                    fullWidth
+                    required
+                    label="Password"
+                    name="password"
+                    value={
+                      receptionistForm.password
+                    }
+                    onChange={
+                      handleReceptionistChange
+                    }
+                    placeholder="*******"
                     size="small"
                   />
 
@@ -951,47 +830,7 @@ const Receptionists = () => {
 
               {/* ACCOUNT INFORMATION */}
 
-              <div>
-
-                <h3 className="text-sm font-semibold text-foreground mb-4">
-                  Account Information
-                </h3>
-
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-
-                  {/* STATUS */}
-
-                  <TextField
-                    select
-                    fullWidth
-                    label="Status"
-                    name="status"
-                    value={
-                      receptionistForm.status
-                    }
-                    onChange={
-                      handleReceptionistChange
-                    }
-                    size="small"
-                  >
-
-                    <MenuItem value="Active">
-                      Active
-                    </MenuItem>
-
-
-                    <MenuItem value="Inactive">
-                      Inactive
-                    </MenuItem>
-
-                  </TextField>
-
-
-                </div>
-
-              </div>
+              
 
 
               {/* INFO BOX */}
@@ -1020,8 +859,6 @@ const Receptionists = () => {
                       Receptionists can manage patients,
                       create and update appointments,
                       and handle basic front-desk operations.
-                      Permissions should be controlled by
-                      your RBAC system.
 
                     </p>
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { LogOut } from "lucide-react";
-import { api } from "../../../services/api";
+import { api } from "../../services/api";
 // ---------- Sidebar ----------
 
 const navItems = [
