@@ -21,6 +21,7 @@ import {
     Stethoscope,
     MessageCircle
 } from 'lucide-react';
+import { api } from '../../services/api';
 
 /* -------------------------------------------------------------------------- */
 /*  Mock data — replace with API calls                                         */
@@ -765,6 +766,16 @@ const Receptionist = ({ receptionistName = 'Receptionist' }) => {
     const paymentTarget = modal?.type === 'payment' ? appointments.find((a) => a.id === modal.id) : null;
     const unsentReminders = tomorrows.filter((a) => !a.reminderSent).length;
 
+    const handleLogout = async() => {
+            try {
+                const result = await api.post('/auth/logout')
+                console.log(result) 
+            } catch (error) {
+                console.log(error)
+            }
+    
+        }
+
     return (
         <div className="min-h-screen bg-background p-6 font-inter">
             {/* Header */}
@@ -796,6 +807,7 @@ const Receptionist = ({ receptionistName = 'Receptionist' }) => {
                         <CalendarPlus size={16} />
                         New appointment
                     </button>
+                    <button onClick={handleLogout}>logout</button>
                 </div>
             </div>
 

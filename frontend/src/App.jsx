@@ -3,6 +3,7 @@ import Home from '../Pages/Home/Home'
 import { Routes, Route } from "react-router";
 import { Oval } from 'react-loader-spinner'
 import ProtectedRoute from "./Components/ProtectedRoute";
+import Unauthorized from '../Pages/Unauthorized';
 
 
 
@@ -90,14 +91,20 @@ const App = () => {
           {/* receptionist routes */}
           <Route path='/receptionist' 
           element={
-            <ProtectedRoute role='doctor' loginPath='/doctor/sign-in' allowedRoles={['doctor']}> 
-            <Doctor/>
+            <ProtectedRoute role='receptionist' loginPath='/receptionist/sign-in' 
+            allowedRoles={['receptionist']}> 
+            <Receptionist/>
             </ProtectedRoute>
           }
            />
-          <Route path='/receptionist/sign-in' element={<ReceptionistSignin />} />
+          <Route path='/receptionist/sign-in' element={<ReceptionistSignin/>} />
 
 
+
+
+        {/* unauthorized route */}
+
+        <Route path='/unauthorized' element={<Unauthorized/>}/>
         </Routes>
       </Suspense>
 

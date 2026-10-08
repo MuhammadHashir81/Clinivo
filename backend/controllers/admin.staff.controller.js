@@ -113,16 +113,14 @@ export const createStaff = async (req, res) => {
 export const loginStaff = async (req, res) => {
 
     try {
-        const { email, password } = req.body;
+        const { email, password, role } = req.body;
 
         // Find staff
         const staff = await User.findOne({
             email,
-            role: {
-                $in: ["doctor", "receptionist"]
-            }
+            role
         });
-
+        
         if (!staff) {
             return res.status(401).json({
                 error: "Invalid email or password"
@@ -137,7 +135,7 @@ export const loginStaff = async (req, res) => {
 
         if (!isPasswordMatch) {
             return res.status(401).json({
-                error: "Invalid email or password"
+                error: "Invalid password"
             });
         }
 
@@ -191,7 +189,7 @@ export const loginStaff = async (req, res) => {
         );
 
         return res.status(200).json({
-            success: "Staff login successful",
+            success: "login successfully",
             user: {
                 id: staff._id,
                 name: staff.name,

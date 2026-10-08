@@ -26,7 +26,7 @@
         failedQueue = [];
     };
 
-    const redirectToSignin = () => {
+const redirectToSignin = () => {
   const path = window.location.pathname;
   console.log(path)
 
@@ -91,7 +91,7 @@
                         
 
                         // Redirect to sign-in or dispatch logout action
-                        redirectToSignin()
+                        // redirectToSignin()
                         
                         return Promise.reject(refreshError);
                     }

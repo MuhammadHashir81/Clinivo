@@ -5,12 +5,12 @@ import { useForm } from "react-hook-form"
 import toast, { Toaster } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { staffLogin } from '../../../src/store/slices/authSlice';
-
+import { clearError } from '../../../src/store/slices/authSlice';
 const Signin = () => {
     
     const dispatch = useDispatch()
 
-    const { loading, error } = useSelector((state) => state.auth)
+    const { loading, error,success } = useSelector((state) => state.auth)
     console.log(error,loading)
         const {
         register,
@@ -20,19 +20,32 @@ const Signin = () => {
       } = useForm()
     
       const onSubmit = async (data) => {
+        const loginData = {
+            ...data,
+            role:'doctor'
+        }
         console.log(data)   
-        dispatch(staffLogin(data))
-        window.location.href = '/doctor'
+        dispatch(staffLogin(loginData))
       }
 
 
-      useEffect(()=>{
+  useEffect(()=>{
 
-        if(error){
-            toast.error(error)
-        }
+    if(success){
+        toast.success(success)
+        dispatch(clearError())
+        reset()
+        setTimeout(() => {
+        window.location.href = '/doctor'
+        }, 2000);
+    }
+    else if (error){
+     toast.error(error)
+     dispatch(clearError())
+    }
+    
+  },[error,success])
 
-      },[error])
 
 
     return (

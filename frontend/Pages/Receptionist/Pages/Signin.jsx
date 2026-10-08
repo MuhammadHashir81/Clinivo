@@ -7,11 +7,12 @@ import { useState } from 'react';
 import { api } from '../../../services/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { staffLogin } from '../../../src/store/slices/authSlice';
+import { clearError } from '../../../src/store/slices/authSlice';
 
 const Signin = () => {
     const dispatch = useDispatch()
 
-    const { loading } = useSelector((state) => state.auth)
+    const { loading, error, success } = useSelector((state) => state.auth)
 
 
         const {
@@ -22,12 +23,41 @@ const Signin = () => {
       } = useForm()
     
       const onSubmit = async (data) => {
-        console.log(data)
-        dispatch(staffLogin(data))
-        // window.location.href = '/receptionist'
+        const loginData = {
+            ...data,
+            role:'receptionist'
+        }
+        try {
+         const result = await dispatch(staffLogin(loginData))
+         console.log(result)
+            
+        } catch (error) {
+            console.log(error)
+        }
+
+
+        
       }
 
 
+
+
+  useEffect(()=>{
+
+    if(success){
+        toast.success(success)
+        dispatch(clearError())
+        reset()
+        setTimeout(() => {
+        window.location.href = '/receptionist'
+        }, 2000);
+    }
+    else if (error){
+     toast.error(error)
+     dispatch(clearError())
+    }
+    
+  },[error,success])
 
     return (
         <div className='flex items-center justify-center h-screen bg-background '>

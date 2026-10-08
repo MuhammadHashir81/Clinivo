@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { api } from '../../services/api';
 import {
     CalendarDays,
     Users,
@@ -542,10 +543,20 @@ const Doctor = ({ doctorName = 'Doctor' }) => {
 
     const canStart = !inProgress && availability !== 'off';
 
+
+    const handleLogout = async() => {
+        try {
+            const result = await api.post('/auth/logout')
+            console.log(result) 
+        } catch (error) {
+            console.log(error)
+        }
+
+    }
     return (
         <div className="min-h-screen bg-background p-6 font-inter">
             {/* Header */}
-            <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div className=" mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
                     <div className="flex items-center gap-2">
                         <Stethoscope size={24} className="text-primary" />
@@ -580,6 +591,15 @@ const Doctor = ({ doctorName = 'Doctor' }) => {
                             {opt.label}
                         </button>
                     ))}
+                    
+                <div className=''>
+
+                <button onClick={handleLogout} 
+                className='bg-red-500 text-white rounded-lg px-2.5 py-1.5 text-sm '>
+                    logout
+                </button>
+                </div>
+                    
                 </div>
             </div>
 
