@@ -62,6 +62,15 @@ const Home = () => {
                                 anchor='bottom end'
                                 className='w-48 mt-2 origin-top-right rounded-xl border border-border bg-background p-2 shadow-lg focus:outline-none'
                             >
+                                
+                                <MenuItem>
+                                    <a
+                                        href='/admin'
+                                        className='block px-3 py-2 text-sm rounded-lg hover:bg-muted font-inter'
+                                    >
+                                        admin
+                                    </a>
+                                </MenuItem>
 
                                 <MenuItem>
                                     <a
@@ -72,14 +81,6 @@ const Home = () => {
                                     </a>
                                 </MenuItem>
 
-                                <MenuItem>
-                                    <a
-                                        href='/admin'
-                                        className='block px-3 py-2 text-sm rounded-lg hover:bg-muted font-inter'
-                                    >
-                                        admin
-                                    </a>
-                                </MenuItem>
 
                                 <MenuItem>
                                     <a

@@ -331,6 +331,8 @@ export const getAllDoctors = async (req, res) => {
     }
 };
 
+
+
 // get all receptionists
 export const getAllReceptionists = async (req, res) => {
     try {
@@ -454,5 +456,53 @@ export const getAllReceptionists = async (req, res) => {
         console.log(error)
         res.status(500).json({ error: error })
 
+    }
+}
+
+
+
+export const updateStaff = async (req,res)=>{
+    try {
+        const { userId } = req
+        const { staffId } = req.params
+
+       const {
+            name,
+            email,
+            password,
+            phone,
+            specialization,
+            experience,
+            consultationFee,
+            bio,
+            shift
+        } = req.body;
+        
+        const clinic = await Clinic.findOne({
+            ownerId: userId
+        });
+
+        if(!clinic){
+            return res.status(400).json({error:'clinic does not exist'})
+        }
+
+        let staffDetails = await Doctor.findOne({
+            userId:staffId,
+            clinicId:clinic._id
+        })
+
+        if(!staffDetails){
+            
+        }
+
+
+
+
+
+
+    } catch (error) {
+        return res.status(500).json({error:error.message})
+        conssole.log(error)
+        
     }
 }

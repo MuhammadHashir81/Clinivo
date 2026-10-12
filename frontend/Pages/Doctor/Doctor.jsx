@@ -547,6 +547,7 @@ const Doctor = ({ doctorName = 'Doctor' }) => {
     const handleLogout = async() => {
         try {
             const result = await api.post('/auth/logout')
+            
             console.log(result) 
         } catch (error) {
             console.log(error)
