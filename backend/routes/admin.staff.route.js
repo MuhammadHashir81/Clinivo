@@ -13,6 +13,8 @@ staffRouter.post('/create', verifyUser,  createStaff)
 staffRouter.post('/login',   loginStaff) 
 staffRouter.get('/get-all/doctors', verifyUser, getAllDoctors)
 staffRouter.get('/get-all-receptionists',verifyUser,getAllReceptionists) 
+staffRouter.patch('/staff/update',verifyUser,getAllReceptionists)
+
 
     
 //staff

@@ -516,6 +516,7 @@ const Doctors = () => {
                 </th>
 
                 <th className="px-5 py-3">
+                actions
                 </th>
 
               </tr>
@@ -583,6 +584,9 @@ const Doctors = () => {
                           {doctor.phone}
                         </div>
 
+                        
+                        
+
                       </div>
 
                     </td>
@@ -591,6 +595,12 @@ const Doctors = () => {
                     <td className="px-5 py-4 text-muted-foreground">
                       {new Date(doctor.date).toLocaleDateString("en-GB")}
                     </td>
+                    
+                    <td>
+                      <button className="cursor-pointer text-blue-500">edit</button> { " " }
+                      <button className="cursor-pointer text-red-500">delete</button>
+                    </td>
+
 
 
                   </tr>

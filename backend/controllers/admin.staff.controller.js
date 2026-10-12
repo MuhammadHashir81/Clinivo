@@ -491,13 +491,64 @@ export const updateStaff = async (req,res)=>{
             clinicId:clinic._id
         })
 
-        if(!staffDetails){
-            
+        let role = "doctor"
+
+          if (!staffDetails) {
+
+            staffDetails = await Receptionist.findOne({
+            userId: staffId,
+            clinicId: clinic._id
+            });
+            role = "receptionist";
+
+        }
+
+        if (!staffDetails) {
+            return res.status(404).json({
+                error: "Staff member not found in your clinic"
+            });
+        }
+
+        const user = await User.findById(staffId);
+
+         if (!user) {
+            return res.status(404).json({ error: "User account not found" });
+        }
+
+        if (name) {
+            user.name = name.trim();
+        }
+        
+        if(email){
+            user.email = email
+        }
+
+        if(password){
+            user.password = await bcrypt.hash(password,10)
+        }
+
+        await user.save()
+
+         // ----- Update role-specific fields -----
+        if (role === "doctor") {
+            if (phone !== undefined) staffDetails.phone = phone;
+            if (specialization !== undefined) staffDetails.specialization = specialization;
+            if (experience !== undefined) staffDetails.experience = experience;
+            if (consultationFee !== undefined) staffDetails.consultationFee = consultationFee;
+            if (bio !== undefined) staffDetails.bio = bio;
+        } 
+        else {
+            if (phone !== undefined) staffDetails.phone = phone;
+            if (shift !== undefined) staffDetails.shift = shift;
         }
 
 
+        await staffDetails.save()
 
-
+        return res.status(200).json({
+            success: `${role} updated successfully`,
+            staff: staffDetails
+        });
 
 
     } catch (error) {
