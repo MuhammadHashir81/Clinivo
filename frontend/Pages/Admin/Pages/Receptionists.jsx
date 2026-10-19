@@ -21,52 +21,64 @@ import {
   MenuItem,
 } from "@mui/material";
 import { api } from "../../../services/api";
-import toast, {Toaster} from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 
 
 
 
 
 /* =========================================================
-   RECEPTIONISTS COMPONENT
+   RECEPTIONISTS COMPONENT  
 ========================================================= */
 
 const Receptionists = () => {
 
   const [search, setSearch] = useState("");
-  const [receptionists,setReceptionists] = useState([])
-  const [page,setPage] = useState(1)
-  const [totalPages,setTotalPages] = useState(0)
-  const [totalReceptionists,setTotalReceptionists] = useState(0)
+  const [receptionists, setReceptionists] = useState([])
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(0)
+  const [totalReceptionists, setTotalReceptionists] = useState(0)
+  const [staffId, setStaffId] = useState(null)
+
+  const [openUpdateModal, setOpenUpdateModal] = useState(false)
 
   const [statusFilter, setStatusFilter] =
     useState("All Status");
 
-    const shifts = [
-  "morning",
-  "evening",
-];
+  const shifts = [
+    "morning",
+    "evening",
+  ];
 
 
-const limit = 10
+  const limit = 10
 
   const [openModal, setOpenModal] =
     useState(false);
 
 
-      const [receptionistForm, setReceptionistForm] = useState({
-      name: "",
-      email: "",
-      password: "",
-      phone: "",
-      shift: "",
-      role:"receptionist"
-    });
+  const [receptionistForm, setReceptionistForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    phone: "",
+    shift: "",
+    role: "receptionist"
+  });
 
 
-    console.log(receptionistForm)
+  const [updateForm, setUpdateForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    phone: "",
+    shift: "",
+    role: "",
+  });
 
-const handleCreateReceptionist = async (e) => {
+
+
+  const handleCreateReceptionist = async (e) => {
 
     e.preventDefault();
 
@@ -84,40 +96,40 @@ const handleCreateReceptionist = async (e) => {
 
 
     handleCloseModal();
-};
+  };
 
 
 
- const getAllRecepitonists = async () => {
-  try {
-    const result = await api.get(`/staff/get-all-receptionists?page=${page}&limit=${limit}&search=${search}`)
-    setReceptionists(result.receptionists)
-    setTotalReceptionists(result.totalReceptionists)
-    setTotalPages(result.totalPages)
-    console.log(result)
-  } catch (error) {
-    console.log(error)
-    
+  const getAllRecepitonists = async () => {
+    try {
+      const result = await api.get(`/staff/get-all-receptionists?page=${page}&limit=${limit}&search=${search}`)
+      setReceptionists(result.receptionists)
+      setTotalReceptionists(result.totalReceptionists)
+      setTotalPages(result.totalPages)
+      console.log(result)
+    } catch (error) {
+      console.log(error)
+
+    }
   }
-}
 
 
-useEffect(()=>{
-   getAllRecepitonists()
-},[search,page])
-
-
+  useEffect(() => {
+    getAllRecepitonists()
+  }, [search, page])
 
 
 
-      // previous-next pages
+
+
+  // previous-next pages
 
   const previousPage = () => {
     setPage(page - 1)
   }
 
   const nextPage = () => {
-    setPage(page + 1 )
+    setPage(page + 1)
   }
 
 
@@ -149,18 +161,70 @@ useEffect(()=>{
       email: "",
       phone: "",
       shift: "",
-      password:"",
-      role:"receptionist"
+      password: "",
+      role: "receptionist"
     });
   };
 
 
 
+  //update receptionist 
+  const handleOpenUpdateModal = (receptionist) => {
+    setUpdateForm({
+      name: receptionist.name ?? "",
+      email: receptionist.email ?? "",
+      phone: receptionist.phone ?? "",
+      shift: receptionist.shift ?? "",
+      password: receptionist.password ?? "",
+      role: 'receptionist'
 
+    })
+    setStaffId(receptionist._id)
+    setOpenUpdateModal(true)
+  }
+
+
+  // delete receptionist 
+  const handleDelete = async () => {
+    try {
+
+
+    } catch (error) {
+
+    }
+
+  }
+
+  const handleCloseUpdateModal = () => {
+    setOpenUpdateModal(false)
+
+  }
+
+  const handleSubmitUpdate = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await api.patch(`/staff/update/${staffId}`, updateForm)
+      toast.success(response.success)
+      getAllRecepitonists()
+      handleCloseUpdateModal()
+    } catch (error) {
+      toast.error(error.response?.data?.error || "Something went wrong")
+      console.log(error.response?.data || error)
+    }
+  }
+  const handleUpdateChange = (e) => {
+    const { name, value } = e.target;
+
+    setUpdateForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
   return (
 
     <div className="w-full min-h-screen bg-background p-6 lg:p-8">
-      <Toaster/>
+      <Toaster />
 
       {/* ===================================================
           HEADER
@@ -373,12 +437,6 @@ useEffect(()=>{
                               {receptionist.name}
                             </p>
 
-                            <p className="text-xs text-muted-foreground mt-0.5">
-                              ID: REC-
-                              {String(
-                                receptionist._id
-                              ).padStart(4, "0")}
-                            </p>
 
                           </div>
 
@@ -483,18 +541,26 @@ useEffect(()=>{
                       {/* ACTIONS */}
 
                       <td className="px-5 py-4">
+                        <button
+                          className="cursor-pointer text-blue-500"
+                          onClick={() => handleOpenUpdateModal(receptionist)}
+                        >
+
+                          edit
+                        </button>
+
+                        {" "}
 
                         <button
                           type="button"
-                          className="p-2 rounded-lg hover:bg-muted transition"
+                          className="cursor-pointer text-red-500"
+                          onClick={() => handleDelete()}
                         >
-
-                          <MoreHorizontal
-                            size={18}
-                            className="text-muted-foreground"
-                          />
-
+                          delete
                         </button>
+
+
+
 
                       </td>
 
@@ -598,10 +664,10 @@ useEffect(()=>{
             </button>
 
 
-            <button 
-            className="h-9 px-3 rounded-lg border border-border text-sm hover:bg-muted"
-            onClick={nextPage}
-            disabled={page === totalPages}
+            <button
+              className="h-9 px-3 rounded-lg border border-border text-sm hover:bg-muted"
+              onClick={nextPage}
+              disabled={page === totalPages}
             >
 
               Next
@@ -830,7 +896,7 @@ useEffect(()=>{
 
               {/* ACCOUNT INFORMATION */}
 
-              
+
 
 
               {/* INFO BOX */}
@@ -911,6 +977,146 @@ useEffect(()=>{
 
       </Modal>
 
+      {/* update modal */}
+
+      <Modal
+        open={openUpdateModal}
+        onClose={handleCloseUpdateModal}
+        aria-labelledby="update-doctor-modal"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: {
+              xs: "92%",
+              sm: "600px",
+              md: "700px",
+            },
+            maxHeight: "90vh",
+            overflowY: "auto",
+            bgcolor: "background.paper",
+            borderRadius: "12px",
+            boxShadow: 24,
+            outline: "none",
+          }}
+        >
+          {/* Modal Header */}
+          <div className="flex items-center justify-between px-6 py-5 border-b border-border">
+            <div>
+              <h2
+                id="update-doctor-modal"
+                className="text-lg font-semibold text-foreground"
+              >
+                Update receptionist
+              </h2>
+
+              <p className="text-sm text-muted-foreground mt-1">
+                Edit the doctor's details.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleCloseUpdateModal}
+              className="p-2 rounded-lg hover:bg-muted transition"
+            >
+              <X size={20} className="text-muted-foreground cursor-pointer" />
+            </button>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmitUpdate}>
+            <div className="p-6 space-y-5">
+
+              {/* Basic Information */}
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-4">
+                  Basic Information
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <TextField
+                    fullWidth
+                    required
+                    label="name"
+                    name="name"
+                    value={updateForm.name}
+                    onChange={handleUpdateChange}
+                    size="small"
+                  />
+
+                  <TextField
+                    fullWidth
+                    required
+                    type="email"
+                    label="Email Address"
+                    name="email"
+                    value={updateForm.email}
+                    onChange={handleUpdateChange}
+                    size="small"
+
+                  />
+
+                  <TextField
+                    fullWidth
+                    required
+                    type="text"
+                    label="phone"
+                    name="phone"
+                    value={updateForm.phone}
+                    onChange={handleUpdateChange}
+                    size="small"
+                  />
+
+                  <TextField
+                    fullWidth
+                    required
+                    type="text"
+                    label="shift"
+                    name="shift"
+                    value={updateForm.shift}
+                    onChange={handleUpdateChange}
+                    size="small"
+                  />
+
+
+
+                </div>
+              </div>
+
+
+
+
+
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border bg-muted/20">
+              <button
+                type="button"
+                onClick={handleCloseUpdateModal}
+                className="cursor-pointer h-10 px-4 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-muted transition"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                className="cursor-pointer h-10 px-5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition"
+              >
+                Update Doctor
+              </button>
+            </div>
+          </form>
+        </Box>
+      </Modal>
+
+
+
+
 
     </div>
   );
@@ -984,9 +1190,8 @@ const StatusBadge = ({
   return (
 
     <span
-      className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${
-        styles[status]
-      }`}
+      className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${styles[status]
+        }`}
     >
       {status}
     </span>

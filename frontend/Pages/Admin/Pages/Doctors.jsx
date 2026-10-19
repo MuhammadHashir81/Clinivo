@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Swal from "sweetalert2";
 import {
   Search,
   Plus,
@@ -47,13 +48,14 @@ const Doctors = () => {
   const [totalPages,setTotalPages] = useState(0)
   const [page,setPage] = useState(1)
   const [totalDoctors,setTotalDoctors] = useState(0)
+
   const limit = 10
 
 
   const [openModal, setOpenModal] = useState(false);
 
   const [doctorForm, setDoctorForm] = useState({
-    name: "",
+    name: "", 
     email: "",
     password: "",
     phone: "",
@@ -64,6 +66,80 @@ const Doctors = () => {
     role:"doctor"
   });
 
+  // ================= UPDATE DOCTOR STATE =================
+
+  const [openUpdateModal,setOpenUpdateModal] = useState(false)
+  const [staffId,setStaffId] = useState(null)
+
+  const [updateForm, setUpdateForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    specialization: "",
+    experience: "",
+    consultationFee: "",
+    status: "Active",
+    bio: "",
+  });
+
+  const handleUpdateChange = (e) => {
+    const { name, value } = e.target;
+
+    setUpdateForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
+
+  // open update modal and pre-fill it with the selected doctor's data
+  const handleOpenUpdateModal = (doctor) => {
+    setStaffId(doctor._id)
+
+    setUpdateForm({
+      name: doctor.name ?? "",
+      email: doctor.email ?? "",
+      phone: doctor.phone ?? "",
+      specialization: doctor.specialization ?? "",
+      experience: doctor.experience ?? "",
+      consultationFee: doctor.consultationFee ?? "",
+      status: doctor.status ?? "Active",
+      bio: doctor.bio ?? "",
+    })
+
+    setOpenUpdateModal(true)
+  }
+
+  const handleCloseUpdateModal = () => {
+    setOpenUpdateModal(false)
+    setStaffId(null)
+
+    setUpdateForm({
+      name: "",
+      email: "",
+      phone: "",
+      specialization: "",
+      experience: "",
+      consultationFee: "",
+      status: "Active",
+      bio: "",
+    })
+  }
+
+  // update doctor
+  const handleSubmitUpdate  = async (e) => {
+    e.preventDefault();
+
+     try {
+      const response = await api.patch(`/staff/update/${staffId}`, updateForm)
+      console.log(response)
+      toast.success(response.success)
+      handleGetAllDoctors()
+      handleCloseUpdateModal()
+    } catch (error) {
+      toast.error(error.response?.data?.error || "Something went wrong")
+      console.log(error.response?.data || error)
+    }
+  }
 
 
   const handleDoctorChange = (e) => {
@@ -117,7 +193,7 @@ const Doctors = () => {
       console.log(error)
     }
   }
-
+ 
 
   useEffect(() => {
     const timer = setTimeout(()=>{
@@ -151,10 +227,44 @@ const Doctors = () => {
     handleCloseModal();
   };
 
+  // delete doctor
+// delete doctor
 
 
+const handleDelete = async (doctor) => {
+  try {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    });
 
-  
+    if (result.isConfirmed) {
+      const response = await api.delete(`/staff/delete/${doctor._id}`);
+
+      await Swal.fire({
+        title: "Deleted!",
+        text: response.success,
+        icon: "success",
+      });
+      handleGetAllDoctors()
+
+      // Refresh your staff list here if needed
+    }
+  } catch (error) {
+    console.log(error);
+
+    Swal.fire({
+      title: "Error!",
+      text: error.response?.data?.error || "Failed to delete staff.",
+      icon: "error",
+    });
+  }
+};
 
   return (
     <div className="w-full min-h-screen bg-background p-6 lg:p-8">
@@ -396,6 +506,219 @@ const Doctors = () => {
         </Box>
       </Modal>
 
+      {/* ================================
+    UPDATE DOCTOR MODAL
+================================ */}
+
+  <Modal
+  open={openUpdateModal}
+  onClose={handleCloseUpdateModal}
+  aria-labelledby="update-doctor-modal"
+>
+  <Box
+    sx={{
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      width: {
+        xs: "92%",
+        sm: "600px",
+        md: "700px",
+      },
+      maxHeight: "90vh",
+      overflowY: "auto",
+      bgcolor: "background.paper",
+      borderRadius: "12px",
+      boxShadow: 24,
+      outline: "none",
+    }}
+  >
+    {/* Modal Header */}
+    <div className="flex items-center justify-between px-6 py-5 border-b border-border">
+      <div>
+        <h2
+          id="update-doctor-modal"
+          className="text-lg font-semibold text-foreground"
+        >
+          Update Doctor
+        </h2>
+
+        <p className="text-sm text-muted-foreground mt-1">
+          Edit the doctor's details.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        onClick={handleCloseUpdateModal}
+        className="p-2 rounded-lg hover:bg-muted transition"
+      >
+        <X size={20} className="text-muted-foreground cursor-pointer" />
+      </button>
+    </div>
+
+    {/* Form */}
+    <form onSubmit={handleSubmitUpdate}>
+      <div className="p-6 space-y-5">
+
+        {/* Basic Information */}
+        <div>
+          <h3 className="text-sm font-semibold text-foreground mb-4">
+            Basic Information
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <TextField
+              fullWidth
+              required
+              label="Doctor Name"
+              name="name"
+              value={updateForm.name}
+              onChange={handleUpdateChange}
+              size="small"
+            />
+
+            <TextField
+              fullWidth
+              required
+              type="email"
+              label="Email Address"
+              name="email"
+              value={updateForm.email}
+              onChange={handleUpdateChange}
+              size="small"
+            />
+
+            <TextField
+              fullWidth
+              required
+              type="tel"
+              label="Phone Number"
+              name="phone"
+              value={updateForm.phone}
+              onChange={handleUpdateChange}
+              size="small"
+            />
+
+            <TextField
+              select
+              fullWidth
+              required
+              label="Specialization"
+              name="specialization"
+              value={updateForm.specialization}
+              onChange={handleUpdateChange}
+              size="small"
+            >
+              {specializations
+                .filter((item) => item !== "All Specializations")
+                .map((item) => (
+                  <MenuItem key={item} value={item}>
+                    {item}
+                  </MenuItem>
+                ))}
+            </TextField>
+          </div>
+        </div>
+
+        {/* Professional Information */}
+        <div>
+          <h3 className="text-sm font-semibold text-foreground mb-4">
+            Professional Information
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <TextField
+              fullWidth
+              required
+              type="number"
+              label="Years of Experience"
+              name="experience"
+              value={updateForm.experience}
+              onChange={handleUpdateChange}
+              size="small"
+            />
+
+            <TextField
+              fullWidth
+              required
+              type="number"
+              label="Consultation Fee"
+              name="consultationFee"
+              value={updateForm.consultationFee}
+              onChange={handleUpdateChange}
+              size="small"
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <span className="mr-2 text-sm text-muted-foreground">
+                      Rs.
+                    </span>
+                  ),
+                },
+              }}
+            />
+
+            <TextField
+              select
+              fullWidth
+              required
+              label="Status"
+              name="status"
+              value={updateForm.status}
+              onChange={handleUpdateChange}
+              size="small"
+            >
+              <MenuItem value="Active">Active</MenuItem>
+              <MenuItem value="Inactive">Inactive</MenuItem>
+            </TextField>
+          </div>
+        </div>
+
+        {/* Bio */}
+        <div>
+          <h3 className="text-sm font-semibold text-foreground mb-4">
+            Additional Information
+          </h3>
+
+          <TextField
+            fullWidth
+            multiline
+            rows={4}
+            label="Doctor Bio"
+            name="bio"
+            value={updateForm.bio}
+            onChange={handleUpdateChange}
+            placeholder="Write a short description about the doctor..."
+          />
+        </div>
+
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border bg-muted/20">
+        <button
+          type="button"
+          onClick={handleCloseUpdateModal}
+          className="cursor-pointer h-10 px-4 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-muted transition"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          className="cursor-pointer h-10 px-5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition"
+        >
+          Update Doctor
+        </button>
+      </div>
+    </form>
+  </Box>
+   </Modal>
+
+      
+
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
 
@@ -510,6 +833,10 @@ const Doctors = () => {
                   Contact
                 </th>
 
+                <th className="px-5 py-3 font-medium text-muted-foreground">
+                  fee
+                </th>
+
 
                 <th className="px-5 py-3 font-medium text-muted-foreground">
                   Joined
@@ -584,6 +911,7 @@ const Doctors = () => {
                           {doctor.phone}
                         </div>
 
+
                         
                         
 
@@ -591,14 +919,23 @@ const Doctors = () => {
 
                     </td>
 
+                    <td>
+                        <p>{doctor.consultationFee}</p>
+                      </td>
+
                     {/* Joined */}
                     <td className="px-5 py-4 text-muted-foreground">
                       {new Date(doctor.date).toLocaleDateString("en-GB")}
                     </td>
                     
                     <td>
-                      <button className="cursor-pointer text-blue-500">edit</button> { " " }
-                      <button className="cursor-pointer text-red-500">delete</button>
+                      <button className="cursor-pointer text-blue-500"
+                      onClick={()=>handleOpenUpdateModal(doctor)}
+                       >edit</button> { " " }
+
+                      <button 
+                      className="cursor-pointer text-red-500" 
+                      onClick={()=>handleDelete(doctor)}>delete</button>
                     </td>
 
 
@@ -754,4 +1091,3 @@ const getInitials = (name) => {
 };
 
 export default Doctors;
-
