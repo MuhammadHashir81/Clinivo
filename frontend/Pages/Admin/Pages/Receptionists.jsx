@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-
+import Swal from "sweetalert2";
 import {
   Search,
   Plus,
@@ -185,15 +185,41 @@ const Receptionists = () => {
 
 
   // delete receptionist 
-  const handleDelete = async () => {
+  const handleDelete = async (receptionist) => {
     try {
-
-
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      });
+  
+      if (result.isConfirmed) {
+        const response = await api.delete(`/staff/delete/${receptionist._id}`);
+  
+        await Swal.fire({
+          title: "Deleted!",
+          text: response.success,
+          icon: "success",
+        });
+        getAllRecepitonists()
+  
+        // Refresh your staff list here if needed
+      }
     } catch (error) {
-
+      console.log(error);
+  
+      Swal.fire({
+        title: "Error!",
+        text: error.response?.data?.error || "Failed to delete staff.",
+        icon: "error",
+      });
     }
-
-  }
+  };
+  
 
   const handleCloseUpdateModal = () => {
     setOpenUpdateModal(false)
@@ -554,7 +580,7 @@ const Receptionists = () => {
                         <button
                           type="button"
                           className="cursor-pointer text-red-500"
-                          onClick={() => handleDelete()}
+                          onClick={() => handleDelete(receptionist)}
                         >
                           delete
                         </button>
@@ -1107,7 +1133,7 @@ const Receptionists = () => {
                 type="submit"
                 className="cursor-pointer h-10 px-5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition"
               >
-                Update Doctor
+                Update Receptionist
               </button>
             </div>
           </form>

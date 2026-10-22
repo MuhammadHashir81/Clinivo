@@ -1,0 +1,65 @@
+"filename", "language", "JavaScript", "JavaScript JSX", "PostCSS", "JSON", "Dotenv", "XML", "Markdown", "HTML", "comment", "blank", "total"
+"d:\Mern stack\Clinivo\backend\.env", "Dotenv", 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 5
+"d:\Mern stack\Clinivo\backend\config\db.js", "JavaScript", 12, 0, 0, 0, 0, 0, 0, 0, 0, 6, 18
+"d:\Mern stack\Clinivo\backend\controllers\admin.auth.controller.js", "JavaScript", 96, 0, 0, 0, 0, 0, 0, 0, 9, 28, 133
+"d:\Mern stack\Clinivo\backend\controllers\admin.staff.controller.js", "JavaScript", 425, 0, 0, 0, 0, 0, 0, 0, 14, 120, 559
+"d:\Mern stack\Clinivo\backend\controllers\clinic.controller.js", "JavaScript", 34, 0, 0, 0, 0, 0, 0, 0, 0, 20, 54
+"d:\Mern stack\Clinivo\backend\controllers\user.auth.controller.js", "JavaScript", 121, 0, 0, 0, 0, 0, 0, 0, 5, 65, 191
+"d:\Mern stack\Clinivo\backend\index.js", "JavaScript", 31, 0, 0, 0, 0, 0, 0, 0, 0, 11, 42
+"d:\Mern stack\Clinivo\backend\middleware\AuthMiddleware.js", "JavaScript", 15, 0, 0, 0, 0, 0, 0, 0, 0, 5, 20
+"d:\Mern stack\Clinivo\backend\middleware\IsAdmin.js", "JavaScript", 8, 0, 0, 0, 0, 0, 0, 0, 0, 1, 9
+"d:\Mern stack\Clinivo\backend\models\clinic.schema.js", "JavaScript", 22, 0, 0, 0, 0, 0, 0, 0, 0, 8, 30
+"d:\Mern stack\Clinivo\backend\models\doctor.schema.js", "JavaScript", 34, 0, 0, 0, 0, 0, 0, 0, 0, 13, 47
+"d:\Mern stack\Clinivo\backend\models\patient.schema.js", "JavaScript", 35, 0, 0, 0, 0, 0, 0, 0, 0, 9, 44
+"d:\Mern stack\Clinivo\backend\models\receptionist.schema.js", "JavaScript", 28, 0, 0, 0, 0, 0, 0, 0, 0, 6, 34
+"d:\Mern stack\Clinivo\backend\models\user.schema.js", "JavaScript", 28, 0, 0, 0, 0, 0, 0, 0, 0, 12, 40
+"d:\Mern stack\Clinivo\backend\package-lock.json", "JSON", 0, 0, 0, 1291, 0, 0, 0, 0, 0, 1, 1292
+"d:\Mern stack\Clinivo\backend\package.json", "JSON", 0, 0, 0, 22, 0, 0, 0, 0, 0, 1, 23
+"d:\Mern stack\Clinivo\backend\routes\admin.route.js", "JavaScript", 6, 0, 0, 0, 0, 0, 0, 0, 2, 4, 12
+"d:\Mern stack\Clinivo\backend\routes\admin.staff.route.js", "JavaScript", 9, 0, 0, 0, 0, 0, 0, 0, 2, 9, 20
+"d:\Mern stack\Clinivo\backend\routes\clinic.route.js", "JavaScript", 5, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6
+"d:\Mern stack\Clinivo\backend\routes\user.auth.route.js", "JavaScript", 9, 0, 0, 0, 0, 0, 0, 0, 0, 2, 11
+"d:\Mern stack\Clinivo\backend\utils\Generate_Token.js", "JavaScript", 19, 0, 0, 0, 0, 0, 0, 0, 0, 9, 28
+"d:\Mern stack\Clinivo\backend\validations\ClinicValidation.js", "JavaScript", 12, 0, 0, 0, 0, 0, 0, 0, 0, 1, 13
+"d:\Mern stack\Clinivo\backend\validations\DoctorFormValidation.js", "JavaScript", 30, 0, 0, 0, 0, 0, 0, 0, 0, 1, 31
+"d:\Mern stack\Clinivo\backend\validations\authSchema.js", "JavaScript", 6, 0, 0, 0, 0, 0, 0, 0, 1, 5, 12
+"d:\Mern stack\Clinivo\frontend\.env", "Dotenv", 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1
+"d:\Mern stack\Clinivo\frontend\Pages\Admin\Admin.jsx", "JavaScript JSX", 0, 90, 0, 0, 0, 0, 0, 0, 7, 38, 135
+"d:\Mern stack\Clinivo\frontend\Pages\Admin\Pages\Appointments.jsx", "JavaScript JSX", 0, 874, 0, 0, 0, 0, 0, 0, 78, 257, 1209
+"d:\Mern stack\Clinivo\frontend\Pages\Admin\Pages\Clinic.jsx", "JavaScript JSX", 0, 92, 0, 0, 0, 0, 0, 0, 0, 34, 126
+"d:\Mern stack\Clinivo\frontend\Pages\Admin\Pages\Dashboard.jsx", "JavaScript JSX", 0, 420, 0, 0, 0, 0, 0, 0, 10, 55, 485
+"d:\Mern stack\Clinivo\frontend\Pages\Admin\Pages\Doctors.jsx", "JavaScript JSX", 0, 793, 0, 0, 0, 0, 0, 0, 45, 206, 1044
+"d:\Mern stack\Clinivo\frontend\Pages\Admin\Pages\Receptionists.jsx", "JavaScript JSX", 0, 562, 0, 0, 0, 0, 0, 0, 65, 388, 1015
+"d:\Mern stack\Clinivo\frontend\Pages\Admin\Pages\Signin.jsx", "JavaScript JSX", 0, 94, 0, 0, 0, 0, 0, 0, 0, 30, 124
+"d:\Mern stack\Clinivo\frontend\Pages\Admin\Pages\Signup.jsx", "JavaScript JSX", 0, 98, 0, 0, 0, 0, 0, 0, 0, 31, 129
+"d:\Mern stack\Clinivo\frontend\Pages\Doctor\Doctor.jsx", "JavaScript JSX", 0, 896, 0, 0, 0, 0, 0, 0, 30, 88, 1014
+"d:\Mern stack\Clinivo\frontend\Pages\Doctor\Pages\Signin.jsx", "JavaScript JSX", 0, 99, 0, 0, 0, 0, 0, 0, 0, 27, 126
+"d:\Mern stack\Clinivo\frontend\Pages\Home\Components\DeserveBetter.jsx", "JavaScript JSX", 0, 22, 0, 0, 0, 0, 0, 0, 0, 6, 28
+"d:\Mern stack\Clinivo\frontend\Pages\Home\Components\Features.jsx", "JavaScript JSX", 0, 77, 0, 0, 0, 0, 0, 0, 1, 14, 92
+"d:\Mern stack\Clinivo\frontend\Pages\Home\Components\Footer.jsx", "JavaScript JSX", 0, 92, 0, 0, 0, 0, 0, 0, 0, 23, 115
+"d:\Mern stack\Clinivo\frontend\Pages\Home\Components\HowITWorks.jsx", "JavaScript JSX", 0, 53, 0, 0, 0, 0, 0, 0, 0, 13, 66
+"d:\Mern stack\Clinivo\frontend\Pages\Home\Components\Pricing.jsx", "JavaScript JSX", 0, 135, 0, 0, 0, 0, 0, 0, 0, 11, 146
+"d:\Mern stack\Clinivo\frontend\Pages\Home\Home.jsx", "JavaScript JSX", 0, 113, 0, 0, 0, 0, 0, 0, 4, 31, 148
+"d:\Mern stack\Clinivo\frontend\Pages\Receptionist\Pages\Signin.jsx", "JavaScript JSX", 0, 104, 0, 0, 0, 0, 0, 0, 0, 33, 137
+"d:\Mern stack\Clinivo\frontend\Pages\Receptionist\Receptionist.jsx", "JavaScript JSX", 0, 1070, 0, 0, 0, 0, 0, 0, 35, 100, 1205
+"d:\Mern stack\Clinivo\frontend\Pages\Unauthorized.jsx", "JavaScript JSX", 0, 48, 0, 0, 0, 0, 0, 0, 5, 17, 70
+"d:\Mern stack\Clinivo\frontend\README.md", "Markdown", 0, 0, 0, 0, 0, 0, 9, 0, 0, 8, 17
+"d:\Mern stack\Clinivo\frontend\eslint.config.js", "JavaScript", 20, 0, 0, 0, 0, 0, 0, 0, 0, 2, 22
+"d:\Mern stack\Clinivo\frontend\index.html", "HTML", 0, 0, 0, 0, 0, 0, 0, 12, 0, 1, 13
+"d:\Mern stack\Clinivo\frontend\package-lock.json", "JSON", 0, 0, 0, 4447, 0, 0, 0, 0, 0, 1, 4448
+"d:\Mern stack\Clinivo\frontend\package.json", "JSON", 0, 0, 0, 42, 0, 0, 0, 0, 0, 1, 43
+"d:\Mern stack\Clinivo\frontend\public\favicon.svg", "XML", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
+"d:\Mern stack\Clinivo\frontend\public\icons.svg", "XML", 0, 0, 0, 0, 0, 24, 0, 0, 0, 1, 25
+"d:\Mern stack\Clinivo\frontend\services\api.js", "JavaScript", 74, 0, 0, 0, 0, 0, 0, 0, 7, 27, 108
+"d:\Mern stack\Clinivo\frontend\src\.env", "Dotenv", 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"d:\Mern stack\Clinivo\frontend\src\App.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"d:\Mern stack\Clinivo\frontend\src\App.jsx", "JavaScript JSX", 0, 69, 0, 0, 0, 0, 0, 0, 12, 36, 117
+"d:\Mern stack\Clinivo\frontend\src\Components\ProtectedRoute.jsx", "JavaScript JSX", 0, 30, 0, 0, 0, 0, 0, 0, 4, 16, 50
+"d:\Mern stack\Clinivo\frontend\src\assets\react.svg", "XML", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
+"d:\Mern stack\Clinivo\frontend\src\assets\vite.svg", "XML", 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 2
+"d:\Mern stack\Clinivo\frontend\src\index.css", "PostCSS", 0, 0, 24, 0, 0, 0, 0, 0, 0, 6, 30
+"d:\Mern stack\Clinivo\frontend\src\main.jsx", "JavaScript JSX", 0, 16, 0, 0, 0, 0, 0, 0, 0, 3, 19
+"d:\Mern stack\Clinivo\frontend\src\store\slices\authSlice.js", "JavaScript", 174, 0, 0, 0, 0, 0, 0, 0, 7, 67, 248
+"d:\Mern stack\Clinivo\frontend\src\store\store.js", "JavaScript", 7, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8
+"d:\Mern stack\Clinivo\frontend\vite.config.js", "JavaScript", 9, 0, 0, 0, 0, 0, 0, 0, 1, 4, 14
+"Total", "-", 1269, 5847, 24, 5802, 6, 27, 9, 12, 344, 1917, 15257

@@ -461,11 +461,13 @@ export const getAllReceptionists = async (req, res) => {
 
 
 
+
+// update staff
 export const updateStaff = async (req,res)=>{
     try {
         const { userId } = req
         const { staffId } = req.params
-
+        
        const {
             name,
             email,
@@ -477,6 +479,7 @@ export const updateStaff = async (req,res)=>{
             bio,
             shift
         } = req.body;
+
         
         const clinic = await Clinic.findOne({
             ownerId: userId
@@ -553,7 +556,64 @@ export const updateStaff = async (req,res)=>{
 
     } catch (error) {
         return res.status(500).json({error:error.message})
-        conssole.log(error)
         
     }
 }
+
+
+
+// delete staff
+export const deleteStaff = async(req,res)=>{
+    try {
+        const { userId } = req
+        const { staffId } = req.params
+
+        
+        const clinic = await Clinic.findOne({
+            ownerId: userId
+        });
+
+        if(!clinic){
+            return res.status(400).json({error:'clinic does not exist'})
+        }
+
+        
+        let staffDetails = await Doctor.findOne({
+            userId:staffId,
+            clinicId:clinic._id
+        })
+
+        let role = "doctor"
+
+        
+          if (!staffDetails) {
+
+            staffDetails = await Receptionist.findOne({
+            userId: staffId,
+            clinicId: clinic._id
+            });
+            role = "receptionist";
+
+        }
+
+        await staffDetails.deleteOne()
+
+        const user = await User.findByIdAndDelete(staffId)
+
+         if (!user) {
+            return res.status(404).json({ error: "User account not found" });
+        }
+
+         return res.status(200).json({
+            success: `${role} deleted successfully`
+        });
+
+        
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({error:error.message})
+        
+    }
+}
+
+

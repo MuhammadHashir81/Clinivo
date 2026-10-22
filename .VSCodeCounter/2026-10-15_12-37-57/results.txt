@@ -1,0 +1,128 @@
+Date : 2026-10-15 12:37:57
+Directory : d:\Mern stack\Clinivo
+Total : 63 files,  13081 codes, 349 comments, 1945 blanks, all 15375 lines
+
+Languages
++----------------+------------+------------+------------+------------+------------+
+| language       | files      | code       | comment    | blank      | total      |
++----------------+------------+------------+------------+------------+------------+
+| JavaScript JSX |         22 |      5,885 |        299 |      1,465 |      7,649 |
+| JSON           |          4 |      5,814 |          0 |          4 |      5,818 |
+| JavaScript     |         26 |      1,304 |         50 |        457 |      1,811 |
+| XML            |          4 |         27 |          0 |          2 |         29 |
+| PostCSS        |          2 |         24 |          0 |          7 |         31 |
+| HTML           |          1 |         12 |          0 |          1 |         13 |
+| Markdown       |          1 |          9 |          0 |          8 |         17 |
+| Dotenv         |          3 |          6 |          0 |          1 |          7 |
++----------------+------------+------------+------------+------------+------------+
+
+Directories
++------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                   | files      | code       | comment    | blank      | total      |
++------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                      |         63 |     13,081 |        349 |      1,945 |     15,375 |
+| backend                                                                |         24 |      2,338 |         35 |        358 |      2,731 |
+| backend (Files)                                                        |          4 |      1,349 |          0 |         13 |      1,362 |
+| backend\config                                                         |          1 |         12 |          0 |          6 |         18 |
+| backend\controllers                                                    |          4 |        710 |         30 |        256 |        996 |
+| backend\middleware                                                     |          2 |         23 |          0 |          6 |         29 |
+| backend\models                                                         |          5 |        147 |          0 |         48 |        195 |
+| backend\routes                                                         |          4 |         30 |          4 |         13 |         47 |
+| backend\utils                                                          |          1 |         19 |          0 |          9 |         28 |
+| backend\validations                                                    |          3 |         48 |          1 |          7 |         56 |
+| frontend                                                               |         39 |     10,743 |        314 |      1,587 |     12,644 |
+| frontend (Files)                                                       |          7 |      4,552 |          1 |         17 |      4,570 |
+| frontend\Pages                                                         |         19 |      5,770 |        283 |      1,410 |      7,463 |
+| frontend\Pages (Files)                                                 |          1 |         48 |          5 |         17 |         70 |
+| frontend\Pages\Admin                                                   |          8 |      3,061 |        208 |      1,047 |      4,316 |
+| frontend\Pages\Admin (Files)                                           |          1 |         90 |          7 |         38 |        135 |
+| frontend\Pages\Admin\Pages                                             |          7 |      2,971 |        201 |      1,009 |      4,181 |
+| frontend\Pages\Doctor                                                  |          2 |        995 |         30 |        115 |      1,140 |
+| frontend\Pages\Doctor (Files)                                          |          1 |        896 |         30 |         88 |      1,014 |
+| frontend\Pages\Doctor\Pages                                            |          1 |         99 |          0 |         27 |        126 |
+| frontend\Pages\Home                                                    |          6 |        492 |          5 |         98 |        595 |
+| frontend\Pages\Home (Files)                                            |          1 |        113 |          4 |         31 |        148 |
+| frontend\Pages\Home\Components                                         |          5 |        379 |          1 |         67 |        447 |
+| frontend\Pages\Receptionist                                            |          2 |      1,174 |         35 |        133 |      1,342 |
+| frontend\Pages\Receptionist (Files)                                    |          1 |      1,070 |         35 |        100 |      1,205 |
+| frontend\Pages\Receptionist\Pages                                      |          1 |        104 |          0 |         33 |        137 |
+| frontend\public                                                        |          2 |         25 |          0 |          1 |         26 |
+| frontend\services                                                      |          1 |         74 |          7 |         27 |        108 |
+| frontend\src                                                           |         10 |        322 |         23 |        132 |        477 |
+| frontend\src (Files)                                                   |          5 |        109 |         12 |         47 |        168 |
+| frontend\src\Components                                                |          1 |         30 |          4 |         16 |         50 |
+| frontend\src\assets                                                    |          2 |          2 |          0 |          1 |          3 |
+| frontend\src\store                                                     |          2 |        181 |          7 |         68 |        256 |
+| frontend\src\store (Files)                                             |          1 |          7 |          0 |          1 |          8 |
+| frontend\src\store\slices                                              |          1 |        174 |          7 |         67 |        248 |
++------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++------------------------------------------------------------------------+----------------+------------+------------+------------+------------+
+| filename                                                               | language       | code       | comment    | blank      | total      |
++------------------------------------------------------------------------+----------------+------------+------------+------------+------------+
+| d:\Mern stack\Clinivo\backend\.env                                     | Dotenv         |          5 |          0 |          0 |          5 |
+| d:\Mern stack\Clinivo\backend\config\db.js                             | JavaScript     |         12 |          0 |          6 |         18 |
+| d:\Mern stack\Clinivo\backend\controllers\admin.auth.controller.js     | JavaScript     |         96 |          9 |         28 |        133 |
+| d:\Mern stack\Clinivo\backend\controllers\admin.staff.controller.js    | JavaScript     |        459 |         16 |        143 |        618 |
+| d:\Mern stack\Clinivo\backend\controllers\clinic.controller.js         | JavaScript     |         34 |          0 |         20 |         54 |
+| d:\Mern stack\Clinivo\backend\controllers\user.auth.controller.js      | JavaScript     |        121 |          5 |         65 |        191 |
+| d:\Mern stack\Clinivo\backend\index.js                                 | JavaScript     |         31 |          0 |         11 |         42 |
+| d:\Mern stack\Clinivo\backend\middleware\AuthMiddleware.js             | JavaScript     |         15 |          0 |          5 |         20 |
+| d:\Mern stack\Clinivo\backend\middleware\IsAdmin.js                    | JavaScript     |          8 |          0 |          1 |          9 |
+| d:\Mern stack\Clinivo\backend\models\clinic.schema.js                  | JavaScript     |         22 |          0 |          8 |         30 |
+| d:\Mern stack\Clinivo\backend\models\doctor.schema.js                  | JavaScript     |         34 |          0 |         13 |         47 |
+| d:\Mern stack\Clinivo\backend\models\patient.schema.js                 | JavaScript     |         35 |          0 |          9 |         44 |
+| d:\Mern stack\Clinivo\backend\models\receptionist.schema.js            | JavaScript     |         28 |          0 |          6 |         34 |
+| d:\Mern stack\Clinivo\backend\models\user.schema.js                    | JavaScript     |         28 |          0 |         12 |         40 |
+| d:\Mern stack\Clinivo\backend\package-lock.json                        | JSON           |      1,291 |          0 |          1 |      1,292 |
+| d:\Mern stack\Clinivo\backend\package.json                             | JSON           |         22 |          0 |          1 |         23 |
+| d:\Mern stack\Clinivo\backend\routes\admin.route.js                    | JavaScript     |          6 |          2 |          4 |         12 |
+| d:\Mern stack\Clinivo\backend\routes\admin.staff.route.js              | JavaScript     |         10 |          2 |          6 |         18 |
+| d:\Mern stack\Clinivo\backend\routes\clinic.route.js                   | JavaScript     |          5 |          0 |          1 |          6 |
+| d:\Mern stack\Clinivo\backend\routes\user.auth.route.js                | JavaScript     |          9 |          0 |          2 |         11 |
+| d:\Mern stack\Clinivo\backend\utils\Generate_Token.js                  | JavaScript     |         19 |          0 |          9 |         28 |
+| d:\Mern stack\Clinivo\backend\validations\ClinicValidation.js          | JavaScript     |         12 |          0 |          1 |         13 |
+| d:\Mern stack\Clinivo\backend\validations\DoctorFormValidation.js      | JavaScript     |         30 |          0 |          1 |         31 |
+| d:\Mern stack\Clinivo\backend\validations\authSchema.js                | JavaScript     |          6 |          1 |          5 |         12 |
+| d:\Mern stack\Clinivo\frontend\.env                                    | Dotenv         |          1 |          0 |          0 |          1 |
+| d:\Mern stack\Clinivo\frontend\Pages\Admin\Admin.jsx                   | JavaScript JSX |         90 |          7 |         38 |        135 |
+| d:\Mern stack\Clinivo\frontend\Pages\Admin\Pages\Appointments.jsx      | JavaScript JSX |        874 |         78 |        257 |      1,209 |
+| d:\Mern stack\Clinivo\frontend\Pages\Admin\Pages\Clinic.jsx            | JavaScript JSX |         92 |          0 |         34 |        126 |
+| d:\Mern stack\Clinivo\frontend\Pages\Admin\Pages\Dashboard.jsx         | JavaScript JSX |        420 |         10 |         55 |        485 |
+| d:\Mern stack\Clinivo\frontend\Pages\Admin\Pages\Doctors.jsx           | JavaScript JSX |        831 |         48 |        214 |      1,093 |
+| d:\Mern stack\Clinivo\frontend\Pages\Admin\Pages\Receptionists.jsx     | JavaScript JSX |        562 |         65 |        388 |      1,015 |
+| d:\Mern stack\Clinivo\frontend\Pages\Admin\Pages\Signin.jsx            | JavaScript JSX |         94 |          0 |         30 |        124 |
+| d:\Mern stack\Clinivo\frontend\Pages\Admin\Pages\Signup.jsx            | JavaScript JSX |         98 |          0 |         31 |        129 |
+| d:\Mern stack\Clinivo\frontend\Pages\Doctor\Doctor.jsx                 | JavaScript JSX |        896 |         30 |         88 |      1,014 |
+| d:\Mern stack\Clinivo\frontend\Pages\Doctor\Pages\Signin.jsx           | JavaScript JSX |         99 |          0 |         27 |        126 |
+| d:\Mern stack\Clinivo\frontend\Pages\Home\Components\DeserveBetter.jsx | JavaScript JSX |         22 |          0 |          6 |         28 |
+| d:\Mern stack\Clinivo\frontend\Pages\Home\Components\Features.jsx      | JavaScript JSX |         77 |          1 |         14 |         92 |
+| d:\Mern stack\Clinivo\frontend\Pages\Home\Components\Footer.jsx        | JavaScript JSX |         92 |          0 |         23 |        115 |
+| d:\Mern stack\Clinivo\frontend\Pages\Home\Components\HowITWorks.jsx    | JavaScript JSX |         53 |          0 |         13 |         66 |
+| d:\Mern stack\Clinivo\frontend\Pages\Home\Components\Pricing.jsx       | JavaScript JSX |        135 |          0 |         11 |        146 |
+| d:\Mern stack\Clinivo\frontend\Pages\Home\Home.jsx                     | JavaScript JSX |        113 |          4 |         31 |        148 |
+| d:\Mern stack\Clinivo\frontend\Pages\Receptionist\Pages\Signin.jsx     | JavaScript JSX |        104 |          0 |         33 |        137 |
+| d:\Mern stack\Clinivo\frontend\Pages\Receptionist\Receptionist.jsx     | JavaScript JSX |      1,070 |         35 |        100 |      1,205 |
+| d:\Mern stack\Clinivo\frontend\Pages\Unauthorized.jsx                  | JavaScript JSX |         48 |          5 |         17 |         70 |
+| d:\Mern stack\Clinivo\frontend\README.md                               | Markdown       |          9 |          0 |          8 |         17 |
+| d:\Mern stack\Clinivo\frontend\eslint.config.js                        | JavaScript     |         20 |          0 |          2 |         22 |
+| d:\Mern stack\Clinivo\frontend\index.html                              | HTML           |         12 |          0 |          1 |         13 |
+| d:\Mern stack\Clinivo\frontend\package-lock.json                       | JSON           |      4,458 |          0 |          1 |      4,459 |
+| d:\Mern stack\Clinivo\frontend\package.json                            | JSON           |         43 |          0 |          1 |         44 |
+| d:\Mern stack\Clinivo\frontend\public\favicon.svg                      | XML            |          1 |          0 |          0 |          1 |
+| d:\Mern stack\Clinivo\frontend\public\icons.svg                        | XML            |         24 |          0 |          1 |         25 |
+| d:\Mern stack\Clinivo\frontend\services\api.js                         | JavaScript     |         74 |          7 |         27 |        108 |
+| d:\Mern stack\Clinivo\frontend\src\.env                                | Dotenv         |          0 |          0 |          1 |          1 |
+| d:\Mern stack\Clinivo\frontend\src\App.css                             | PostCSS        |          0 |          0 |          1 |          1 |
+| d:\Mern stack\Clinivo\frontend\src\App.jsx                             | JavaScript JSX |         69 |         12 |         36 |        117 |
+| d:\Mern stack\Clinivo\frontend\src\Components\ProtectedRoute.jsx       | JavaScript JSX |         30 |          4 |         16 |         50 |
+| d:\Mern stack\Clinivo\frontend\src\assets\react.svg                    | XML            |          1 |          0 |          0 |          1 |
+| d:\Mern stack\Clinivo\frontend\src\assets\vite.svg                     | XML            |          1 |          0 |          1 |          2 |
+| d:\Mern stack\Clinivo\frontend\src\index.css                           | PostCSS        |         24 |          0 |          6 |         30 |
+| d:\Mern stack\Clinivo\frontend\src\main.jsx                            | JavaScript JSX |         16 |          0 |          3 |         19 |
+| d:\Mern stack\Clinivo\frontend\src\store\slices\authSlice.js           | JavaScript     |        174 |          7 |         67 |        248 |
+| d:\Mern stack\Clinivo\frontend\src\store\store.js                      | JavaScript     |          7 |          0 |          1 |          8 |
+| d:\Mern stack\Clinivo\frontend\vite.config.js                          | JavaScript     |          9 |          1 |          4 |         14 |
+| Total                                                                  |                |     13,081 |        349 |      1,945 |     15,375 |
++------------------------------------------------------------------------+----------------+------------+------------+------------+------------+
