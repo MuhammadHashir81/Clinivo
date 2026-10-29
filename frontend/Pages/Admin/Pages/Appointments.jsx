@@ -1207,3 +1207,5 @@ const formatDate = (date) => {
 };
 
 export default Appointments;
+
+

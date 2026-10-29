@@ -1,39 +1,39 @@
-    import mongoose from 'mongoose'
-    const { Schema } = mongoose 
+import mongoose from 'mongoose'
+const { Schema } = mongoose
 
-    const UserSchema = new Schema({
+const UserSchema = new Schema({
 
-        name:{
-            type:String,
-            required:true,
-            min:[3, 'name should contain atleast 3 characters']
-        },
-
-        email:{
-            type:String,
-            required:true,
-            lowercase:true,
-            trim:true,
-            unique:true
-        },
-        
-        password:{
-            type:String,
-        },
-
-        role:{
-            type:String,
-            enum:['patient','admin','receptionist','doctor'],
-            default:'patient'
-        },
-        
-
-
+    name: {
+        type: String,
+        required: true,
+        min: [3, 'name should contain atleast 3 characters']
     },
 
-        {
-            timestamps:true
-        })
+    email: {
+        type: String,
+        required: true,
+        lowercase: true,
+        trim: true,
+        unique: true
+    },
 
-    export const User =  mongoose.model('User',UserSchema)
+    password: {
+        type: String,
+    },
+
+    role: {
+        type: String,
+        enum: ['patient', 'admin', 'receptionist', 'doctor'],
+        default: 'patient'
+    },
+
+
+
+},
+
+    {
+        timestamps: true
+    })
+
+export const User = mongoose.model('User', UserSchema)
 
