@@ -3,6 +3,7 @@ import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import Modal from '@mui/material/Modal';
 
 import React, { useState } from 'react';
 import {
@@ -80,39 +81,6 @@ const getGreeting = () => {
 /*  Shared UI                                                                  */
 /* -------------------------------------------------------------------------- */
 
-const Modal = ({ title, subtitle, onClose, children, footer }) => (
-    <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        onClick={onClose}
-    >
-        <div
-            className="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-xl border border-border bg-card"
-            onClick={(e) => e.stopPropagation()}
-        >
-            <div className="flex items-start justify-between border-b border-border p-5">
-                <div>
-                    <h2 className="font-semibold text-card-foreground">{title}</h2>
-                    {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
-                </div>
-                <button
-                    onClick={onClose}
-                    aria-label="Close"
-                    className="rounded-lg p-2 text-muted-foreground hover:bg-muted"
-                >
-                    <X size={18} />
-                </button>
-            </div>
-
-            <div className="p-5">{children}</div>
-
-            {footer && <div className="flex justify-end gap-3 border-t border-border p-5">{footer}</div>}
-        </div>
-    </div>
-);
-
 const Field = ({ label, htmlFor, children }) => (
     <div>
         <label className="mb-1.5 block text-sm font-medium text-card-foreground" htmlFor={htmlFor}>
@@ -126,104 +94,136 @@ const Field = ({ label, htmlFor, children }) => (
 /*  Booking modal (appointment details + payment in one place)                 */
 /* -------------------------------------------------------------------------- */
 
-const BookingModal = ({ doctors, onClose }) => {
-    
+const BookingModal = ({ doctors, open, onClose }) => {
     return (
         <Modal
-            title="New appointment"
-            subtitle="Book an appointment and receive payment."
+            open={open}
             onClose={onClose}
-            footer={
-                <>
+            aria-labelledby="booking-modal-title"
+            aria-describedby="booking-modal-description"
+            className="flex items-center justify-center p-4"
+        >
+            <div className="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-xl border border-border bg-card outline-none">
+                {/* Header */}
+                <div className="flex items-start justify-between border-b border-border p-5">
+                    <div>
+                        <h2 id="booking-modal-title" className="font-semibold text-card-foreground">
+                            New appointment
+                        </h2>
+                        <p id="booking-modal-description" className="mt-1 text-sm text-muted-foreground">
+                            Book an appointment and receive payment.
+                        </p>
+                    </div>
                     <button
                         onClick={onClose}
-                        className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-card-foreground hover:bg-muted"
+                        aria-label="Close"
+                        className="cursor-pointer rounded-lg p-2 text-muted-foreground hover:bg-muted"
+                    >
+                        <X size={18} />
+                    </button>
+                </div>
+
+                {/* Body */}
+                <div className="p-5">
+                    <div className="space-y-4">
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <Field label="Patient name" htmlFor="bk-name">
+                                <input
+                                    id="bk-name"
+                                    placeholder="e.g. Ali Khan"
+                                    className={inputClass}
+                                />
+                            </Field>
+                            <Field label="Mobile number" htmlFor="bk-phone">
+                                <input
+                                    id="bk-phone"
+                                    placeholder="0300-1234567"
+                                    inputMode="tel"
+                                    className={inputClass}
+                                />
+                            </Field>
+                        </div>
+
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <Field label="Doctor" htmlFor="bk-doctor">
+                                <select id="bk-doctor" className={inputClass}>
+                                    {doctors.map((d) => (
+                                        <option key={d.id} value={d.id} disabled={d.availability === 'off'}>
+                                            {d.name} — {d.specialty}
+                                            {d.availability === 'off' ? ' (Off duty)' : ''}
+                                        </option>
+                                    ))}
+                                </select>
+                            </Field>
+                            <Field label="Visit type" htmlFor="bk-type">
+                                <input
+                                    id="bk-type"
+                                    placeholder="e.g. General Checkup"
+                                    className={inputClass}
+                                />
+                            </Field>
+                        </div>
+
+                        <Field label="Reason for visit" htmlFor="bk-reason">
+                            <input
+                                id="bk-reason"
+                                placeholder="e.g. Fever since two days"
+                                className={inputClass}
+                            />
+                        </Field>
+
+                        <Field label="Doctor's name" htmlFor="dr-name">
+                            <input
+                                id="dr-name"
+                                placeholder="e.g. Dr. Ali Khan"
+                                className={inputClass}
+                            />
+                        </Field>
+
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DemoContainer components={['DatePicker']}>
+                                    <DatePicker label="date" />
+                                </DemoContainer>
+                            </LocalizationProvider>
+
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DemoContainer components={['TimePicker']}>
+                                    <TimePicker label="time" />
+                                </DemoContainer>
+                            </LocalizationProvider>
+                        </div>
+
+                        {/* Payment */}
+                        <div className="space-y-4 rounded-lg border border-border p-4">
+                            <h3 className="text-sm font-semibold text-card-foreground">Payment</h3>
+
+                            <Field label="Amount received (PKR)" htmlFor="bk-amount">
+                                <input
+                                    id="bk-amount"
+                                    type="number"
+                                    min="0"
+                                    placeholder="e.g. 1500"
+                                    className={inputClass}
+                                />
+                            </Field>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Footer */}
+                <div className="flex justify-end gap-3 border-t border-border p-5">
+                    <button
+                        onClick={onClose}
+                        className="cursor-pointer rounded-lg border border-border px-4 py-2 text-sm font-medium text-card-foreground hover:bg-muted"
                     >
                         Cancel
                     </button>
                     <button
-                        className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                        className="cursor-pointer rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                     >
                         Book appointment
                     </button>
-                </>
-            }
-        >
-            <div className="space-y-4">
-                <div className="grid gap-4 sm:grid-cols-2">
-                    <Field label="Patient name" htmlFor="bk-name">
-                        <input
-                            id="bk-name"
-                            placeholder="e.g. Ali Khan"
-                            className={inputClass}
-                        />
-                    </Field>
-                    <Field label="Mobile number" htmlFor="bk-phone">
-                        <input
-                            id="bk-phone"
-                            placeholder="0300-1234567"
-                            inputMode="tel"
-                            className={inputClass}
-                        />
-                    </Field>
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                    <Field label="Doctor" htmlFor="bk-doctor">
-                        <select id="bk-doctor" className={inputClass}>
-                            {doctors.map((d) => (
-                                <option key={d.id} value={d.id} disabled={d.availability === 'off'}>
-                                    {d.name} — {d.specialty}
-                                    {d.availability === 'off' ? ' (Off duty)' : ''}
-                                </option>
-                            ))}
-                        </select>
-                    </Field>
-                    <Field label="Visit type" htmlFor="bk-type">
-                        <input
-                            id="bk-type"
-                            placeholder="e.g. General Checkup"
-                            className={inputClass}
-                        />
-                    </Field>
-                </div>
-
-                <Field label="Reason for visit" htmlFor="bk-reason">
-                    <input
-                        id="bk-reason"
-                        placeholder="e.g. Fever since two days"
-                        className={inputClass}
-                    />
-                </Field>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DemoContainer components={['DatePicker']}>
-                            <DatePicker label="date" />
-                        </DemoContainer>
-                    </LocalizationProvider>
-
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DemoContainer components={['TimePicker']}>
-                            <TimePicker label="time" />
-                        </DemoContainer>
-                    </LocalizationProvider>
-                </div>
-
-                {/* Payment */}
-                <div className="space-y-4 rounded-lg border border-border p-4">
-                    <h3 className="text-sm font-semibold text-card-foreground">Payment</h3>
-
-                    <Field label="Amount received (PKR)" htmlFor="bk-amount">
-                        <input
-                            id="bk-amount"
-                            type="number"
-                            min="0"
-                            placeholder="e.g. 1500"
-                            className={inputClass}
-                        />
-                    </Field>
-
                 </div>
             </div>
         </Modal>
@@ -259,7 +259,6 @@ const Receptionist = () => {
     const [statCards, setStatCards] = useState([
         { title: "Today's Appointments", value: 12, icon: CalendarDays },
         { title: 'Waiting Now', value: 5, icon: Hourglass },
-        { title: 'Consultations', value: 5, icon: Hourglass },
     ]);
     const [doctors, setDoctors] = useState(DOCTORS);
     const [appointments, setAppointments] = useState([
@@ -277,7 +276,6 @@ const Receptionist = () => {
         { id: 'act1', text: 'Ali Khan checked in for Dr. Ayesha Khan', time: '09:35' },
         { id: 'act2', text: 'Sara Malik completed consultation with Dr. Bilal Ahmed', time: '10:30' },
     ]);
-    
 
 
     const dateLabel = new Date().toLocaleDateString('en-PK', {
@@ -325,7 +323,7 @@ const Receptionist = () => {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 {statCards.map((stat) => {
                     const Icon = stat.icon;
                     return (
@@ -605,9 +603,11 @@ const Receptionist = () => {
             </div>
 
             {/* Modal */}
-            {showBooking && (
-                <BookingModal doctors={doctors} onClose={() => setShowBooking(false)} />
-            )}
+            <BookingModal
+                open={showBooking}
+                doctors={doctors}
+                onClose={() => setShowBooking(false)}
+            />
         </div>
     );
 };

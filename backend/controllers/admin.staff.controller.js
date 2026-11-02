@@ -288,6 +288,7 @@ export const getAllDoctors = async (req, res) => {
                                 consultationFee: "$doctorDetails.consultationFee",
                                 specialization: "$doctorDetails.specialization",
                                 experience: "$doctorDetails.experience",
+                                availability: { $ifNull: ["$doctorDetails.availability", "off"] },
                                 date: "$doctors.createdAt"
                             }
                         },
@@ -458,8 +459,6 @@ export const getAllReceptionists = async (req, res) => {
 
     }
 }
-
-
 
 
 // update staff

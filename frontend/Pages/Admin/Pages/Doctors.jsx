@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-
+import { Loader } from "lucide-react";
 import {
   Search,
   Plus,
@@ -13,35 +13,35 @@ import {
   Mail,
   Phone,
   X,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
-import toast, { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from "react-hot-toast";
+
 import {
   Modal,
   Box,
   TextField,
   MenuItem,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
 
 import { api } from "../../../services/api";
-import { useEffect } from "react";
-
-
-
-
-
-
 
 const Doctors = () => {
   const [search, setSearch] = useState("");
   const [specialization, setSpecialization] = useState("All Specializations");
-  const [doctors, setDoctors] = useState([])
-  const [totalPages, setTotalPages] = useState(0)
-  const [page, setPage] = useState(1)
-  const [totalDoctors, setTotalDoctors] = useState(0)
+  const [doctors, setDoctors] = useState([]);
+  const [totalPages, setTotalPages] = useState(0);
+  const [page, setPage] = useState(1);
+  const [totalDoctors, setTotalDoctors] = useState(0);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(true);
+  
 
-  const limit = 10
-
+  const limit = 10;
 
   const [openModal, setOpenModal] = useState(false);
 
@@ -54,13 +54,13 @@ const Doctors = () => {
     experience: "",
     consultationFee: "",
     bio: "",
-    role: "doctor"
+    role: "doctor",
   });
 
   // ================= UPDATE DOCTOR STATE =================
 
-  const [openUpdateModal, setOpenUpdateModal] = useState(false)
-  const [staffId, setStaffId] = useState(null)
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
+  const [staffId, setStaffId] = useState(null);
 
   const [updateForm, setUpdateForm] = useState({
     name: "",
@@ -73,6 +73,35 @@ const Doctors = () => {
     bio: "",
   });
 
+  // ================= HANDLE AVAILABILITY STATUS =================
+
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      const updatedDoctor = await api.patch(
+        `/doctor/update-status/${id}`,
+        { status: newStatus }
+      );
+
+      setDoctors((prev) =>
+        prev.map((doctor) =>
+          doctor._id === id
+            ? {
+                ...doctor,
+                availability: updatedDoctor.availability,
+              }
+            : doctor
+        )
+      );
+    } catch (error) {
+      toast.error(
+        error.response?.data?.error ||
+          "Something went wrong while updating status"
+      );
+    }
+  };
+
+  // ================= HANDLE UPDATE FORM =================
+
   const handleUpdateChange = (e) => {
     const { name, value } = e.target;
 
@@ -80,11 +109,12 @@ const Doctors = () => {
       ...prev,
       [name]: value,
     }));
-  }
+  };
 
-  // open update modal and pre-fill it with the selected doctor's data
+  // Open update modal and pre-fill it with selected doctor's data
+
   const handleOpenUpdateModal = (doctor) => {
-    setStaffId(doctor._id)
+    setStaffId(doctor._id);
 
     setUpdateForm({
       name: doctor.name ?? "",
@@ -95,14 +125,14 @@ const Doctors = () => {
       consultationFee: doctor.consultationFee ?? "",
       status: doctor.status ?? "Active",
       bio: doctor.bio ?? "",
-    })
+    });
 
-    setOpenUpdateModal(true)
-  }
+    setOpenUpdateModal(true);
+  };
 
   const handleCloseUpdateModal = () => {
-    setOpenUpdateModal(false)
-    setStaffId(null)
+    setOpenUpdateModal(false);
+    setStaffId(null);
 
     setUpdateForm({
       name: "",
@@ -113,25 +143,35 @@ const Doctors = () => {
       consultationFee: "",
       status: "Active",
       bio: "",
-    })
-  }
+    });
+  };
 
-  // update doctor
+  // ================= UPDATE DOCTOR =================
+
   const handleSubmitUpdate = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await api.patch(`/staff/update/${staffId}`, updateForm)
-      console.log(response)
-      toast.success(response.success)
-      handleGetAllDoctors()
-      handleCloseUpdateModal()
-    } catch (error) {
-      toast.error(error.response?.data?.error || "Something went wrong")
-      console.log(error.response?.data || error)
-    }
-  }
+      const response = await api.patch(
+        `/staff/update/${staffId}`,
+        updateForm
+      );
 
+      console.log(response);
+      toast.success(response.success);
+
+      handleGetAllDoctors();
+      handleCloseUpdateModal();
+    } catch (error) {
+      toast.error(
+        error.response?.data?.error || "Something went wrong"
+      );
+
+      console.log(error.response?.data || error);
+    }
+  };
+
+  // ================= HANDLE CREATE FORM =================
 
   const handleDoctorChange = (e) => {
     const { name, value } = e.target;
@@ -149,78 +189,79 @@ const Doctors = () => {
       name: "",
       email: "",
       phone: "",
-      password: '',
+      password: "",
       specialization: "",
       licenseNumber: "",
       experience: "",
       consultationFee: "",
       status: "Active",
       bio: "",
-      role: "doctor"
+      role: "doctor",
     });
   };
 
-
-  // previous-next pages
+  // ================= PAGINATION =================
 
   const previousPage = () => {
-    setPage(page - 1)
-  }
+    setPage(page - 1);
+  };
 
   const nextPage = () => {
-    setPage(page + 1)
-  }
+    setPage(page + 1);
+  };
 
-  // get all doctors 
+  // ================= GET ALL DOCTORS =================
 
   const handleGetAllDoctors = async () => {
-    try {
-      const response = await api.get(`/staff/get-all/doctors?page=${page}&limit=${limit}&search=${search}`)
-      setDoctors(response.doctors)
-      setTotalPages(response.totalPages)
-      setTotalDoctors(response.totalDoctors)
-      console.log(response)
-    } catch (error) {
-      console.log(error)
-    }
-  }
 
+    setLoading(true);
+    
+    try {
+      const response = await api.get(
+        `/staff/get-all/doctors?page=${page}&limit=${limit}&search=${search}`
+      );
+
+
+      setDoctors(response.doctors);
+      setTotalPages(response.totalPages);
+      setTotalDoctors(response.totalDoctors);
+      setLoading(false);
+
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
+      handleGetAllDoctors();
+    }, 500);
 
-      handleGetAllDoctors()
+    return () => clearTimeout(timer);
+  }, [page, search]);
 
-    }, 500)
+  // ================= CREATE DOCTOR =================
 
-    return () => clearTimeout(timer)
-
-  }, [page, search])
-
-
-  // create doctor
   const handleCreateDoctor = async (e) => {
-    console.log("doctors")
     e.preventDefault();
 
     try {
-      const response = await api.post('/staff/create', doctorForm)
-      toast.success(response.success)
-      handleGetAllDoctors()
-    } catch (error) {
-      toast.error(error.response.data.error)
-      console.log(error.response.data)
-    }
+      const response = await api.post("/staff/create", doctorForm);
 
+      toast.success(response.success);
+      handleGetAllDoctors();
+    } catch (error) {
+      toast.error(error.response.data.error);
+      console.log(error.response.data);
+    }
 
     console.log("Doctor Data:", doctorForm);
 
     handleCloseModal();
   };
 
-  // delete doctor
-  // delete doctor
-
+  // ================= DELETE DOCTOR =================
 
   const handleDelete = async (doctor) => {
     try {
@@ -235,23 +276,26 @@ const Doctors = () => {
       });
 
       if (result.isConfirmed) {
-        const response = await api.delete(`/staff/delete/${doctor._id}`);
+        const response = await api.delete(
+          `/staff/delete/${doctor._id}`
+        );
 
         await Swal.fire({
           title: "Deleted!",
           text: response.success,
           icon: "success",
         });
-        handleGetAllDoctors()
 
-        // Refresh your staff list here if needed
+        handleGetAllDoctors();
       }
     } catch (error) {
       console.log(error);
 
       Swal.fire({
         title: "Error!",
-        text: error.response?.data?.error || "Failed to delete staff.",
+        text:
+          error.response?.data?.error ||
+          "Failed to delete staff.",
         icon: "error",
       });
     }
@@ -261,10 +305,9 @@ const Doctors = () => {
     <div className="w-full min-h-screen bg-background p-6 lg:p-8">
       <Toaster />
 
-
       {/* ================================
-    CREATE DOCTOR MODAL
-================================ */}
+          CREATE DOCTOR MODAL
+      ================================= */}
 
       <Modal
         open={openModal}
@@ -290,10 +333,9 @@ const Doctors = () => {
             outline: "none",
           }}
         >
-
           {/* Modal Header */}
-          <div className="flex items-center justify-between px-6 py-5 border-b border-border">
 
+          <div className="flex items-center justify-between px-6 py-5 border-b border-border">
             <div>
               <h2
                 id="create-doctor-modal"
@@ -314,14 +356,12 @@ const Doctors = () => {
             >
               <X size={20} className="text-muted-foreground cursor-pointer" />
             </button>
-
           </div>
 
           {/* Form */}
+
           <form onSubmit={handleCreateDoctor}>
-
             <div className="p-6 space-y-5">
-
               {/* Basic Information */}
 
               <div>
@@ -330,7 +370,6 @@ const Doctors = () => {
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
                   <TextField
                     fullWidth
                     required
@@ -357,13 +396,34 @@ const Doctors = () => {
                   <TextField
                     fullWidth
                     required
-                    type="password"
-                    label="password"
+                    type={showPassword ? "text" : "password"}
+                    label="Password"
                     name="password"
                     value={doctorForm.password}
                     onChange={handleDoctorChange}
                     placeholder="******"
                     size="small"
+                    slotProps={{
+                      input: {
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              edge="end"
+                              size="small"
+                              onClick={() =>
+                                setShowPassword((prev) => !prev)
+                              }
+                            >
+                              {showPassword ? (
+                                <EyeOff size={18} />
+                              ) : (
+                                <Eye size={18} />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      },
+                    }}
                   />
 
                   <TextField
@@ -387,9 +447,7 @@ const Doctors = () => {
                     value={doctorForm.specialization}
                     onChange={handleDoctorChange}
                     size="small"
-                  >
-                  </TextField>
-
+                  />
                 </div>
               </div>
 
@@ -401,8 +459,6 @@ const Doctors = () => {
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-
                   <TextField
                     fullWidth
                     required
@@ -435,8 +491,6 @@ const Doctors = () => {
                       },
                     }}
                   />
-
-
                 </div>
               </div>
 
@@ -458,13 +512,11 @@ const Doctors = () => {
                   placeholder="Write a short description about the doctor..."
                 />
               </div>
-
             </div>
 
             {/* Footer */}
 
             <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border bg-muted/20">
-
               <button
                 type="button"
                 onClick={handleCloseModal}
@@ -480,17 +532,14 @@ const Doctors = () => {
                 <Plus size={17} />
                 Create Doctor
               </button>
-
             </div>
-
           </form>
-
         </Box>
       </Modal>
 
       {/* ================================
-    UPDATE DOCTOR MODAL
-================================ */}
+          UPDATE DOCTOR MODAL
+      ================================= */}
 
       <Modal
         open={openUpdateModal}
@@ -517,6 +566,7 @@ const Doctors = () => {
           }}
         >
           {/* Modal Header */}
+
           <div className="flex items-center justify-between px-6 py-5 border-b border-border">
             <div>
               <h2
@@ -541,10 +591,11 @@ const Doctors = () => {
           </div>
 
           {/* Form */}
+
           <form onSubmit={handleSubmitUpdate}>
             <div className="p-6 space-y-5">
-
               {/* Basic Information */}
+
               <div>
                 <h3 className="text-sm font-semibold text-foreground mb-4">
                   Basic Information
@@ -592,13 +643,12 @@ const Doctors = () => {
                     value={updateForm.specialization}
                     onChange={handleUpdateChange}
                     size="small"
-                  >
-
-                  </TextField>
+                  />
                 </div>
               </div>
 
               {/* Professional Information */}
+
               <div>
                 <h3 className="text-sm font-semibold text-foreground mb-4">
                   Professional Information
@@ -653,6 +703,7 @@ const Doctors = () => {
               </div>
 
               {/* Bio */}
+
               <div>
                 <h3 className="text-sm font-semibold text-foreground mb-4">
                   Additional Information
@@ -669,10 +720,10 @@ const Doctors = () => {
                   placeholder="Write a short description about the doctor..."
                 />
               </div>
-
             </div>
 
             {/* Footer */}
+
             <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border bg-muted/20">
               <button
                 type="button"
@@ -693,11 +744,9 @@ const Doctors = () => {
         </Box>
       </Modal>
 
+      {/* ================= HEADER ================= */}
 
-
-      {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
-
         <div>
           <h1 className="text-2xl font-semibold text-foreground">
             Doctors
@@ -707,6 +756,7 @@ const Doctors = () => {
             Manage doctors, specializations and their availability.
           </p>
         </div>
+
         <button
           onClick={() => setOpenModal(true)}
           className="cursor-pointer inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition"
@@ -714,12 +764,11 @@ const Doctors = () => {
           <Plus size={18} />
           Add Doctor
         </button>
-
       </div>
 
-      {/* Statistics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
+      {/* ================= STATISTICS ================= */}
 
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
         <StatCard
           title="Total Doctors"
           value={totalDoctors}
@@ -743,20 +792,18 @@ const Doctors = () => {
           value={"totalAppointments"}
           icon={CalendarDays}
         />
-
       </div>
 
-      {/* Doctors Table Card */}
+      {/* ================= DOCTORS TABLE ================= */}
+
       <div className="bg-card border border-border rounded-xl overflow-hidden">
-
         {/* Filters */}
+
         <div className="p-5 border-b border-border">
-
           <div className="flex flex-col lg:flex-row gap-3 lg:items-center lg:justify-between">
-
             {/* Search */}
-            <div className="relative w-full lg:max-w-md">
 
+            <div className="relative w-full lg:max-w-md">
               <Search
                 size={18}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
@@ -769,24 +816,16 @@ const Doctors = () => {
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full h-10 pl-10 pr-4 rounded-lg border border-border bg-background text-sm text-foreground outline-none focus:ring-2 focus:ring-primary"
               />
-
             </div>
-
-            {/* Specialization */}
-
-
           </div>
-
         </div>
 
         {/* Table */}
+
         <div className="overflow-x-auto">
-
           <table className="w-full text-sm">
-
             <thead>
               <tr className="border-b border-border text-left">
-
                 <th className="px-5 py-3 font-medium text-muted-foreground">
                   Doctor
                 </th>
@@ -800,36 +839,34 @@ const Doctors = () => {
                 </th>
 
                 <th className="px-5 py-3 font-medium text-muted-foreground">
-                  fee
+                  Fee
                 </th>
-
 
                 <th className="px-5 py-3 font-medium text-muted-foreground">
                   Joined
                 </th>
 
                 <th className="px-5 py-3">
-                  actions
+                  Actions
                 </th>
 
+                <th className="px-5 py-3 font-medium text-muted-foreground">
+                  Availability
+                </th>
               </tr>
             </thead>
 
             <tbody>
-
               {doctors.length > 0 ? (
                 doctors.map((doctor) => (
-
                   <tr
                     key={doctor._id}
                     className="border-b border-border last:border-none hover:bg-muted/40 transition"
                   >
-
                     {/* Doctor */}
+
                     <td className="px-5 py-4">
-
                       <div className="flex items-center gap-3">
-
                         <div className="w-10 h-10 rounded-full bg-secondary text-primary flex items-center justify-center font-semibold">
                           {getInitials(doctor.name)}
                         </div>
@@ -843,14 +880,12 @@ const Doctors = () => {
                             {doctor.email}
                           </p>
                         </div>
-
                       </div>
-
                     </td>
 
                     {/* Specialization */}
-                    <td className="px-5 py-4">
 
+                    <td className="px-5 py-4">
                       <span className="inline-flex items-center gap-2 text-foreground">
                         <Stethoscope
                           size={15}
@@ -859,14 +894,12 @@ const Doctors = () => {
 
                         {doctor.specialization}
                       </span>
-
                     </td>
 
                     {/* Contact */}
+
                     <td className="px-5 py-4">
-
                       <div className="space-y-1">
-
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <Mail size={13} />
                           {doctor.email}
@@ -876,49 +909,101 @@ const Doctors = () => {
                           <Phone size={13} />
                           {doctor.phone}
                         </div>
-
-
-
-
-
                       </div>
-
                     </td>
 
-                    <td>
+                    {/* Fee */}
+
+                    <td className="px-5 py-4">
                       <p>{doctor.consultationFee}</p>
                     </td>
 
                     {/* Joined */}
+
                     <td className="px-5 py-4 text-muted-foreground">
                       {new Date(doctor.date).toLocaleDateString("en-GB")}
                     </td>
 
-                    <td>
-                      <button className="cursor-pointer text-blue-500"
-                        onClick={() => handleOpenUpdateModal(doctor)}
-                      >edit</button> {" "}
+                    {/* Actions */}
 
-                      <button
-                        className="cursor-pointer text-red-500"
-                        onClick={() => handleDelete(doctor)}>delete</button>
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-3">
+                        <button
+                          className="cursor-pointer text-blue-500"
+                          onClick={() => handleOpenUpdateModal(doctor)}
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          className="cursor-pointer text-red-500"
+                          onClick={() => handleDelete(doctor)}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
 
+                    {/* MUI AVAILABILITY SELECT */}
 
+                    <td className="px-5 py-4">
+                      <TextField
+                        select
+                        size="small"
+                        value={doctor.availability || "available"}
+                        onChange={(e) =>
+                          handleStatusChange(doctor._id, e.target.value)
+                        }
+                        sx={{
+                          minWidth: 140,
+                          "& .MuiOutlinedInput-root": {
+                            borderRadius: "8px",
+                            fontSize: "13px",
+                            backgroundColor: "#fff",
+                          },
+                          "& .MuiSelect-select": {
+                            padding: "8px 12px",
+                          },
+                        }}
+                      >
+                        <MenuItem value="available">
+                          <span className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-green-500" />
+                            Available
+                          </span>
+                        </MenuItem>
 
+                        <MenuItem value="off">
+                          <span className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-gray-500" />
+                            Off
+                          </span>
+                        </MenuItem>
+
+                        <MenuItem value="on leave">
+                          <span className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-orange-500" />
+                            On Leave
+                          </span>
+                        </MenuItem>
+
+                        <MenuItem value="break">
+                          <span className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-blue-500" />
+                            Break
+                          </span>
+                        </MenuItem>
+                      </TextField>
+                    </td>
                   </tr>
-
                 ))
               ) : (
-
                 <tr>
                   <td
                     colSpan="7"
                     className="px-5 py-12 text-center"
                   >
-
                     <div className="flex flex-col items-center">
-
                       <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center text-muted-foreground mb-3">
                         <Users size={22} />
                       </div>
@@ -930,23 +1015,17 @@ const Doctors = () => {
                       <p className="text-sm text-muted-foreground mt-1">
                         Try changing your search or filter.
                       </p>
-
                     </div>
-
                   </td>
                 </tr>
-
               )}
-
             </tbody>
-
           </table>
-
         </div>
 
         {/* Pagination */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-t border-border">
 
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-t border-border">
           <p className="text-sm text-muted-foreground">
             Showing{" "}
             <span className="font-medium text-foreground">
@@ -960,7 +1039,6 @@ const Doctors = () => {
           </p>
 
           <div className="flex items-center gap-2">
-
             <button
               disabled={page === 1}
               onClick={previousPage}
@@ -976,29 +1054,23 @@ const Doctors = () => {
             <button
               onClick={nextPage}
               disabled={page === totalPages}
-              className="h-9 px-3 rounded-lg border border-border text-sm text-muted-foreground disabled:opacity-50">
+              className="h-9 px-3 rounded-lg border border-border text-sm text-muted-foreground disabled:opacity-50"
+            >
               Next
             </button>
-
           </div>
-
         </div>
-
       </div>
     </div>
   );
 };
 
-/* ==========================================
-   STAT CARD
-========================================== */
+/* ================= STAT CARD ================= */
+
 const StatCard = ({ title, value, icon: Icon }) => {
   return (
     <div className="bg-card border border-border rounded-xl p-5">
-
-
       <div className="flex items-start justify-between">
-
         <div>
           <p className="text-sm text-muted-foreground">
             {title}
@@ -1012,19 +1084,14 @@ const StatCard = ({ title, value, icon: Icon }) => {
         <div className="w-10 h-10 rounded-lg bg-secondary text-primary flex items-center justify-center">
           <Icon size={20} />
         </div>
-
       </div>
-
     </div>
   );
 };
 
-/* ==========================================
-   STATUS BADGE
-========================================== */
+/* ================= STATUS BADGE ================= */
 
 const StatusBadge = ({ status }) => {
-
   const styles = {
     Active: "bg-green-100 text-green-700",
     Inactive: "bg-red-100 text-red-700",
@@ -1032,20 +1099,18 @@ const StatusBadge = ({ status }) => {
 
   return (
     <span
-      className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${styles[status]
-        }`}
+      className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${
+        styles[status]
+      }`}
     >
       {status}
     </span>
   );
 };
 
-/* ==========================================
-   GET INITIALS
-========================================== */
+/* ================= GET INITIALS ================= */
 
-const getInitials = (name) => {
-
+const getInitials = (name = "") => {
   return name
     .replace("Dr. ", "")
     .split(" ")
@@ -1053,7 +1118,6 @@ const getInitials = (name) => {
     .join("")
     .slice(0, 2)
     .toUpperCase();
-
 };
 
 export default Doctors;

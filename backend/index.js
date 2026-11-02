@@ -5,7 +5,7 @@ import cors from 'cors'
 import { authRouter } from './routes/user.auth.route.js';
 import { adminRouter } from './routes/admin.route.js';
 import { staffRouter } from './routes/admin.staff.route.js';
-
+import { doctorRouter } from './routes/doctor.route.js';
 import cookieParser from "cookie-parser";
 import { clinicRouter } from './routes/clinic.route.js';
 
@@ -36,7 +36,7 @@ app.use('/auth',authRouter)
 app.use('/admin',adminRouter)
 app.use('/staff',staffRouter)
 app.use('/clinic',clinicRouter)
-
+app.use('/doctor',doctorRouter)
 app.listen(port, () => {
   console.log(`Clinivo is listening on port ${port}`);
 });
