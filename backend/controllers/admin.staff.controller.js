@@ -292,6 +292,12 @@ export const getAllDoctors = async (req, res) => {
                                 date: "$doctors.createdAt"
                             }
                         },
+                        
+                        {
+                            $sort: {
+                                date: -1
+                            }
+                        },
 
                         {
                             $skip: skip

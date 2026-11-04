@@ -241,6 +241,10 @@ const Doctors = () => {
     return () => clearTimeout(timer);
   }, [page, search]);
 
+  const activeDoctors = doctors.filter((doctor) => doctor.availability === "available").length;
+  const inactiveDoctors = doctors.filter((doctor) => doctor.availability !== "available").length;
+
+
   // ================= CREATE DOCTOR =================
 
   const handleCreateDoctor = async (e) => {
@@ -305,6 +309,7 @@ const Doctors = () => {
 
   return (
     <div className="w-full min-h-screen bg-background p-6 lg:p-8">
+      <button onClick={handleOpenModal}>Add Doctor</button>
       <Toaster />
 
       {/* ================================
@@ -522,6 +527,7 @@ const Doctors = () => {
                       id="consultationFee"
                       label="Consultation Fee"
                       name="consultationFee"
+                      placeholder="PKR"
                       value={doctorForm.consultationFee}
                       onChange={handleDoctorChange}
                       className='w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
@@ -757,23 +763,7 @@ const Doctors = () => {
                 </div>
               </div>
 
-              {/* Bio */}
 
-              <div>
-                <h3 className="text-sm font-semibold text-foreground mb-4">
-                  Additional Information
-                </h3>
-
-                <textarea     
-                  rows={4}
-                  label="Doctor Bio"
-                  name="bio"
-                  value={updateForm.bio}
-                  onChange={handleUpdateChange}
-                  placeholder="Write a short description about the doctor..."
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
-                />
-              </div>
             </div>
 
             {/* Footer */}
@@ -822,7 +812,7 @@ const Doctors = () => {
 
       {/* ================= STATISTICS ================= */}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 mb-6">
         <StatCard
           title="Total Doctors"
           value={totalDoctors}
@@ -831,21 +821,16 @@ const Doctors = () => {
 
         <StatCard
           title="Active Doctors"
-          value={"activeDoctors"}
+          value={activeDoctors}
           icon={UserCheck}
         />
 
         <StatCard
           title="Inactive Doctors"
-          value={"inactiveDoctors"}
+          value={inactiveDoctors}
           icon={UserX}
         />
 
-        <StatCard
-          title="Total Appointments"
-          value={"totalAppointments"}
-          icon={CalendarDays}
-        />
       </div>
 
       {/* ================= DOCTORS TABLE ================= */}
@@ -1141,11 +1126,11 @@ const StatCard = ({ title, value, icon: Icon }) => {
     <div className="bg-card border border-border rounded-xl p-5">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm text-muted-foreground">
+          <p className="font-primary font-medium text-sm text-muted-foreground">
             {title}
           </p>
 
-          <p className="text-2xl font-semibold text-foreground mt-2">
+          <p className="font-primary text-2xl font-semibold text-foreground mt-2">
             {value}
           </p>
         </div>
@@ -1155,24 +1140,6 @@ const StatCard = ({ title, value, icon: Icon }) => {
         </div>
       </div>
     </div>
-  );
-};
-
-/* ================= STATUS BADGE ================= */
-
-const StatusBadge = ({ status }) => {
-  const styles = {
-    Active: "bg-green-100 text-green-700",
-    Inactive: "bg-red-100 text-red-700",
-  };
-
-  return (
-    <span
-      className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${styles[status]
-        }`}
-    >
-      {status}
-    </span>
   );
 };
 
