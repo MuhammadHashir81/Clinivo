@@ -371,7 +371,7 @@ const Doctors = () => {
                   Basic Information
                 </h3>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Full Name */}
                   <div>
                     <label
@@ -490,44 +490,44 @@ const Doctors = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
 
-                  <label
-                    htmlFor="experience"
-                    className="block text-sm font-medium text-foreground mb-1.5"
-                  >
-                    Years of Experience
-                  </label>
-                  <input
-                    type="number"
-                    id="experience"
-                    label="Years of Experience"
-                    name="experience"
-                    value={doctorForm.experience}
-                    onChange={handleDoctorChange}
-                    placeholder="5"
-                    size="small"
-                    className='w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
-                  />
+                    <label
+                      htmlFor="experience"
+                      className="block text-sm font-medium text-foreground mb-1.5"
+                    >
+                      Years of Experience
+                    </label>
+                    <input
+                      type="number"
+                      id="experience"
+                      label="Years of Experience"
+                      name="experience"
+                      value={doctorForm.experience}
+                      onChange={handleDoctorChange}
+                      placeholder="5"
+                      size="small"
+                      className='w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
+                    />
                   </div>
 
                   <div>
 
-                  <label
-                    htmlFor="consultationFee"
-                    className="block text-sm font-medium text-foreground mb-1.5"
-                  >
-                    Consultation Fee
-                  </label>
-                  <input
-                    type="number"
-                    id="consultationFee"
-                    label="Consultation Fee"
-                    name="consultationFee"
-                    value={doctorForm.consultationFee}
-                    onChange={handleDoctorChange}
-                    className='w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
-                  />
+                    <label
+                      htmlFor="consultationFee"
+                      className="block text-sm font-medium text-foreground mb-1.5"
+                    >
+                      Consultation Fee
+                    </label>
+                    <input
+                      type="number"
+                      id="consultationFee"
+                      label="Consultation Fee"
+                      name="consultationFee"
+                      value={doctorForm.consultationFee}
+                      onChange={handleDoctorChange}
+                      className='w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
+                    />
                   </div>
-                    
+
                 </div>
               </div>
 
@@ -637,48 +637,91 @@ const Doctors = () => {
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input
-                    type="text"
-                    required
-                    label="Doctor Name"
-                    name="name"
-                    value={updateForm.name}
-                    onChange={handleUpdateChange}
-                    size="small"
-                  />
+                  <div>
 
-                  <TextField
-                    fullWidth
-                    required
-                    type="email"
-                    label="Email Address"
-                    name="email"
-                    value={updateForm.email}
-                    onChange={handleUpdateChange}
-                    size="small"
-                  />
+                    <label htmlFor="dr-name"
+                      className="block text-sm font-medium text-foreground mb-1.5">Doctor Name</label>
+                    <input
+                      type="text"
+                      id="dr-name"
+                      name="name"
+                      value={updateForm.name}
+                      onChange={handleUpdateChange}
+                      className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary "
 
-                  <TextField
-                    fullWidth
-                    required
-                    type="tel"
-                    label="Phone Number"
-                    name="phone"
-                    value={updateForm.phone}
-                    onChange={handleUpdateChange}
-                    size="small"
-                  />
+                    />
+                  </div>
 
-                  <TextField
-                    type="text"
-                    fullWidth
-                    required
-                    label="Specialization"
-                    name="specialization"
-                    value={updateForm.specialization}
-                    onChange={handleUpdateChange}
-                    size="small"
-                  />
+                  <div>
+                    <label htmlFor="dr-email"
+                    className="block text-sm font-medium text-foreground mb-1.5"
+                    >Email Address</label>
+                    <input
+                      type="email"
+                      id="dr-email"
+                      name="email"
+                      value={updateForm.email}
+                      onChange={handleUpdateChange}
+                      className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary "
+                    />
+                  </div>
+
+                  <div>
+
+
+
+                    <label htmlFor="dr-phone"
+                      className="block text-sm font-medium text-foreground mb-1.5"
+                    >
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      id="dr-phone"
+                      name="phone"
+                      value={updateForm.phone}
+                      onChange={handleUpdateChange}
+                      className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary "
+                    />
+                  </div>
+
+                  <div>
+
+
+                    <label htmlFor="dr-specialization"
+                      className="block text-sm font-medium text-foreground mb-1.5"
+                    >
+                      Specialization
+                    </label>
+                    <input
+                      type="text"
+                      id="dr-specialization"
+                      name="specialization"
+                      value={updateForm.specialization}
+                      onChange={handleUpdateChange}
+                      className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary "
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="specialization"
+                      className="block text-sm font-medium text-foreground mb-1.5"
+                    >
+                      Specialization
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      id="specialization"
+                      label="Specialization"
+                      name="specialization"
+                      value={updateForm.specialization}
+                      onChange={handleUpdateChange}
+                      size="small"
+                      className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
+                    />
+
+                  </div>
                 </div>
               </div>
 
@@ -690,8 +733,7 @@ const Doctors = () => {
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <TextField
-                    fullWidth
+                  <input
                     required
                     type="number"
                     label="Years of Experience"
@@ -699,41 +741,19 @@ const Doctors = () => {
                     value={updateForm.experience}
                     onChange={handleUpdateChange}
                     size="small"
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
                   />
 
-                  <TextField
-                    fullWidth
-                    required
+                  <input
                     type="number"
                     label="Consultation Fee"
                     name="consultationFee"
                     value={updateForm.consultationFee}
                     onChange={handleUpdateChange}
                     size="small"
-                    slotProps={{
-                      input: {
-                        startAdornment: (
-                          <span className="mr-2 text-sm text-muted-foreground">
-                            Rs.
-                          </span>
-                        ),
-                      },
-                    }}
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
                   />
 
-                  <TextField
-                    select
-                    fullWidth
-                    required
-                    label="Status"
-                    name="status"
-                    value={updateForm.status}
-                    onChange={handleUpdateChange}
-                    size="small"
-                  >
-                    <MenuItem value="Active">Active</MenuItem>
-                    <MenuItem value="Inactive">Inactive</MenuItem>
-                  </TextField>
                 </div>
               </div>
 
@@ -744,15 +764,14 @@ const Doctors = () => {
                   Additional Information
                 </h3>
 
-                <TextField
-                  fullWidth
-                  multiline
+                <textarea     
                   rows={4}
                   label="Doctor Bio"
                   name="bio"
                   value={updateForm.bio}
                   onChange={handleUpdateChange}
                   placeholder="Write a short description about the doctor..."
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
                 />
               </div>
             </div>
@@ -892,183 +911,183 @@ const Doctors = () => {
             </thead>
 
             <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan="7" className="py-12 text-center">
-                      <div className="flex flex-col items-center justify-center gap-3">
-                        <Loader
-                          size={30}
-                          className="animate-spin text-primary"
-                        />
+              {loading ? (
+                <tr>
+                  <td colSpan="7" className="py-12 text-center">
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <Loader
+                        size={30}
+                        className="animate-spin text-primary"
+                      />
 
+                    </div>
+                  </td>
+                </tr>
+              ) :
+
+                doctors.length > 0 ? (
+                  doctors.map((doctor) => (
+                    <tr
+                      key={doctor._id}
+                      className="border-b border-border last:border-none hover:bg-muted/40 transition"
+                    >
+                      {/* Doctor */}
+
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-secondary text-primary flex items-center justify-center font-semibold">
+                            {getInitials(doctor.name)}
+                          </div>
+
+                          <div>
+                            <p className="font-medium text-foreground">
+                              {doctor.name}
+                            </p>
+
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {doctor.email}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Specialization */}
+
+                      <td className="px-5 py-4">
+                        <span className="inline-flex items-center gap-2 text-foreground">
+                          <Stethoscope
+                            size={15}
+                            className="text-muted-foreground"
+                          />
+
+                          {doctor.specialization}
+                        </span>
+                      </td>
+
+                      {/* Contact */}
+
+                      <td className="px-5 py-4">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <Mail size={13} />
+                            {doctor.email}
+                          </div>
+
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <Phone size={13} />
+                            {doctor.phone}
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Fee */}
+
+                      <td className="px-5 py-4">
+                        <p>{doctor.consultationFee}</p>
+                      </td>
+
+                      {/* Joined */}
+
+                      <td className="px-5 py-4 text-muted-foreground">
+                        {new Date(doctor.date).toLocaleDateString("en-GB")}
+                      </td>
+
+                      {/* Actions */}
+
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3">
+                          <button
+                            className="cursor-pointer text-blue-500"
+                            onClick={() => handleOpenUpdateModal(doctor)}
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            className="cursor-pointer text-red-500"
+                            onClick={() => handleDelete(doctor)}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+
+                      {/* MUI AVAILABILITY SELECT */}
+
+                      <td className="px-5 py-4">
+                        <TextField
+                          select
+                          size="small"
+                          value={doctor.availability || "available"}
+                          onChange={(e) =>
+                            handleStatusChange(doctor._id, e.target.value)
+                          }
+                          sx={{
+                            minWidth: 140,
+                            "& .MuiOutlinedInput-root": {
+                              borderRadius: "8px",
+                              fontSize: "13px",
+                              backgroundColor: "#fff",
+                            },
+                            "& .MuiSelect-select": {
+                              padding: "8px 12px",
+                            },
+                          }}
+                        >
+                          <MenuItem value="available">
+                            <span className="flex items-center gap-2">
+                              <span className="w-2 h-2 rounded-full bg-green-500" />
+                              Available
+                            </span>
+                          </MenuItem>
+
+                          <MenuItem value="off">
+                            <span className="flex items-center gap-2">
+                              <span className="w-2 h-2 rounded-full bg-gray-500" />
+                              Off
+                            </span>
+                          </MenuItem>
+
+                          <MenuItem value="on leave">
+                            <span className="flex items-center gap-2">
+                              <span className="w-2 h-2 rounded-full bg-orange-500" />
+                              On Leave
+                            </span>
+                          </MenuItem>
+
+                          <MenuItem value="break">
+                            <span className="flex items-center gap-2">
+                              <span className="w-2 h-2 rounded-full bg-blue-500" />
+                              Break
+                            </span>
+                          </MenuItem>
+                        </TextField>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan="7"
+                      className="px-5 py-12 text-center"
+                    >
+                      <div className="flex flex-col items-center">
+                        <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center text-muted-foreground mb-3">
+                          <Users size={22} />
+                        </div>
+
+                        <p className="font-medium text-foreground">
+                          No doctors found
+                        </p>
+
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Try changing your search or filter.
+                        </p>
                       </div>
                     </td>
                   </tr>
-                ) :
-                  
-                    doctors.length > 0 ? (
-                      doctors.map((doctor) => (
-                        <tr
-                          key={doctor._id}
-                          className="border-b border-border last:border-none hover:bg-muted/40 transition"
-                        >
-                          {/* Doctor */}
-
-                          <td className="px-5 py-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-secondary text-primary flex items-center justify-center font-semibold">
-                                {getInitials(doctor.name)}
-                              </div>
-
-                              <div>
-                                <p className="font-medium text-foreground">
-                                  {doctor.name}
-                                </p>
-
-                                <p className="text-xs text-muted-foreground mt-0.5">
-                                  {doctor.email}
-                                </p>
-                              </div>
-                            </div>
-                          </td>
-
-                          {/* Specialization */}
-
-                          <td className="px-5 py-4">
-                            <span className="inline-flex items-center gap-2 text-foreground">
-                              <Stethoscope
-                                size={15}
-                                className="text-muted-foreground"
-                              />
-
-                              {doctor.specialization}
-                            </span>
-                          </td>
-
-                          {/* Contact */}
-
-                          <td className="px-5 py-4">
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                <Mail size={13} />
-                                {doctor.email}
-                              </div>
-
-                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                <Phone size={13} />
-                                {doctor.phone}
-                              </div>
-                            </div>
-                          </td>
-
-                          {/* Fee */}
-
-                          <td className="px-5 py-4">
-                            <p>{doctor.consultationFee}</p>
-                          </td>
-
-                          {/* Joined */}
-
-                          <td className="px-5 py-4 text-muted-foreground">
-                            {new Date(doctor.date).toLocaleDateString("en-GB")}
-                          </td>
-
-                          {/* Actions */}
-
-                          <td className="px-5 py-4">
-                            <div className="flex items-center gap-3">
-                              <button
-                                className="cursor-pointer text-blue-500"
-                                onClick={() => handleOpenUpdateModal(doctor)}
-                              >
-                                Edit
-                              </button>
-
-                              <button
-                                className="cursor-pointer text-red-500"
-                                onClick={() => handleDelete(doctor)}
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          </td>
-
-                          {/* MUI AVAILABILITY SELECT */}
-
-                          <td className="px-5 py-4">
-                            <TextField
-                              select
-                              size="small"
-                              value={doctor.availability || "available"}
-                              onChange={(e) =>
-                                handleStatusChange(doctor._id, e.target.value)
-                              }
-                              sx={{
-                                minWidth: 140,
-                                "& .MuiOutlinedInput-root": {
-                                  borderRadius: "8px",
-                                  fontSize: "13px",
-                                  backgroundColor: "#fff",
-                                },
-                                "& .MuiSelect-select": {
-                                  padding: "8px 12px",
-                                },
-                              }}
-                            >
-                              <MenuItem value="available">
-                                <span className="flex items-center gap-2">
-                                  <span className="w-2 h-2 rounded-full bg-green-500" />
-                                  Available
-                                </span>
-                              </MenuItem>
-
-                              <MenuItem value="off">
-                                <span className="flex items-center gap-2">
-                                  <span className="w-2 h-2 rounded-full bg-gray-500" />
-                                  Off
-                                </span>
-                              </MenuItem>
-
-                              <MenuItem value="on leave">
-                                <span className="flex items-center gap-2">
-                                  <span className="w-2 h-2 rounded-full bg-orange-500" />
-                                  On Leave
-                                </span>
-                              </MenuItem>
-
-                              <MenuItem value="break">
-                                <span className="flex items-center gap-2">
-                                  <span className="w-2 h-2 rounded-full bg-blue-500" />
-                                  Break
-                                </span>
-                              </MenuItem>
-                            </TextField>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td
-                          colSpan="7"
-                          className="px-5 py-12 text-center"
-                        >
-                          <div className="flex flex-col items-center">
-                            <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center text-muted-foreground mb-3">
-                              <Users size={22} />
-                            </div>
-
-                            <p className="font-medium text-foreground">
-                              No doctors found
-                            </p>
-
-                            <p className="text-sm text-muted-foreground mt-1">
-                              Try changing your search or filter.
-                            </p>
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  }
+                )
+              }
             </tbody>
           </table>
         </div>

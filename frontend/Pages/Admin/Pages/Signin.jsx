@@ -22,7 +22,6 @@ const Signin = () => {
       } = useForm()
     
       const onSubmit = async (data) => {
-        console.log('dfsdf')
          dispatch(adminLogin(data))
       }
 
