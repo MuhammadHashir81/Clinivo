@@ -23,6 +23,11 @@ const receptionistSchema = new mongoose.Schema(
             type: String,
             enum: ["morning", "evening"],
             required: true
+        },
+        status: {
+            type: String,
+            enum: ["active", "inactive"],
+            default: "inactive"
         }
     },
     {

@@ -48,7 +48,7 @@ export const createStaff = async (req, res) => {
 
         if (existingUser) {
             return res.status(400).json({
-                error: "An account with this email already exists"
+                error: "This email is already registered"
             });
         }
 
@@ -120,7 +120,7 @@ export const loginStaff = async (req, res) => {
             email,
             role
         });
-        
+
         if (!staff) {
             return res.status(401).json({
                 error: "Invalid email or password"
@@ -292,7 +292,7 @@ export const getAllDoctors = async (req, res) => {
                                 date: "$doctors.createdAt"
                             }
                         },
-                        
+
                         {
                             $sort: {
                                 date: -1
@@ -468,12 +468,12 @@ export const getAllReceptionists = async (req, res) => {
 
 
 // update staff
-export const updateStaff = async (req,res)=>{
+export const updateStaff = async (req, res) => {
     try {
         const { userId } = req
         const { staffId } = req.params
-        
-       const {
+
+        const {
             name,
             email,
             password,
@@ -485,27 +485,27 @@ export const updateStaff = async (req,res)=>{
             shift
         } = req.body;
 
-        
+
         const clinic = await Clinic.findOne({
             ownerId: userId
         });
 
-        if(!clinic){
-            return res.status(400).json({error:'clinic does not exist'})
+        if (!clinic) {
+            return res.status(400).json({ error: 'clinic does not exist' })
         }
 
         let staffDetails = await Doctor.findOne({
-            userId:staffId,
-            clinicId:clinic._id
+            userId: staffId,
+            clinicId: clinic._id
         })
 
         let role = "doctor"
 
-          if (!staffDetails) {
+        if (!staffDetails) {
 
             staffDetails = await Receptionist.findOne({
-            userId: staffId,
-            clinicId: clinic._id
+                userId: staffId,
+                clinicId: clinic._id
             });
             role = "receptionist";
 
@@ -519,32 +519,44 @@ export const updateStaff = async (req,res)=>{
 
         const user = await User.findById(staffId);
 
-         if (!user) {
+        if (!user) {
             return res.status(404).json({ error: "User account not found" });
         }
 
         if (name) {
             user.name = name.trim();
         }
-        
-        if(email){
-            user.email = email
+
+        if (email) {
+            const existingUser = await User.findOne({
+                email: email.toLowerCase().trim(),
+                _id: { $ne: staffId }
+            });
+
+            if (existingUser) {
+                return res.status(400).json({
+                    error: "This email is already registered"
+                });
+            }
+
+            user.email = email.toLowerCase().trim();
         }
 
-        if(password){
-            user.password = await bcrypt.hash(password,10)
+        if (password) {
+            user.password = await bcrypt.hash(password, 10)
         }
 
         await user.save()
 
-         // ----- Update role-specific fields -----
+        // ----- Update role-specific fields -----
         if (role === "doctor") {
             if (phone !== undefined) staffDetails.phone = phone;
             if (specialization !== undefined) staffDetails.specialization = specialization;
             if (experience !== undefined) staffDetails.experience = experience;
             if (consultationFee !== undefined) staffDetails.consultationFee = consultationFee;
             if (bio !== undefined) staffDetails.bio = bio;
-        } 
+        }
+
         else {
             if (phone !== undefined) staffDetails.phone = phone;
             if (shift !== undefined) staffDetails.shift = shift;
@@ -560,42 +572,42 @@ export const updateStaff = async (req,res)=>{
 
 
     } catch (error) {
-        return res.status(500).json({error:error.message})
-        
+        return res.status(500).json({ error: error.message })
+
     }
 }
 
 
 
 // delete staff
-export const deleteStaff = async(req,res)=>{
+export const deleteStaff = async (req, res) => {
     try {
         const { userId } = req
         const { staffId } = req.params
 
-        
+
         const clinic = await Clinic.findOne({
             ownerId: userId
         });
 
-        if(!clinic){
-            return res.status(400).json({error:'clinic does not exist'})
+        if (!clinic) {
+            return res.status(400).json({ error: 'clinic does not exist' })
         }
 
-        
+
         let staffDetails = await Doctor.findOne({
-            userId:staffId,
-            clinicId:clinic._id
+            userId: staffId,
+            clinicId: clinic._id
         })
 
         let role = "doctor"
 
-        
-          if (!staffDetails) {
+
+        if (!staffDetails) {
 
             staffDetails = await Receptionist.findOne({
-            userId: staffId,
-            clinicId: clinic._id
+                userId: staffId,
+                clinicId: clinic._id
             });
             role = "receptionist";
 
@@ -605,18 +617,18 @@ export const deleteStaff = async(req,res)=>{
 
         const user = await User.findByIdAndDelete(staffId)
 
-         if (!user) {
+        if (!user) {
             return res.status(404).json({ error: "User account not found" });
         }
 
-         return res.status(200).json({
+        return res.status(200).json({
             success: `${role} deleted successfully`
         });
 
-        
+
     } catch (error) {
         console.log(error)
-        return res.status(500).json({error:error.message})
-        
+        return res.status(500).json({ error: error.message })
+
     }
 }

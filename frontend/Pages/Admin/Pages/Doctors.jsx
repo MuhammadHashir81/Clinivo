@@ -4,12 +4,10 @@ import { Loader } from "lucide-react";
 import {
   Search,
   Plus,
-  MoreHorizontal,
   Stethoscope,
   Users,
   UserCheck,
   UserX,
-  CalendarDays,
   Mail,
   Phone,
   X,
@@ -23,8 +21,6 @@ import {
   Modal,
   Box,
   MenuItem,
-  InputAdornment,
-  IconButton,
   TextField,
 } from "@mui/material";
 
@@ -220,6 +216,7 @@ const Doctors = () => {
       const response = await api.get(
         `/staff/get-all/doctors?page=${page}&limit=${limit}&search=${search}`
       );
+      console.log("Doctors Response:", response);
 
 
       setDoctors(response.doctors);
@@ -305,11 +302,9 @@ const Doctors = () => {
     }
   };
 
-
-
   return (
     <div className="w-full min-h-screen bg-background p-6 lg:p-8">
-      <button onClick={handleOpenModal}>Add Doctor</button>
+      
       <Toaster />
 
       {/* ================================
@@ -406,6 +401,7 @@ const Doctors = () => {
                     </label>
                     <input
                       id="create-email"
+                      required
                       type="email"
                       name="email"
                       value={doctorForm.email}
@@ -427,6 +423,7 @@ const Doctors = () => {
                       <input
                         id="create-password"
                         type={showPassword ? "text" : "password"}
+                        required
                         name="password"
                         value={doctorForm.password}
                         onChange={handleDoctorChange}
@@ -456,6 +453,7 @@ const Doctors = () => {
                     <input
                       id="create-phone"
                       type="tel"
+                      required
                       name="phone"
                       value={doctorForm.phone}
                       onChange={handleDoctorChange}
@@ -475,6 +473,7 @@ const Doctors = () => {
                     <input
                       id="create-specialization"
                       type="text"
+                      required
                       name="specialization"
                       value={doctorForm.specialization}
                       onChange={handleDoctorChange}
@@ -503,6 +502,7 @@ const Doctors = () => {
                     </label>
                     <input
                       type="number"
+                      required
                       id="experience"
                       label="Years of Experience"
                       name="experience"
@@ -524,6 +524,7 @@ const Doctors = () => {
                     </label>
                     <input
                       type="number"
+                      required
                       id="consultationFee"
                       label="Consultation Fee"
                       name="consultationFee"
@@ -649,6 +650,7 @@ const Doctors = () => {
                       className="block text-sm font-medium text-foreground mb-1.5">Doctor Name</label>
                     <input
                       type="text"
+                      required
                       id="dr-name"
                       name="name"
                       value={updateForm.name}
@@ -664,6 +666,7 @@ const Doctors = () => {
                     >Email Address</label>
                     <input
                       type="email"
+                      required
                       id="dr-email"
                       name="email"
                       value={updateForm.email}
@@ -683,6 +686,7 @@ const Doctors = () => {
                     </label>
                     <input
                       type="tel"
+                      required
                       id="dr-phone"
                       name="phone"
                       value={updateForm.phone}
@@ -701,6 +705,7 @@ const Doctors = () => {
                     </label>
                     <input
                       type="text"
+                      required
                       id="dr-specialization"
                       name="specialization"
                       value={updateForm.specialization}
@@ -752,6 +757,7 @@ const Doctors = () => {
 
                   <input
                     type="number"
+                    required
                     label="Consultation Fee"
                     name="consultationFee"
                     value={updateForm.consultationFee}
@@ -850,6 +856,7 @@ const Doctors = () => {
 
               <input
                 type="text"
+                required
                 placeholder="Search doctors..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -1048,7 +1055,7 @@ const Doctors = () => {
                           </MenuItem>
                         </TextField>
                       </td>
-                    </tr>
+                    </tr> 
                   ))
                 ) : (
                   <tr>

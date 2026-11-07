@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import { Loader } from "lucide-react";
 import {
   Search,
   Plus,
@@ -12,6 +13,8 @@ import {
   Phone,
   X,
   Clock3,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
 import {
@@ -39,11 +42,12 @@ const Receptionists = () => {
   const [totalPages, setTotalPages] = useState(0)
   const [totalReceptionists, setTotalReceptionists] = useState(0)
   const [staffId, setStaffId] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   const [openUpdateModal, setOpenUpdateModal] = useState(false)
 
-  const [statusFilter, setStatusFilter] =
-    useState("All Status");
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const shifts = [
     "morning",
@@ -101,15 +105,17 @@ const Receptionists = () => {
 
 
   const getAllRecepitonists = async () => {
+    setLoading(true)
     try {
       const result = await api.get(`/staff/get-all-receptionists?page=${page}&limit=${limit}&search=${search}`)
       setReceptionists(result.receptionists)
       setTotalReceptionists(result.totalReceptionists)
       setTotalPages(result.totalPages)
       console.log(result)
+      setLoading(false)
     } catch (error) {
       console.log(error)
-
+      setLoading(false)
     }
   }
 
@@ -196,22 +202,22 @@ const Receptionists = () => {
         cancelButtonColor: "#d33",
         confirmButtonText: "Yes, delete it!",
       });
-  
+
       if (result.isConfirmed) {
         const response = await api.delete(`/staff/delete/${receptionist._id}`);
-  
+
         await Swal.fire({
           title: "Deleted!",
           text: response.success,
           icon: "success",
         });
         getAllRecepitonists()
-  
+
         // Refresh your staff list here if needed
       }
     } catch (error) {
       console.log(error);
-  
+
       Swal.fire({
         title: "Error!",
         text: error.response?.data?.error || "Failed to delete staff.",
@@ -219,7 +225,7 @@ const Receptionists = () => {
       });
     }
   };
-  
+
 
   const handleCloseUpdateModal = () => {
     setOpenUpdateModal(false)
@@ -279,9 +285,7 @@ const Receptionists = () => {
         >
 
           <Plus size={18} />
-
           Add Receptionist
-
         </button>
 
       </div>
@@ -382,8 +386,7 @@ const Receptionists = () => {
 
             <thead>
 
-              <tr className="border-b border-border text-left">
-
+              <tr className="border-b border-border text-left text-muted-foreground">
 
                 <th className="px-5 py-3 font-medium text-muted-foreground">
                   Receptionist
@@ -400,18 +403,14 @@ const Receptionists = () => {
                 </th>
 
 
-                <th className="px-5 py-3 font-medium text-muted-foreground">
-                  Appointments
-                </th>
-
-
-                <th className="px-5 py-3 font-medium text-muted-foreground">
-                  Status
-                </th>
 
 
                 <th className="px-5 py-3 font-medium text-muted-foreground">
                   Joined
+                </th>
+
+                <th className="px-5 py-3 font-medium text-muted-foreground">
+                  Status
                 </th>
 
 
@@ -428,213 +427,204 @@ const Receptionists = () => {
             {/* TABLE BODY */}
 
             <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="7" className="py-12 text-center">
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <Loader
+                        size={30}
+                        className="animate-spin text-primary"
+                      />
+
+                    </div>
+                  </td>
+                </tr>
+              ) :
 
 
-              {receptionists.length > 0 ? (
+                receptionists.length > 0 ? (
 
-                receptionists.map(
-                  (receptionist) => (
+                  receptionists.map(
+                    (receptionist) => (
 
-                    <tr
-                      key={receptionist._id}
-                      className="border-b border-border last:border-none hover:bg-muted/40 transition"
-                    >
-
-
-                      {/* RECEPTIONIST */}
-
-                      <td className="px-5 py-4">
-
-                        <div className="flex items-center gap-3">
+                      <tr
+                        key={receptionist._id}
+                        className="border-b border-border last:border-none hover:bg-muted/40 transition"
+                      >
 
 
-                          <div className="w-10 h-10 rounded-full bg-secondary text-primary flex items-center justify-center font-semibold">
+                        {/* RECEPTIONIST */}
 
-                            {getInitials(
-                              receptionist.name
-                            )}
+                        <td className="px-5 py-4">
+
+                          <div className="flex items-center gap-3">
+
+
+                            <div className="w-10 h-10 rounded-full bg-secondary text-primary flex items-center justify-center font-semibold">
+
+                              {getInitials(
+                                receptionist.name
+                              )}
+
+                            </div>
+
+
+                            <div>
+
+                              <p className="font-medium text-foreground">
+                                {receptionist.name}
+                              </p>
+
+
+                            </div>
+
 
                           </div>
 
+                        </td>
 
-                          <div>
 
-                            <p className="font-medium text-foreground">
-                              {receptionist.name}
-                            </p>
+                        {/* CONTACT */}
+
+                        <td className="px-5 py-4">
+
+                          <div className="space-y-1">
+
+
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+
+                              <Mail size={13} />
+
+                              {receptionist.email}
+
+                            </div>
+
+
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+
+                              <Phone size={13} />
+
+                              {receptionist.phone}
+
+                            </div>
 
 
                           </div>
 
-
-                        </div>
-
-                      </td>
+                        </td>
 
 
-                      {/* CONTACT */}
+                        {/* SHIFT */}
 
-                      <td className="px-5 py-4">
+                        <td className="px-5 py-4">
 
-                        <div className="space-y-1">
+                          <span className="inline-flex items-center gap-2 text-foreground">
 
+                            <Clock3
+                              size={15}
+                              className="text-muted-foreground"
+                            />
 
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-
-                            <Mail size={13} />
-
-                            {receptionist.email}
-
-                          </div>
-
-
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-
-                            <Phone size={13} />
-
-                            {receptionist.phone}
-
-                          </div>
-
-
-                        </div>
-
-                      </td>
-
-
-                      {/* SHIFT */}
-
-                      <td className="px-5 py-4">
-
-                        <span className="inline-flex items-center gap-2 text-foreground">
-
-                          <Clock3
-                            size={15}
-                            className="text-muted-foreground"
-                          />
-
-                          {receptionist.shift}
-
-                        </span>
-
-                      </td>
-
-
-                      {/* APPOINTMENTS */}
-
-                      <td className="px-5 py-4">
-
-                        <div className="flex items-center gap-2">
-
-                          <CalendarDays
-                            size={15}
-                            className="text-muted-foreground"
-                          />
-
-                          <span className="font-medium text-foreground">
-
-                            {receptionist.appointments}
+                            {receptionist.shift}
 
                           </span>
 
+                        </td>
+
+                        {/* JOINED */}
+
+                        <td className="px-5 py-4 text-muted-foreground">
+
+                          {new Date(receptionist.date).toLocaleDateString('en-GB')}
+
+                        </td>
+
+
+
+                        {/* STATUS */}
+
+                        <td className="px-5 py-4">
+                          {receptionist.status}
+
+                          <StatusBadge
+                            status={
+                              receptionist.status
+                            }
+                          />
+
+                        </td>
+
+
+                        {/* ACTIONS */}
+
+                        <td className="px-5 py-4">
+                          <button
+                            className="cursor-pointer text-blue-500"
+                            onClick={() => handleOpenUpdateModal(receptionist)}
+                          >
+                            edit
+                          </button>
+
+                          {" "}
+
+                          <button
+                            type="button"
+                            className="cursor-pointer text-red-500"
+                            onClick={() => handleDelete(receptionist)}
+                          >
+                            delete
+                          </button>
+
+
+
+
+                        </td>
+
+
+                      </tr>
+
+                    )
+                  )
+
+                ) : (
+
+
+                  /* NO RESULTS */
+
+                  <tr>
+
+                    <td
+                      colSpan="7"
+                      className="px-5 py-12 text-center"
+                    >
+
+                      <div className="flex flex-col items-center">
+
+
+                        <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center text-muted-foreground mb-3">
+
+                          <Users size={22} />
+
                         </div>
 
-                      </td>
+
+                        <p className="font-medium text-foreground">
+                          No receptionists found
+                        </p>
 
 
-                      {/* STATUS */}
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Try changing your search or filter.
+                        </p>
 
-                      <td className="px-5 py-4">
-
-                        <StatusBadge
-                          status={
-                            receptionist.status
-                          }
-                        />
-
-                      </td>
-
-
-                      {/* JOINED */}
-
-                      <td className="px-5 py-4 text-muted-foreground">
-
-                        {new Date(receptionist.date).toLocaleDateString('en-GB')}
-
-                      </td>
-
-
-                      {/* ACTIONS */}
-
-                      <td className="px-5 py-4">
-                        <button
-                          className="cursor-pointer text-blue-500"
-                          onClick={() => handleOpenUpdateModal(receptionist)}
-                        >
-
-                          edit
-                        </button>
-
-                        {" "}
-
-                        <button
-                          type="button"
-                          className="cursor-pointer text-red-500"
-                          onClick={() => handleDelete(receptionist)}
-                        >
-                          delete
-                        </button>
-
-
-
-
-                      </td>
-
-
-                    </tr>
-
-                  )
-                )
-
-              ) : (
-
-
-                /* NO RESULTS */
-
-                <tr>
-
-                  <td
-                    colSpan="7"
-                    className="px-5 py-12 text-center"
-                  >
-
-                    <div className="flex flex-col items-center">
-
-
-                      <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center text-muted-foreground mb-3">
-
-                        <Users size={22} />
 
                       </div>
 
+                    </td>
 
-                      <p className="font-medium text-foreground">
-                        No receptionists found
-                      </p>
+                  </tr>
 
-
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Try changing your search or filter.
-                      </p>
-
-
-                    </div>
-
-                  </td>
-
-                </tr>
-
-              )}
+                )}
 
             </tbody>
 
@@ -814,8 +804,7 @@ const Receptionists = () => {
 
                   {/* NAME */}
 
-                  <TextField
-                    fullWidth
+                  <input
                     required
                     label="Full Name"
                     name="name"
@@ -826,14 +815,14 @@ const Receptionists = () => {
                       handleReceptionistChange
                     }
                     placeholder="receptionist"
-                    size="small"
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+
                   />
 
 
                   {/* EMAIL */}
 
-                  <TextField
-                    fullWidth
+                  <input
                     required
                     type="email"
                     label="Email Address"
@@ -845,13 +834,13 @@ const Receptionists = () => {
                       handleReceptionistChange
                     }
                     placeholder="receptionist@clinivo.pk"
-                    size="small"
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
 
 
                   {/* PHONE */}
 
-                  <TextField
+                  <input
                     fullWidth
                     required
                     label="Phone Number"
@@ -863,23 +852,54 @@ const Receptionists = () => {
                       handleReceptionistChange
                     }
                     placeholder="+92 300 1234567"
-                    size="small"
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
 
-                  <TextField
-                    fullWidth
-                    required
-                    label="Password"
-                    name="password"
-                    value={
-                      receptionistForm.password
+                  {/* PASSWORD */}
+                  <div className="relative" >
+
+
+
+                    <input
+                      required
+                      label="Password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+
+                      value={
+                        receptionistForm.password
+                      }
+                      onChange={
+                        handleReceptionistChange
+                      }
+                      placeholder="*******"
+                      size="small"
+
+                      className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    />
+                    {
+                      showPassword ? (
+                        <Eye
+                          size={18}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground cursor-pointer"
+                          onClick={() => setShowPassword(false)}
+                        />
+
+
+                      ) : (
+
+
+                        <EyeOff
+                          size={18}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground cursor-pointer"
+                          onClick={() => setShowPassword(true)}
+                        />
+
+                      )
+
                     }
-                    onChange={
-                      handleReceptionistChange
-                    }
-                    placeholder="*******"
-                    size="small"
-                  />
+                  </div>
+
 
 
                   {/* SHIFT */}
@@ -897,6 +917,18 @@ const Receptionists = () => {
                       handleReceptionistChange
                     }
                     size="small"
+                    sx={{
+                      minWidth: 140,
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: "8px",
+                        fontSize: "13px",
+                        borderColor: "#e5e7ea",
+                        backgroundColor: "#fff",
+                      },
+                      "& .MuiSelect-select": {
+                        padding: "8px 12px",
+                      },
+                    }}
                   >
 
                     {shifts.map(
@@ -905,8 +937,12 @@ const Receptionists = () => {
                         <MenuItem
                           key={shift}
                           value={shift}
+
                         >
-                          {shift}
+
+                          <span className="flex items-center gap-2">
+                            {shift}
+                          </span>
                         </MenuItem>
 
                       )
@@ -975,7 +1011,7 @@ const Receptionists = () => {
               <button
                 type="button"
                 onClick={handleCloseModal}
-                className="h-10 px-4 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-muted transition"
+                className="cursor-pointer h-10 px-4 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-muted transition"
               >
                 Cancel
               </button>
@@ -983,7 +1019,7 @@ const Receptionists = () => {
 
               <button
                 type="submit"
-                className="h-10 px-5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition inline-flex items-center gap-2"
+                className="cursor-pointer h-10 px-5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition inline-flex items-center gap-2"
               >
 
                 <Plus size={17} />
@@ -1064,17 +1100,17 @@ const Receptionists = () => {
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <TextField
-                    fullWidth
+                  <input
                     required
                     label="name"
                     name="name"
                     value={updateForm.name}
                     onChange={handleUpdateChange}
                     size="small"
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
 
-                  <TextField
+                  <input
                     fullWidth
                     required
                     type="email"
@@ -1083,11 +1119,11 @@ const Receptionists = () => {
                     value={updateForm.email}
                     onChange={handleUpdateChange}
                     size="small"
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
 
                   />
 
-                  <TextField
-                    fullWidth
+                  <input
                     required
                     type="text"
                     label="phone"
@@ -1095,10 +1131,10 @@ const Receptionists = () => {
                     value={updateForm.phone}
                     onChange={handleUpdateChange}
                     size="small"
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
 
-                  <TextField
-                    fullWidth
+                  <input
                     required
                     type="text"
                     label="shift"
@@ -1106,6 +1142,7 @@ const Receptionists = () => {
                     value={updateForm.shift}
                     onChange={handleUpdateChange}
                     size="small"
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
 
 
@@ -1204,10 +1241,10 @@ const StatusBadge = ({
 
   const styles = {
 
-    Active:
+    active:
       "bg-green-100 text-green-700",
 
-    Inactive:
+    inactive:
       "bg-red-100 text-red-700",
 
   };
