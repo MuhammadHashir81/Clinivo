@@ -28,8 +28,6 @@ import toast, { Toaster } from 'react-hot-toast';
 
 
 
-
-
 /* =========================================================
    RECEPTIONISTS COMPONENT  
 ========================================================= */
@@ -411,7 +409,7 @@ const Receptionists = () => {
 
                 <th className="px-5 py-3 font-medium text-muted-foreground">
                   Status
-                </th>
+                </th> 
 
 
                 <th className="px-5 py-3">
@@ -1100,7 +1098,11 @@ const Receptionists = () => {
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="">
+
+                  <label htmlFor="name" className="block text-sm font-medium text-foreground mb-1.5">name</label>
                   <input
+                    id='name'
                     required
                     label="name"
                     name="name"
@@ -1110,18 +1112,27 @@ const Receptionists = () => {
                     className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
 
+                  </div>
+
+                  <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1.5">email</label>
                   <input
+                    id="email"
                     fullWidth
                     required
                     type="email"
                     label="Email Address"
-                    name="email"
+                    name="email" 
                     value={updateForm.email}
                     onChange={handleUpdateChange}
                     size="small"
                     className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
 
                   />
+                  </div>
+
+                  <div >
+                    <label htmlFor="phone" className="block text-sm font-medium text-foreground mb-1.5">phone</label>
 
                   <input
                     required
@@ -1133,8 +1144,15 @@ const Receptionists = () => {
                     size="small"
                     className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
+                  </div>
+
+
+                  <div>
+
+                  <label htmlFor="shift" className="block text-sm font-medium text-foreground mb-1.5">shift</label>
 
                   <input
+                    id="shift"
                     required
                     type="text"
                     label="shift"
@@ -1144,14 +1162,9 @@ const Receptionists = () => {
                     size="small"
                     className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
-
-
-
                 </div>
+                    </div>
               </div>
-
-
-
 
 
             </div>

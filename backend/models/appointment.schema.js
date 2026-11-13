@@ -69,9 +69,7 @@ const AppointmentSchema = new Schema(
             ],
             default: "waiting",
         },
-
     },
-
 
 );
 
