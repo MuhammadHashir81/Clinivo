@@ -248,11 +248,6 @@ const BookingModal = ({ doctors, open, onClose }) => {
 /*  activity:             [{ id, text, time }]                                 */
 /* -------------------------------------------------------------------------- */
 
-const DOCTORS = [
-    { id: 'd1', name: 'Dr. Ayesha Khan', specialty: 'Dermatology', availability: 'available', fee: 1500, waiting: 2, inProgress: 1 },
-    { id: 'd2', name: 'Dr. Bilal Ahmed', specialty: 'Cardiology', availability: 'break', fee: 2000, waiting: 0, inProgress: 1 },
-    { id: 'd3', name: 'Dr. Sana Malik', specialty: 'Pediatrics', availability: 'off', fee: 1200, waiting: 0, inProgress: 0 },
-];
 
 const Receptionist = () => {
     /* Simple modal state: true opens the booking modal, false closes it */
@@ -262,7 +257,7 @@ const Receptionist = () => {
         { title: "Today's Appointments", value: 12, icon: CalendarDays },
         { title: 'Waiting Now', value: 5, icon: Hourglass },
     ]);
-    const [doctors, setDoctors] = useState(DOCTORS);
+    const [doctors, setDoctors] = useState([]);
     const [appointments, setAppointments] = useState([
         { id: 'a1', doctorName: 'Dr. Ayesha Khan', patient: 'Ali Khan', phone: '0300-1234567', time: '09:30', type: 'General Checkup', status: 'waiting', token: 101 },
         { id: 'a2', doctorName: 'Dr. Bilal Ahmed', patient: 'Sara Malik', phone: '0301-7654321', time: '10:00', type: 'Cardiology Consultation', status: 'in-progress', token: 102 },
@@ -288,11 +283,16 @@ const Receptionist = () => {
     });
 
 
+    const [page,setPage] = useState(1)
+    const limit = 10 
+    const [search,setSearch] = useState('')
+
     // get all doctors
   const getAllDoctors = async () => {
     try {
-        const result = await api.get('/staff/get-all/doctors')
-        console.log(result)
+        const response = await api.get(`/staff/get-all/doctors?page=${page}&limit=${limit}&search=${search}`);
+        setDoctors(response.doctors)
+        console.log(response)
     } catch (error) {
         console.log(error)
     }
@@ -307,6 +307,7 @@ const Receptionist = () => {
         try {
             const result = await api.post('/auth/logout')
             console.log(result)
+            
         } catch (error) {
             console.log(error)
         }
@@ -392,11 +393,12 @@ const Receptionist = () => {
                             >
                                 <option value="all">All doctors</option>
                                 {doctors.map((d) => (
-                                    <option key={d.id} value={d.id}>
+                                    <option key={d._id} value={d._id}>
                                         {d.name}
                                     </option>
                                 ))}
                             </select>
+
                         </div>
 
                     </div>
@@ -494,13 +496,13 @@ const Receptionist = () => {
                             {doctors.map((d) => {
                                 const availability = AVAILABILITY_CONFIG[d.availability] || AVAILABILITY_CONFIG.off;
                                 return (
-                                    <div key={d.id} className="flex items-start justify-between gap-3">
+                                    <div key={d._id} className="flex items-start justify-between gap-3">
                                         <div className="min-w-0">
                                             <p className="truncate text-sm font-medium text-card-foreground">
                                                 {d.name}
                                             </p>
                                             <p className="truncate text-xs text-muted-foreground">
-                                                {d.specialty} · {formatPKR(d.fee)}
+                                                {d.specialization} · {formatPKR(d.fee)}
                                             </p>
                                             <p className="mt-1 text-xs text-muted-foreground">
                                                 {d.waiting ?? 0} waiting · {d.inProgress ?? 0} in consultation

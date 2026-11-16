@@ -210,61 +210,61 @@ export const loginStaff = async (req, res) => {
 // get all doctors
 export const getAllDoctors = async (req, res) => {
     try {
-        const { userId } = req;
+        const { userId, role } = req;
+
+        // Resolve the clinic from the authenticated account, never from request data.
+        let clinicId;
+
+        if (role === "admin") {
+            const clinic = await Clinic.findOne({ ownerId: userId }).select("_id");
+            clinicId = clinic?._id;
+        } else if (role === "receptionist") {
+            const receptionist = await Receptionist.findOne({ userId }).select("clinicId");
+            clinicId = receptionist?.clinicId;
+        } else {
+            return res.status(403).json({ error: "Only admins and receptionists can view clinic doctors" });
+        }
+
+        if (!clinicId) {
+            return res.status(404).json({ error: "No clinic is associated with this account" });
+        }
 
         const page = Number(req.query.page) || 1;
-        const limit = Number(req.query.limit) || 10;
+        const limit = Math.min(Number(req.query.limit) || 10, 100);
         const skip = (page - 1) * limit;
 
         const search = req.query.search || "";
 
-        const result = await Clinic.aggregate([
+        const result = await Doctor.aggregate([
             {
                 $match: {
-                    ownerId: new mongoose.Types.ObjectId(userId)
+                    clinicId: new mongoose.Types.ObjectId(clinicId)
                 }
             },
-
-            {
-                $lookup: {
-                    from: "doctors",
-                    localField: "_id",
-                    foreignField: "clinicId",
-                    as: "doctorDetails"
-                }
-            },
-
-            {
-                $unwind: "$doctorDetails"
-            },
-
             {
                 $lookup: {
                     from: "users",
-                    localField: "doctorDetails.userId",
+                    localField: "userId",
                     foreignField: "_id",
-                    as: "doctors"
+                    as: "user"
                 }
             },
-
             {
-                $unwind: "$doctors"
+                $unwind: "$user"
             },
-
-            // Search
             ...(search
                 ? [
                     {
                         $match: {
                             $or: [
                                 {
-                                    "doctors.name": {
+                                    "user.name": {
                                         $regex: search,
                                         $options: "i"
                                     }
                                 },
                                 {
-                                    "doctors.email": {
+                                    "user.email": {
                                         $regex: search,
                                         $options: "i"
                                     }
@@ -275,36 +275,24 @@ export const getAllDoctors = async (req, res) => {
                 ]
                 : []),
 
-            // Pagination + Count
             {
                 $facet: {
                     doctors: [
+                        { $sort: { createdAt: -1 } },
+                        { $skip: skip },
+                        { $limit: limit },
                         {
                             $project: {
-                                _id: "$doctors._id",
-                                name: "$doctors.name",
-                                email: "$doctors.email",
-                                phone: "$doctorDetails.phone",
-                                consultationFee: "$doctorDetails.consultationFee",
-                                specialization: "$doctorDetails.specialization",
-                                experience: "$doctorDetails.experience",
-                                availability: { $ifNull: ["$doctorDetails.availability", "off"] },
-                                date: "$doctors.createdAt"
+                                _id: "$user._id",
+                                name: "$user.name",
+                                email: "$user.email",
+                                phone: "$phone",
+                                consultationFee: "$consultationFee",
+                                specialization: "$specialization",
+                                experience: "$experience",
+                                availability: { $ifNull: ["$availability", "off"] },
+                                date: "$user.createdAt"
                             }
-                        },
-
-                        {
-                            $sort: {
-                                date: -1
-                            }
-                        },
-
-                        {
-                            $skip: skip
-                        },
-
-                        {
-                            $limit: limit
                         }
                     ],
 
