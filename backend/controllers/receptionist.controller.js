@@ -1,7 +1,7 @@
 import Appointment from "../models/appointment.model.js";
-export const bookAppointment = async (req, res) => {
+const handleAppointment = async (req, res) => {
     try {
-        const { userId } = req.body;
+        const { userId } = req
 
         const { doctorId, name, gender, phone, doctorName, visitType, reasonForVisit, visitDate, visitTime } = req.body;
 
@@ -18,8 +18,13 @@ export const bookAppointment = async (req, res) => {
             visitDate,
             visitTime
         });
+
         res.status(201).json({ message: "Appointment booked successfully", appointment });
+
     } catch (error) {
         res.status(500).json({ message: "Error booking appointment", error });
     }
 } 
+
+
+export { handleAppointment }

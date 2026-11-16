@@ -343,7 +343,7 @@ export const getAllDoctors = async (req, res) => {
 // get all receptionists
 export const getAllReceptionists = async (req, res) => {
     try {
-        const { userId } = req
+        const { clinicId } = req.body
 
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;

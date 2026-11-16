@@ -23,6 +23,7 @@ import {
     MessageCircle
 } from 'lucide-react';
 import { api } from '../../services/api';
+import { useEffect } from 'react';
 
 /* -------------------------------------------------------------------------- */
 /*  Display config (presentation only)                                         */
@@ -76,6 +77,7 @@ const getGreeting = () => {
     if (hour < 17) return 'Good afternoon';
     return 'Good evening';
 };
+
 
 /* -------------------------------------------------------------------------- */
 /*  Shared UI                                                                  */
@@ -285,6 +287,22 @@ const Receptionist = () => {
         year: 'numeric',
     });
 
+
+    // get all doctors
+  const getAllDoctors = async () => {
+    try {
+        const result = await api.get('/staff/get-all/doctors')
+        console.log(result)
+    } catch (error) {
+        console.log(error)
+    }
+  }
+
+
+  useEffect(()=>{
+    getAllDoctors()
+  },[])
+
     const handleLogout = async () => {
         try {
             const result = await api.post('/auth/logout')
@@ -358,12 +376,13 @@ const Receptionist = () => {
                             <div className="relative flex-1">
                                 <Search
                                     size={16}
-                                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                                    className=" absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                                 />
                                 <input
                                     placeholder="Search by patient name or phone"
                                     aria-label="Search appointments"
-                                    className="w-full rounded-lg border border-border bg-background py-2 pl-9 pr-3 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                                    className="w-full rounded-lg border outline-none border-border bg-background py-2 pl-9 pr-3 text-sm text-foreground  focus:border-primary 
+                                    focus:ring-2 focus:ring-primary/10"
                                 />
                             </div>
 

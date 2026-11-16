@@ -1151,17 +1151,52 @@ const Receptionists = () => {
 
                   <label htmlFor="shift" className="block text-sm font-medium text-foreground mb-1.5">shift</label>
 
-                  <input
-                    id="shift"
+                  
+                  <TextField
+                    select
+                    fullWidth
                     required
-                    type="text"
-                    label="shift"
+                    label="Shift"
                     name="shift"
-                    value={updateForm.shift}
-                    onChange={handleUpdateChange}
+                    value={
+                      receptionistForm.shift
+                    }
+                    onChange={
+                      handleReceptionistChange
+                    }
                     size="small"
-                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  />
+                    sx={{
+                      minWidth: 140,
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: "8px",
+                        fontSize: "13px",
+                        borderColor: "#e5e7ea",
+                        backgroundColor: "#fff",
+                      },
+                      "& .MuiSelect-select": {
+                        padding: "8px 12px",
+                      },
+                    }}
+                  >
+
+                    {shifts.map(
+                      (shift) => (
+
+                        <MenuItem
+                          key={shift}
+                          value={shift}
+
+                        >
+
+                          <span className="flex items-center gap-2">
+                            {shift}
+                          </span>
+                        </MenuItem>
+
+                      )
+                    )}
+
+                  </TextField>
                 </div>
                     </div>
               </div>
