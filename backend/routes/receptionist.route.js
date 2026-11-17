@@ -1,8 +1,9 @@
 import { Router } from "express";
 import { verifyUser } from "../middleware/AuthMiddleware.js";
-import { handleAppointment } from "../controllers/receptionist.controller.js";
+import { handleAppointment, handleGetAppointments } from "../controllers/receptionist.controller.js";
 
 export const receptionistRouter = Router()
 
-receptionistRouter.post('/appointment/create',handleAppointment)  
+receptionistRouter.get('/appointment/get/all',handleGetAppointments)
+receptionistRouter.post('/appointment/create',verifyUser, handleAppointment)  
 

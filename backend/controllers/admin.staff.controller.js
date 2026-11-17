@@ -212,6 +212,8 @@ export const getAllDoctors = async (req, res) => {
     try {
         const { userId, role } = req;
 
+        console.log('api calling....')
+
         // Resolve the clinic from the authenticated account, never from request data.
         let clinicId;
 
@@ -331,7 +333,7 @@ export const getAllDoctors = async (req, res) => {
 // get all receptionists
 export const getAllReceptionists = async (req, res) => {
     try {
-        const { clinicId } = req.body
+        const { userId } = req
 
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;

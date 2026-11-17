@@ -25,6 +25,7 @@ import {
 } from "@mui/material";
 
 import { api } from "../../../services/api";
+import { extractRootForwardedProps } from "@mui/x-date-pickers/internals";
 
 const Doctors = () => {
   const [search, setSearch] = useState("");
@@ -34,7 +35,7 @@ const Doctors = () => {
   const [page, setPage] = useState(1);
   const [totalDoctors, setTotalDoctors] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
 
   const limit = 10;
@@ -213,7 +214,7 @@ const Doctors = () => {
     setLoading(true);
 
     try {
-      const response = await api.get(
+       const response = await api.get(
         `/staff/get-all/doctors?page=${page}&limit=${limit}&search=${search}`
       );
       console.log("Doctors Response:", response);
@@ -226,6 +227,7 @@ const Doctors = () => {
 
       console.log(response);
     } catch (error) {
+      setLoading(false)
       console.log(error);
     }
   };

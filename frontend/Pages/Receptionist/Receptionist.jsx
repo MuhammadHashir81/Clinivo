@@ -39,13 +39,7 @@ const STATUS_CONFIG = {
     cancelled: { label: 'Cancelled', className: 'bg-muted text-muted-foreground line-through' },
 };
 
-const FILTERS = [
-    { key: 'all', label: 'All' },
-    { key: 'waiting', label: 'Waiting' },
-    { key: 'in-progress', label: 'In consultation' },
-    { key: 'completed', label: 'Done' },
-    { key: 'closed', label: 'No-show / Cancelled' },
-];
+
 
 const AVAILABILITY_CONFIG = {
     available: { label: 'Available', dot: 'bg-green-500' },
@@ -53,6 +47,21 @@ const AVAILABILITY_CONFIG = {
     off: { label: 'Off duty', dot: 'bg-red-500' },
 };
 
+
+const GENDER = [
+    {
+        id: 1,
+        gender: 'male',
+    },
+    {
+        id: 2,
+        gender: 'female',
+    },
+    {
+        id: 3,
+        gender: 'other',
+    },
+]
 
 /* -------------------------------------------------------------------------- */
 /*  Helpers                                                                    */
@@ -79,6 +88,8 @@ const getGreeting = () => {
 };
 
 
+
+
 /* -------------------------------------------------------------------------- */
 /*  Shared UI                                                                  */
 /* -------------------------------------------------------------------------- */
@@ -96,13 +107,24 @@ const Field = ({ label, htmlFor, children }) => (
 /*  Booking modal (appointment details + payment in one place)                 */
 /* -------------------------------------------------------------------------- */
 
-const BookingModal = ({ doctors, open, onClose }) => {
+
+
+const BookingModal = ({ doctors, open, onClose, onSubmit, isSubmitting, submitError }) => {
+    const [form, setForm] = useState({ name: '', phone: '', doctorId: '', gender: 'male' });
+
+    useEffect(() => {
+        if (open) setForm({ name: '', phone: '', doctorId: doctors[0]?._id || '', gender: 'male' });
+    }, [open, doctors]);
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        const doctor = doctors.find((item) => item._id === form.doctorId);
+        if (doctor) onSubmit({ name: form.name.trim(), phone: form.phone.trim(), gender: form.gender, doctorId: doctor._id, doctorName: doctor.name });
+    };
     return (
         <Modal
             open={open}
             onClose={onClose}
-            aria-labelledby="booking-modal-title"
-            aria-describedby="booking-modal-description"
             className="flex items-center justify-center p-4"
         >
             <div className="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-xl border border-border bg-card outline-none">
@@ -126,7 +148,7 @@ const BookingModal = ({ doctors, open, onClose }) => {
                 </div>
 
                 {/* Body */}
-                <div className="p-5">
+                <form onSubmit={handleSubmit} className="p-5">
                     <div className="space-y-4">
                         <div className="grid gap-4 sm:grid-cols-2">
                             <Field label="Patient name" htmlFor="bk-name">
@@ -134,6 +156,10 @@ const BookingModal = ({ doctors, open, onClose }) => {
                                     id="bk-name"
                                     placeholder="e.g. Ali Khan"
                                     className={inputClass}
+                                    value={form.name}
+                                    onChange={(event) => setForm({ ...form, name: event.target.value })}
+                                    required
+
                                 />
                             </Field>
                             <Field label="Mobile number" htmlFor="bk-phone">
@@ -142,91 +168,67 @@ const BookingModal = ({ doctors, open, onClose }) => {
                                     placeholder="0300-1234567"
                                     inputMode="tel"
                                     className={inputClass}
+                                    value={form.phone}
+                                    onChange={(event) => setForm({ ...form, phone: event.target.value })}
+                                    required
                                 />
                             </Field>
                         </div>
 
-                        <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="grid gap-4 grid-cols-2">
                             <Field label="Doctor" htmlFor="bk-doctor">
-                                <select id="bk-doctor" className={inputClass}>
+                                <select id="bk-doctor" className={inputClass} value={form.doctorId} onChange={(event) => setForm({ ...form, doctorId: event.target.value })} required>
+                                    <option value="" disabled>Select a doctor</option>
                                     {doctors.map((d) => (
-                                        <option key={d.id} value={d.id} disabled={d.availability === 'off'}>
-                                            {d.name} — {d.specialty}
+                                        <option key={d._id} value={d._id} disabled={d.availability === 'off'}>
+                                            {d.name} — {d.specialization}
                                             {d.availability === 'off' ? ' (Off duty)' : ''}
                                         </option>
                                     ))}
                                 </select>
                             </Field>
-                            <Field label="Visit type" htmlFor="bk-type">
-                                <input
-                                    id="bk-type"
-                                    placeholder="e.g. General Checkup"
-                                    className={inputClass}
-                                />
+
+                            <Field label="Gender" htmlFor="bk-gender">
+                              <select id='bk-gender' className={inputClass} value={form.gender} onChange={(event) => setForm({ ...form, gender: event.target.value })}>
+
+                                    {
+                                        GENDER.map((g) => (
+                                            <option key={g.id}>
+                                                {g.gender}
+                                            </option>
+
+                                        ))
+
+                                    }
+
+                                </select>
+
                             </Field>
                         </div>
 
-                        <Field label="Reason for visit" htmlFor="bk-reason">
-                            <input
-                                id="bk-reason"
-                                placeholder="e.g. Fever since two days"
-                                className={inputClass}
-                            />
-                        </Field>
 
-                        <Field label="Doctor's name" htmlFor="dr-name">
-                            <input
-                                id="dr-name"
-                                placeholder="e.g. Dr. Ali Khan"
-                                className={inputClass}
-                            />
-                        </Field>
 
-                        <div className="grid gap-4 sm:grid-cols-2">
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DemoContainer components={['DatePicker']}>
-                                    <DatePicker label="date" />
-                                </DemoContainer>
-                            </LocalizationProvider>
-
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DemoContainer components={['TimePicker']}>
-                                    <TimePicker label="time" />
-                                </DemoContainer>
-                            </LocalizationProvider>
-                        </div>
-
-                        {/* Payment */}
-                        <div className="space-y-4 rounded-lg border border-border p-4">
-                            <h3 className="text-sm font-semibold text-card-foreground">Payment</h3>
-
-                            <Field label="Amount received (PKR)" htmlFor="bk-amount">
-                                <input
-                                    id="bk-amount"
-                                    type="number"
-                                    min="0"
-                                    placeholder="e.g. 1500"
-                                    className={inputClass}
-                                />
-                            </Field>
-                        </div>
+                        {submitError && <p role="alert" className="text-sm text-red-600">{submitError}</p>}
                     </div>
-                </div>
 
                 {/* Footer */}
                 <div className="flex justify-end gap-3 border-t border-border p-5">
                     <button
+                        type="button"
                         onClick={onClose}
                         className="cursor-pointer rounded-lg border border-border px-4 py-2 text-sm font-medium text-card-foreground hover:bg-muted"
                     >
                         Cancel
                     </button>
                     <button
-                        className="cursor-pointer rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                        type="submit"
+                        disabled={isSubmitting || doctors.length === 0}
+                        className="cursor-pointer rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
                     >
-                        Book appointment
+                        {isSubmitting ? 'Booking...' : 'Book appointment'}
                     </button>
                 </div>
+                </form>
             </div>
         </Modal>
     );
@@ -252,16 +254,15 @@ const BookingModal = ({ doctors, open, onClose }) => {
 const Receptionist = () => {
     /* Simple modal state: true opens the booking modal, false closes it */
     const [showBooking, setShowBooking] = useState(false);
+    const [isBooking, setIsBooking] = useState(false);
+    const [bookingError, setBookingError] = useState('');
     const [receptionistName, setReceptionistName] = useState('Sarah');
     const [statCards, setStatCards] = useState([
         { title: "Today's Appointments", value: 12, icon: CalendarDays },
         { title: 'Waiting Now', value: 5, icon: Hourglass },
     ]);
     const [doctors, setDoctors] = useState([]);
-    const [appointments, setAppointments] = useState([
-        { id: 'a1', doctorName: 'Dr. Ayesha Khan', patient: 'Ali Khan', phone: '0300-1234567', time: '09:30', type: 'General Checkup', status: 'waiting', token: 101 },
-        { id: 'a2', doctorName: 'Dr. Bilal Ahmed', patient: 'Sara Malik', phone: '0301-7654321', time: '10:00', type: 'Cardiology Consultation', status: 'in-progress', token: 102 },
-    ]);
+    const [appointments, setAppointments] = useState([]);
     const [waitingQueue, setWaitingQueue] = useState([
         { id: 'a1', token: 101, patient: 'Ali Khan', doctorName: 'Dr. Ayesha Khan', waitMinutes: 10 },
         { id: 'a2', token: 102, patient: 'Sara Malik', doctorName: 'Dr. Bilal Ahmed', waitMinutes: 5 },
@@ -283,40 +284,61 @@ const Receptionist = () => {
     });
 
 
-    const [page,setPage] = useState(1)
-    const limit = 10 
-    const [search,setSearch] = useState('')
+    const [page, setPage] = useState(1)
+    const limit = 10
+    const [search, setSearch] = useState('')
 
     // get all doctors
-  const getAllDoctors = async () => {
-    try {
-        const response = await api.get(`/staff/get-all/doctors?page=${page}&limit=${limit}&search=${search}`);
-        setDoctors(response.doctors)
-        console.log(response)
-    } catch (error) {
-        console.log(error)
-    }
-  }
-
-
-  useEffect(()=>{
-    getAllDoctors()
-  },[])
-
-    const handleLogout = async () => {
+    const getAllDoctors = async () => {
         try {
-            const result = await api.post('/auth/logout')
-            console.log(result)
-            
+            const response = await api.get(`/staff/get-all/doctors?page=${page}&limit=${limit}&search=${search}`);
+            setDoctors(response.doctors)
+            console.log(response)
         } catch (error) {
             console.log(error)
         }
     }
 
+
+    useEffect(() => {
+        getAllDoctors()
+    }, [])
+
+    // appointment api call
+
+    const handleAppointment = async (appointmentData) => {
+        setIsBooking(true);
+        setBookingError('');
+        try {
+            const response = await api.post('/receptionist/appointment/create', appointmentData);
+            console.log('Appointment booked:', response);
+            setAppointments(response.appointment)
+            setShowBooking(false);
+        } catch (error) {
+            setBookingError(error.response?.data?.message || error.response?.data?.error || 'Could not book the appointment. Please try again.');
+        } finally {
+            setIsBooking(false);
+        }
+    }
+
+    const handleLogout = async () => {
+        try {
+            const result = await api.post('/auth/logout')
+            console.log(result)
+            window.location.reload()
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+
+
+
     return (
         <div className="min-h-screen bg-background p-6 font-inter">
             {/* Header */}
-            <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div className="mb-8 flex gap-4 flex-row items-start justify-between">
                 <div>
                     <div className="flex items-center gap-2">
                         <ClipboardList size={24} className="text-primary" />
@@ -337,7 +359,8 @@ const Receptionist = () => {
                         <CalendarPlus size={16} />
                         New appointment
                     </button>
-                    <button onClick={handleLogout}>logout</button>
+                    <button onClick={handleLogout}
+                        className='text-sm font-primary cursor-pointer border-border rounded-lg px-3 bg-background '>logout</button>
                 </div>
             </div>
 
@@ -403,7 +426,7 @@ const Receptionist = () => {
 
                     </div>
 
-                    <div className="divide-y divide-border">
+                    <div className="divide-y divide-border ">
                         {appointments.length === 0 && (
                             <div className="p-8 text-center text-sm text-muted-foreground">
                                 No appointments match this view. Try a different filter, or book a new appointment.
@@ -417,7 +440,7 @@ const Receptionist = () => {
 
                             return (
                                 <div
-                                    key={appt.id}
+                                    key={appt._id}
                                     className="flex flex-col gap-3 p-5 transition hover:bg-muted/40 sm:flex-row sm:items-center sm:justify-between"
                                 >
                                     <div className="flex items-center gap-4">
@@ -483,6 +506,13 @@ const Receptionist = () => {
                             );
                         })}
                     </div>
+                    <div className='flex justify-center gap-3 '>
+                        <button className='h-9 px-3 rounded-lg border border-border text-sm text-muted-foreground disabled:opacity-50'>previous</button>
+                        <button className="h-9 w-9 px-3 rounded-lg bg-primary text-primary-foreground text-sm">
+                            {page}
+                        </button>
+                        <button className='h-9 px-3 rounded-lg border border-border text-sm text-muted-foreground disabled:opacity-50'>next</button>
+                    </div>
                 </div>
 
                 {/* Right rail */}
@@ -502,7 +532,7 @@ const Receptionist = () => {
                                                 {d.name}
                                             </p>
                                             <p className="truncate text-xs text-muted-foreground">
-                                                {d.specialization} · {formatPKR(d.fee)}
+                                                {d.specialization} · {formatPKR(d.consultationFee)}
                                             </p>
                                             <p className="mt-1 text-xs text-muted-foreground">
                                                 {d.waiting ?? 0} waiting · {d.inProgress ?? 0} in consultation
@@ -558,68 +588,7 @@ const Receptionist = () => {
                         )}
                     </div>
 
-                    {/* Tomorrow's reminders */}
-                    <div className="rounded-xl border border-border bg-card p-5">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <MessageCircle size={18} className="text-primary" />
-                                <h2 className="font-semibold text-card-foreground">Tomorrow's Reminders</h2>
-                            </div>
-                            <button
-                                className="text-xs font-medium text-primary hover:text-primary/80 disabled:text-muted-foreground"
-                            >
-                                Send all
-                            </button>
-                        </div>
-                        <p className="mt-1 text-sm text-muted-foreground">SMS or WhatsApp to the patient.</p>
 
-                        {tomorrowAppointments.length === 0 ? (
-                            <p className="mt-4 text-sm text-muted-foreground">No bookings for tomorrow yet.</p>
-                        ) : (
-                            <div className="mt-4 space-y-3">
-                                {tomorrowAppointments.map((appt) => (
-                                    <div key={appt.id} className="flex items-center justify-between gap-3">
-                                        <div className="min-w-0">
-                                            <p className="truncate text-sm font-medium text-card-foreground">
-                                                {appt.patient}
-                                            </p>
-                                            <p className="truncate text-xs text-muted-foreground">
-                                                {formatTime(appt.time)} · {appt.doctorName}
-                                            </p>
-                                        </div>
-                                        <button
-                                            disabled={appt.reminderSent}
-                                            className="flex shrink-0 items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-primary hover:bg-secondary disabled:text-muted-foreground disabled:hover:bg-transparent"
-                                        >
-                                            <Send size={12} />
-                                            {appt.reminderSent ? 'Sent' : 'Remind'}
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Activity */}
-                    <div className="rounded-xl border border-border bg-card p-5">
-                        <div className="flex items-center gap-2">
-                            <Bell size={18} className="text-primary" />
-                            <h2 className="font-semibold text-card-foreground">Recent Activity</h2>
-                        </div>
-
-                        {activity.length === 0 ? (
-                            <p className="mt-4 text-sm text-muted-foreground">No recent activity.</p>
-                        ) : (
-                            <ul className="mt-4 space-y-3">
-                                {activity.map((item) => (
-                                    <li key={item.id} className="flex items-start justify-between gap-3">
-                                        <p className="text-sm text-card-foreground">{item.text}</p>
-                                        <span className="shrink-0 text-xs text-muted-foreground">{item.time}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
                 </div>
             </div>
 
@@ -628,6 +597,9 @@ const Receptionist = () => {
                 open={showBooking}
                 doctors={doctors}
                 onClose={() => setShowBooking(false)}
+                onSubmit={handleAppointment}
+                isSubmitting={isBooking}
+                submitError={bookingError}
             />
         </div>
     );

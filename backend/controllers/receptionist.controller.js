@@ -1,9 +1,15 @@
-import Appointment from "../models/appointment.model.js";
+import { Appointment } from "../models/appointment.schema.js";
+import { Clinic } from "../models/clinic.schema.js";
+import { Receptionist } from "../models/receptionist.schema.js";
+
 const handleAppointment = async (req, res) => {
     try {
         const { userId } = req
 
-        const { doctorId, name, gender, phone, doctorName, visitType, reasonForVisit, visitDate, visitTime } = req.body;
+        const clinicId = await Receptionist.findOne({userId}).select('clinicId')
+        console.log(clinicId)
+
+        const { doctorId, name, gender, phone, doctorName  } = req.body;
 
         const appointment = await Appointment.create({
             userId,
@@ -13,18 +19,32 @@ const handleAppointment = async (req, res) => {
             gender,
             phone,  
             doctorName,
-            reasonForVisit,
-            visitType,
-            visitDate,
-            visitTime
         });
 
         res.status(201).json({ message: "Appointment booked successfully", appointment });
 
     } catch (error) {
+        console.log(error)
         res.status(500).json({ message: "Error booking appointment", error });
     }
 } 
 
 
-export { handleAppointment }
+const handleGetAppointments = async (req,res) =>{
+    try {
+        const {userId} = req;
+
+        const clinicId = await Receptionist.findOne({userId}).select('clinicId')
+        console.log(clinicId)
+
+        const appointments = await Appointment.find({clinicId:clinicId})
+        res.status(200).json({appointments})
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({error:error.message})
+        
+    }
+}
+
+export { handleAppointment, handleGetAppointments }

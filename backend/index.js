@@ -8,6 +8,7 @@ import { staffRouter } from './routes/admin.staff.route.js';
 import { doctorRouter } from './routes/doctor.route.js';
 import cookieParser from "cookie-parser";
 import { clinicRouter } from './routes/clinic.route.js';
+import { receptionistRouter } from './routes/receptionist.route.js';
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use('/admin',adminRouter)
 app.use('/staff',staffRouter)
 app.use('/clinic',clinicRouter)
 app.use('/doctor',doctorRouter)
+app.use('/receptionist',receptionistRouter)
 app.listen(port, () => {
   console.log(`Clinivo is listening on port ${port}`);
 });

@@ -8,7 +8,6 @@ const AppointmentSchema = new Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
-            unique: true
         },
 
         clinicId: {
@@ -43,22 +42,6 @@ const AppointmentSchema = new Schema(
             required: true
         },
 
-        visitType: {
-            type: String,
-        },
-
-        reasonForVisit: {
-            type: String,
-        },
-
-
-        visitDate: {
-            type: Date,
-        },
-
-        visitTime: {
-            type: String,
-        },
 
         status: {
             type: String,
@@ -70,6 +53,9 @@ const AppointmentSchema = new Schema(
             default: "waiting",
         },
     },
+    {
+        timeStamps:true
+    }
 
 );
 

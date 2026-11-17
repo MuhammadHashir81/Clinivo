@@ -86,23 +86,24 @@ const Receptionists = () => {
 
     try {
       const response = await api.post('/staff/create', receptionistForm)
-      getAllRecepitonists()
+      getAllReceptionists()
       toast.success(response.success)
+      handleCloseModal();
     } catch (error) {
-      toast.error(error.response.data.error)
-      console.log(error.response.data)
+      toast.error(error?.response?.data?.error)
+      console.log(error)
+      // console.log(error.response.data.error)
     }
 
     console.log(receptionistForm)
 
 
 
-    handleCloseModal();
   };
 
 
 
-  const getAllRecepitonists = async () => {
+  const getAllReceptionists = async () => {
     setLoading(true)
     try {
       const result = await api.get(`/staff/get-all-receptionists?page=${page}&limit=${limit}&search=${search}`)
@@ -119,7 +120,7 @@ const Receptionists = () => {
 
 
   useEffect(() => {
-    getAllRecepitonists()
+    getAllReceptionists()
   }, [search, page])
 
 
@@ -209,7 +210,7 @@ const Receptionists = () => {
           text: response.success,
           icon: "success",
         });
-        getAllRecepitonists()
+        getAllReceptionists()
 
         // Refresh your staff list here if needed
       }
@@ -236,7 +237,7 @@ const Receptionists = () => {
     try {
       const response = await api.patch(`/staff/update/${staffId}`, updateForm)
       toast.success(response.success)
-      getAllRecepitonists()
+      getAllReceptionists()
       handleCloseUpdateModal()
     } catch (error) {
       toast.error(error.response?.data?.error || "Something went wrong")
@@ -738,10 +739,7 @@ const Receptionists = () => {
           ================================================= */}
 
           <div className="flex items-center justify-between px-6 py-5 border-b border-border">
-
-
             <div>
-
               <h2
                 id="create-receptionist-modal"
                 className="text-lg font-semibold text-foreground"
@@ -839,7 +837,6 @@ const Receptionists = () => {
                   {/* PHONE */}
 
                   <input
-                    fullWidth
                     required
                     label="Phone Number"
                     name="phone"
