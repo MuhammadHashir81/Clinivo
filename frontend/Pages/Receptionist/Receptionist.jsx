@@ -6,13 +6,12 @@ import {
     Hourglass,
     UserRound,
     CalendarPlus,
-    UserCheck,
     Search,
     X,
-    Ban,
     Phone,
     ClipboardList,
     Stethoscope,
+    CheckCheck
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useEffect } from 'react';
@@ -250,6 +249,7 @@ const Receptionist = () => {
     const [statCards, setStatCards] = useState([
         { title: "Today's Appointments", value: 12, icon: CalendarDays },
         { title: 'Waiting Now', value: 5, icon: Hourglass },
+        { title: 'Completed', value: 5, icon: CheckCheck },
     ]);
     const [doctors, setDoctors] = useState([]);
     const [appointments, setAppointments] = useState([]);
@@ -260,12 +260,6 @@ const Receptionist = () => {
     const [totalPages, setTotalPages] = useState(0)
     const [totalAppointments, setTotalAppointments] = useState(0)
     const [doctorSearch, setDoctorSearch] = useState('');
-
-
-    const [waitingQueue, setWaitingQueue] = useState([
-        { id: 'a1', token: 101, patient: 'Ali Khan', doctorName: 'Dr. Ayesha Khan', waitMinutes: 10 },
-        { id: 'a2', token: 102, patient: 'Sara Malik', doctorName: 'Dr. Bilal Ahmed', waitMinutes: 5 },
-    ]);
 
 
     const dateLabel = new Date().toLocaleDateString('en-PK', {
@@ -324,11 +318,23 @@ const Receptionist = () => {
         try {
             const response = await api.get(`/receptionist/appointment/get/all?page=${page}&limit=${limit}&search=${debouncedSearch}`)
 
-            console.log(response.appointments)
 
             setAppointments(response.appointments)
             setTotalPages(response.totalPages)
             setTotalAppointments(response.totalAppointments)
+
+            const getWaitingStatus = response.getWaitingStatus.filter((appt) => (
+                appt.status === 'waiting'
+
+            ))
+
+            
+            const getCompletedStatus = response.getWaitingStatus.filter((appt) => (
+                appt.status === 'completed'
+
+            ))
+
+            console.log(getWaitingStatus)
 
 
             setStatCards([
@@ -339,8 +345,13 @@ const Receptionist = () => {
                 },
                 {
                     title: "Waiting Now",
-                    value: response.getWaitingStatus,
+                    value: getWaitingStatus.length,
                     icon: CalendarDays
+                },
+                {
+                    title: "Completed",
+                    value: getCompletedStatus.length,
+                    icon: CheckCheck
                 },
             ])
 
@@ -418,7 +429,7 @@ const Receptionist = () => {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <div className="grid  gap-5 grid-cols-3">
                 {statCards.map((stat) => {
                     const Icon = stat.icon;
                     return (
@@ -614,45 +625,6 @@ const Receptionist = () => {
                         </div>
                     </div>
 
-                    {/* Live queue */}
-                    <div className="rounded-xl border border-border bg-card p-5">
-                        <div className="flex items-center justify-between">
-                            <h2 className="font-semibold text-card-foreground">Waiting Room</h2>
-                            <span className="text-xs text-muted-foreground">{waitingQueue.length} waiting</span>
-                        </div>
-
-                        {waitingQueue.length === 0 ? (
-                            <p className="mt-4 text-sm text-muted-foreground">
-                                Nobody is waiting. Check patients in as they arrive.
-                            </p>
-                        ) : (
-                            <ul className="mt-4 space-y-3">
-                                {waitingQueue.map((appt) => (
-                                    <li key={appt.id} className="flex items-center justify-between gap-3">
-                                        <div className="flex min-w-0 items-center gap-3">
-                                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-semibold text-primary">
-                                                {appt.token}
-                                            </span>
-                                            <div className="min-w-0">
-                                                <p className="truncate text-sm font-medium text-card-foreground">
-                                                    {appt.patient}
-                                                </p>
-                                                <p className="truncate text-xs text-muted-foreground">
-                                                    {appt.doctorName}
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <span
-                                            className={`shrink-0 text-xs font-medium ${appt.waitMinutes >= 15 ? 'text-red-600' : 'text-muted-foreground'
-                                                }`}
-                                        >
-                                            {appt.waitMinutes} min
-                                        </span>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
 
 
                 </div>

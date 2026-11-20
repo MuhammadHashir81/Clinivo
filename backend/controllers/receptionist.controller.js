@@ -137,6 +137,7 @@ const handleGetAppointments = async (req, res) => {
             status: 'waiting'
         });
 
+        
 
 
 
