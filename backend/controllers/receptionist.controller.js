@@ -132,13 +132,9 @@ const handleGetAppointments = async (req, res) => {
         });
 
 
-        const getWaitingStatus = await Appointment.find({
+        const getStatus = await Appointment.find({
             clinicId: clinic.clinicId,
-            status: 'waiting'
         });
-
-        
-
 
 
         res.status(200).json({
@@ -146,7 +142,7 @@ const handleGetAppointments = async (req, res) => {
             totalPages,
             totalAppointments,
             getAllAppointments,
-            getWaitingStatus
+            getStatus
 
         })
 

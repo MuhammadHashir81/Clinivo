@@ -98,7 +98,7 @@ const BookingModal = ({ doctors, open, onClose, onSubmit, isSubmitting, submitEr
         if (open) setForm({ name: '', phone: '', doctorId: doctors[0]?._id || '', gender: 'male' });
         onDoctorSearch('')
 
-    }, [open, onDoctorSearch]);
+    }, [open]);
 
 
 
@@ -260,6 +260,14 @@ const Receptionist = () => {
     const [totalPages, setTotalPages] = useState(0)
     const [totalAppointments, setTotalAppointments] = useState(0)
     const [doctorSearch, setDoctorSearch] = useState('');
+    const [sideDoctorSearch,setSideDoctorSearch] = useState('')
+    const [sideDoctors,setSideDoctors] = useState([])
+    const [sideTotalDoctors,setSideTotalDoctors] = useState('')
+    const [sidePage,setSidPage] = useState(0)
+    const [sideShowingDoctors,setSideShowingDoctors] = useState(0)
+    const [sideTotalPages,setSideTotalPages] = useState(0)
+    const [loading,setLoading] = useState(false)
+
 
 
     const dateLabel = new Date().toLocaleDateString('en-PK', {
@@ -294,6 +302,36 @@ const Receptionist = () => {
     }, [doctorSearch])
 
 
+    const getAllSideDoctors = async()=>{
+        try {
+            
+            const response = await api.get(`/staff/get-all/doctors?page=${sidePage}&limit=${limit}&search=${sideDoctorSearch}`)
+            console.log(response)
+            setSideDoctors(response.doctors)
+            setSideTotalDoctors(response.doctors)
+        } catch (error) {
+            console.log(error)   
+        }
+    }
+
+    useEffect(()=>{
+
+        const timer = setTimeout(() => {
+            getAllSideDoctors()
+        }, 500);
+
+        return ()=> clearTimeout(timer)
+    },[sideDoctorSearch])
+
+
+    const previousSidePage = ()=>{
+
+    }
+
+    const nextSidePage = ()=>{
+
+    }
+ 
 
     // appointment api call
     const handleAppointment = async (appointmentData) => {
@@ -318,23 +356,23 @@ const Receptionist = () => {
         try {
             const response = await api.get(`/receptionist/appointment/get/all?page=${page}&limit=${limit}&search=${debouncedSearch}`)
 
+            console.log(response)
+
 
             setAppointments(response.appointments)
             setTotalPages(response.totalPages)
             setTotalAppointments(response.totalAppointments)
 
-            const getWaitingStatus = response.getWaitingStatus.filter((appt) => (
+            const getWaitingStatus = response.getStatus.filter((appt) => (
                 appt.status === 'waiting'
-
             ))
 
             
-            const getCompletedStatus = response.getWaitingStatus.filter((appt) => (
+            const getCompletedStatus = response.getStatus.filter((appt) => (
                 appt.status === 'completed'
-
             ))
 
-            console.log(getWaitingStatus)
+            console.log(getCompletedStatus)
 
 
             setStatCards([
@@ -598,9 +636,16 @@ const Receptionist = () => {
                     <div className="rounded-xl border border-border bg-card p-5">
                         <h2 className="font-semibold text-card-foreground">Doctors on Duty</h2>
                         <p className="mt-1 text-sm text-muted-foreground">Availability is set by each doctor.</p>
+                        <input type="text" placeholder='search doctors'
+                        className='rounded-lg outline-none border border-border text-sm font-primary 
+                        bg-background px-4 py-1 mt-3 w-full
+                        '
+                        value={sideDoctorSearch}
+                        onChange={(e)=>setSideDoctorSearch(e.target.value)}
+                         />
 
                         <div className="mt-4 space-y-4">
-                            {doctors.map((d) => {
+                            {sideDoctors.map((d) => {
                                 const availability = AVAILABILITY_CONFIG[d.availability] || AVAILABILITY_CONFIG.off;
                                 return (
                                     <div key={d._id} className="flex items-start justify-between gap-3">
@@ -612,7 +657,7 @@ const Receptionist = () => {
                                                 {d.specialization} · {formatPKR(d.consultationFee)}
                                             </p>
                                             <p className="mt-1 text-xs text-muted-foreground">
-                                                {d.waiting ?? 0} waiting · {d.inProgress ?? 0} in consultation
+                                                {d.waiting ?? 0} waiting 
                                             </p>
                                         </div>
                                         <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-card-foreground">
@@ -622,6 +667,19 @@ const Receptionist = () => {
                                     </div>
                                 );
                             })}
+                        </div>
+ 
+                        <div className='flex items-center justify-between my-4'>
+                            <div>
+                                showing 3 of 1
+                            </div>
+
+                            <div>
+                        <button>page</button>
+                        <button>nextpage</button>
+                            </div>
+
+
                         </div>
                     </div>
 
