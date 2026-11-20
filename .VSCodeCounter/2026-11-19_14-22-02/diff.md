@@ -1,8 +1,8 @@
 # Diff Summary
 
-Date : 2026-10-14 12:55:26
+Date : 2026-11-19 14:22:02
 
-Directory d:\\Mern stack\\Clinivo
+Directory d:\\Mern stack\\Clinivo2\\Clinivo
 
 Total : 0 files,  0 codes, 0 comments, 0 blanks, all 0 lines
 

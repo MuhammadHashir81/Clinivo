@@ -36,6 +36,7 @@ const Doctors = () => {
   const [totalDoctors, setTotalDoctors] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [debouncedSearch,setDebouncedSearch] = useState('')
 
 
   const limit = 10;
@@ -215,7 +216,7 @@ const Doctors = () => {
 
     try {
        const response = await api.get(
-        `/staff/get-all/doctors?page=${page}&limit=${limit}&search=${search}`
+        `/staff/get-all/doctors?page=${page}&limit=${limit}&search=${debouncedSearch}`
       );
       console.log("Doctors Response:", response);
 
@@ -231,6 +232,7 @@ const Doctors = () => {
       console.log(error);
     }
   };
+  
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -238,7 +240,17 @@ const Doctors = () => {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [page, search]);
+  }, [page, debouncedSearch]);
+
+    
+   useEffect(()=>{
+    setTimeout(() => {
+      setDebouncedSearch(search)
+    }, 500);
+
+   },[search])
+  
+
 
   const activeDoctors = doctors.filter((doctor) => doctor.availability === "available").length;
   const inactiveDoctors = doctors.filter((doctor) => doctor.availability !== "available").length;
@@ -1105,7 +1117,7 @@ const Doctors = () => {
             <button
               disabled={page === 1}
               onClick={previousPage}
-              className="h-9 px-3 rounded-lg border border-border text-sm text-muted-foreground disabled:opacity-50"
+              className="h-9 px-3 rounded-lg border border-border text-sm text-muted-foreground disabled:opacity-50 cursor-pointer"
             >
               Previous
             </button>
@@ -1117,7 +1129,7 @@ const Doctors = () => {
             <button
               onClick={nextPage}
               disabled={page === totalPages}
-              className="h-9 px-3 rounded-lg border border-border text-sm text-muted-foreground disabled:opacity-50"
+              className="h-9 px-3 rounded-lg border border-border text-sm text-muted-foreground disabled:opacity-50 cursor-pointer"
             >
               Next
             </button>

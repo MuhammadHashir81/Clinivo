@@ -54,7 +54,7 @@ const AppointmentSchema = new Schema(
         },
     },
     {
-        timeStamps:true
+        timestamps:true
     }
 
 );

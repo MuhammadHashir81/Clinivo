@@ -241,7 +241,7 @@ export const getAllDoctors = async (req, res) => {
             {
                 $match: {
                     clinicId: new mongoose.Types.ObjectId(clinicId)
-                }
+                }   
             },
             {
                 $lookup: {
@@ -277,34 +277,34 @@ export const getAllDoctors = async (req, res) => {
                 ]
                 : []),
 
-            {
-                $facet: {
-                    doctors: [
-                        { $sort: { createdAt: -1 } },
-                        { $skip: skip },
-                        { $limit: limit },
-                        {
-                            $project: {
-                                _id: "$user._id",
-                                name: "$user.name",
-                                email: "$user.email",
-                                phone: "$phone",
-                                consultationFee: "$consultationFee",
-                                specialization: "$specialization",
-                                experience: "$experience",
-                                availability: { $ifNull: ["$availability", "off"] },
-                                date: "$user.createdAt"
+                {
+                    $facet: {
+                        doctors: [
+                            { $sort: { createdAt: -1 } },
+                            { $skip: skip },
+                            { $limit: limit },
+                            {
+                                $project: {
+                                    _id: "$user._id",
+                                    name: "$user.name",
+                                    email: "$user.email",
+                                    phone: "$phone",
+                                    consultationFee: "$consultationFee",
+                                    specialization: "$specialization",
+                                    experience: "$experience",
+                                    availability: { $ifNull: ["$availability", "off"] },
+                                    date: "$user.createdAt"
+                                }
                             }
-                        }
-                    ],
+                        ],
 
-                    total: [
-                        {
-                            $count: "count"
-                        }
-                    ]
+                        total: [
+                            {
+                                $count: "count"
+                            }
+                        ]
+                    }
                 }
-            }
         ]);
 
         const doctors = result[0]?.doctors || [];
@@ -312,6 +312,8 @@ export const getAllDoctors = async (req, res) => {
         const totalDoctors = result[0]?.total[0]?.count || 0;
 
         const totalPages = Math.ceil(totalDoctors / limit);
+
+
 
         return res.status(200).json({
             doctors,

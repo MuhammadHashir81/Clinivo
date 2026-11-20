@@ -1,11 +1,6 @@
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Modal from '@mui/material/Modal';
-
-import React, { useState } from 'react';
+import { Autocomplete, TextField } from '@mui/material';
+import { useState } from 'react';
 import {
     CalendarDays,
     Hourglass,
@@ -16,11 +11,8 @@ import {
     X,
     Ban,
     Phone,
-    Bell,
-    Send,
     ClipboardList,
     Stethoscope,
-    MessageCircle
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useEffect } from 'react';
@@ -30,12 +22,8 @@ import { useEffect } from 'react';
 /* -------------------------------------------------------------------------- */
 
 const STATUS_CONFIG = {
-    scheduled: { label: 'Scheduled', className: 'bg-muted text-muted-foreground' },
-    confirmed: { label: 'Confirmed', className: 'bg-secondary text-primary' },
     waiting: { label: 'Waiting', className: 'bg-amber-100 text-amber-700' },
-    'in-progress': { label: 'In consultation', className: 'bg-primary text-primary-foreground' },
     completed: { label: 'Completed', className: 'bg-green-100 text-green-700' },
-    'no-show': { label: 'No-show', className: 'bg-red-100 text-red-700' },
     cancelled: { label: 'Cancelled', className: 'bg-muted text-muted-foreground line-through' },
 };
 
@@ -70,13 +58,6 @@ const GENDER = [
 const inputClass =
     'w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20';
 
-const formatTime = (hhmm) => {
-    if (!hhmm) return '';
-    const [h, m] = hhmm.split(':').map(Number);
-    const suffix = h >= 12 ? 'PM' : 'AM';
-    const hour = h % 12 === 0 ? 12 : h % 12;
-    return `${String(hour).padStart(2, '0')}:${String(m).padStart(2, '0')} ${suffix}`;
-};
 
 const formatPKR = (amount) => `Rs ${Number(amount || 0).toLocaleString('en-PK')}`;
 
@@ -103,24 +84,33 @@ const Field = ({ label, htmlFor, children }) => (
     </div>
 );
 
+
+
+
 /* -------------------------------------------------------------------------- */
 /*  Booking modal (appointment details + payment in one place)                 */
 /* -------------------------------------------------------------------------- */
-
-
-
-const BookingModal = ({ doctors, open, onClose, onSubmit, isSubmitting, submitError }) => {
+const BookingModal = ({ doctors, open, onClose, onSubmit, isSubmitting, submitError, onDoctorSearch }) => {
     const [form, setForm] = useState({ name: '', phone: '', doctorId: '', gender: 'male' });
 
+
     useEffect(() => {
+
         if (open) setForm({ name: '', phone: '', doctorId: doctors[0]?._id || '', gender: 'male' });
-    }, [open, doctors]);
+        onDoctorSearch('')
+
+    }, [open, onDoctorSearch]);
+
+
 
     const handleSubmit = (event) => {
         event.preventDefault();
         const doctor = doctors.find((item) => item._id === form.doctorId);
         if (doctor) onSubmit({ name: form.name.trim(), phone: form.phone.trim(), gender: form.gender, doctorId: doctor._id, doctorName: doctor.name });
     };
+
+
+
     return (
         <Modal
             open={open}
@@ -176,20 +166,35 @@ const BookingModal = ({ doctors, open, onClose, onSubmit, isSubmitting, submitEr
                         </div>
 
                         <div className="grid gap-4 grid-cols-2">
+
                             <Field label="Doctor" htmlFor="bk-doctor">
-                                <select id="bk-doctor" className={inputClass} value={form.doctorId} onChange={(event) => setForm({ ...form, doctorId: event.target.value })} required>
-                                    <option value="" disabled>Select a doctor</option>
-                                    {doctors.map((d) => (
-                                        <option key={d._id} value={d._id} disabled={d.availability === 'off'}>
-                                            {d.name} — {d.specialization}
-                                            {d.availability === 'off' ? ' (Off duty)' : ''}
-                                        </option>
-                                    ))}
-                                </select>
+                                <Autocomplete
+                                    options={doctors}
+                                    value={doctors.find((d) => d._id === form.doctorId) || null}
+                                    onInputChange={(event, value, reason) => {
+                                        if (reason === 'input' || reason === 'clear') {
+                                            onDoctorSearch(value);
+                                        }
+                                    }}
+                                    onChange={(event, doctor) =>
+                                        setForm({ ...form, doctorId: doctor?._id || '' })
+                                    }
+                                    getOptionLabel={(doctor) =>
+                                        `${doctor.name} — ${doctor.specialization}`
+                                    }
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            placeholder="Search doctor"
+                                            size="small"
+
+                                        />
+                                    )}
+                                />
                             </Field>
 
                             <Field label="Gender" htmlFor="bk-gender">
-                              <select id='bk-gender' className={inputClass} value={form.gender} onChange={(event) => setForm({ ...form, gender: event.target.value })}>
+                                <select id='bk-gender' className={inputClass} value={form.gender} onChange={(event) => setForm({ ...form, gender: event.target.value })}>
 
                                     {
                                         GENDER.map((g) => (
@@ -211,44 +216,29 @@ const BookingModal = ({ doctors, open, onClose, onSubmit, isSubmitting, submitEr
                         {submitError && <p role="alert" className="text-sm text-red-600">{submitError}</p>}
                     </div>
 
-                {/* Footer */}
-                <div className="flex justify-end gap-3 border-t border-border p-5">
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="cursor-pointer rounded-lg border border-border px-4 py-2 text-sm font-medium text-card-foreground hover:bg-muted"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        disabled={isSubmitting || doctors.length === 0}
-                        className="cursor-pointer rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
-                    >
-                        {isSubmitting ? 'Booking...' : 'Book appointment'}
-                    </button>
-                </div>
+                    {/* Footer */}
+                    <div className="flex justify-end gap-3 border-t border-border p-5">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="cursor-pointer rounded-lg border border-border px-4 py-2 text-sm font-medium text-card-foreground hover:bg-muted"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={isSubmitting || doctors.length === 0}
+                            className="cursor-pointer rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+                        >
+                            {isSubmitting ? 'Booking...' : 'Book appointment'}
+                        </button>
+                    </div>
                 </form>
             </div>
         </Modal>
     );
 };
 
-/* -------------------------------------------------------------------------- */
-/*  Dashboard                                                                  */
-/*                                                                             */
-/*  Every piece of data arrives through props (empty by default).              */
-/*                                                                             */
-/*  doctors:              [{ id, name, specialty, availability, fee,           */
-/*                           waiting, inProgress }]                            */
-/*  stats:                { todaysAppointments, waitingNow }                   */
-/*  filterCounts:         { all, waiting, 'in-progress', completed, closed }   */
-/*  appointments:         [{ id, doctorName, patient, phone, time, type,       */
-/*                           status, token }]                                  */
-/*  waitingQueue:         [{ id, token, patient, doctorName, waitMinutes }]    */
-/*  tomorrowAppointments: [{ id, patient, time, doctorName, reminderSent }]    */
-/*  activity:             [{ id, text, time }]                                 */
-/* -------------------------------------------------------------------------- */
 
 
 const Receptionist = () => {
@@ -263,16 +253,18 @@ const Receptionist = () => {
     ]);
     const [doctors, setDoctors] = useState([]);
     const [appointments, setAppointments] = useState([]);
+    const [page, setPage] = useState(1)
+    const limit = 10
+    const [search, setSearch] = useState('')
+    const [debouncedSearch, setDebouncedSearch] = useState('')
+    const [totalPages, setTotalPages] = useState(0)
+    const [totalAppointments, setTotalAppointments] = useState(0)
+    const [doctorSearch, setDoctorSearch] = useState('');
+
+
     const [waitingQueue, setWaitingQueue] = useState([
         { id: 'a1', token: 101, patient: 'Ali Khan', doctorName: 'Dr. Ayesha Khan', waitMinutes: 10 },
         { id: 'a2', token: 102, patient: 'Sara Malik', doctorName: 'Dr. Bilal Ahmed', waitMinutes: 5 },
-    ]);
-    const [tomorrowAppointments, setTomorrowAppointments] = useState([
-        { id: 'a3', patient: 'Ahmed Raza', time: '11:00', doctorName: 'Dr. Sana Malik', reminderSent: false },
-    ]);
-    const [activity, setActivity] = useState([
-        { id: 'act1', text: 'Ali Khan checked in for Dr. Ayesha Khan', time: '09:35' },
-        { id: 'act2', text: 'Sara Malik completed consultation with Dr. Bilal Ahmed', time: '10:30' },
     ]);
 
 
@@ -284,14 +276,11 @@ const Receptionist = () => {
     });
 
 
-    const [page, setPage] = useState(1)
-    const limit = 10
-    const [search, setSearch] = useState('')
 
     // get all doctors
     const getAllDoctors = async () => {
         try {
-            const response = await api.get(`/staff/get-all/doctors?page=${page}&limit=${limit}&search=${search}`);
+            const response = await api.get(`/staff/get-all/doctors?page=${page}&limit=${limit}&search=${doctorSearch}`);
             setDoctors(response.doctors)
             console.log(response)
         } catch (error) {
@@ -301,18 +290,27 @@ const Receptionist = () => {
 
 
     useEffect(() => {
-        getAllDoctors()
-    }, [])
+        const timer = setTimeout(() => {
+            getAllDoctors()
+
+        }, 500);
+
+        return () => clearTimeout(timer)
+
+    }, [doctorSearch])
+
+
 
     // appointment api call
-
     const handleAppointment = async (appointmentData) => {
         setIsBooking(true);
         setBookingError('');
         try {
             const response = await api.post('/receptionist/appointment/create', appointmentData);
+            handleGetAllAppointments()
             console.log('Appointment booked:', response);
-            setAppointments(response.appointment)
+
+
             setShowBooking(false);
         } catch (error) {
             setBookingError(error.response?.data?.message || error.response?.data?.error || 'Could not book the appointment. Please try again.');
@@ -320,6 +318,50 @@ const Receptionist = () => {
             setIsBooking(false);
         }
     }
+
+    // get all appointments
+    const handleGetAllAppointments = async () => {
+        try {
+            const response = await api.get(`/receptionist/appointment/get/all?page=${page}&limit=${limit}&search=${debouncedSearch}`)
+
+            console.log(response.appointments)
+
+            setAppointments(response.appointments)
+            setTotalPages(response.totalPages)
+            setTotalAppointments(response.totalAppointments)
+
+
+            setStatCards([
+                {
+                    title: "Today's Appointments",
+                    value: response.totalAppointments,
+                    icon: CalendarDays
+                },
+                {
+                    title: "Waiting Now",
+                    value: response.getWaitingStatus,
+                    icon: CalendarDays
+                },
+            ])
+
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        handleGetAllAppointments()
+    }, [debouncedSearch, page])
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(search);
+        }, 500);
+
+        return () => clearTimeout(timer);
+
+    }, [search]);
 
     const handleLogout = async () => {
         try {
@@ -332,7 +374,18 @@ const Receptionist = () => {
         }
     }
 
+    // previous and next page 
 
+    const handlePreviousPage = () => {
+        console.log('fsdf')
+        setPage((prev) => prev - 1)
+
+    }
+
+
+    const handleNextPage = () => {
+        setPage((prev) => prev + 1)
+    }
 
 
     return (
@@ -385,9 +438,9 @@ const Receptionist = () => {
             </div>
 
             {/* Main Content */}
-            <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="mt-6 grid  gap-6 grid-cols-3">
                 {/* Today's appointments */}
-                <div className="rounded-xl border border-border bg-card lg:col-span-2">
+                <div className="rounded-xl border border-border bg-card col-span-2">
                     <div className="border-b border-border p-5">
                         <h2 className="font-semibold text-card-foreground">Today's Appointments</h2>
                         <p className="mt-1 text-sm text-muted-foreground">
@@ -396,7 +449,7 @@ const Receptionist = () => {
                     </div>
 
                     <div className="space-y-3 border-b border-border p-5">
-                        <div className="flex flex-col gap-3 sm:flex-row">
+                        <div className="flex  gap-3 flex-row">
                             <div className="relative flex-1">
                                 <Search
                                     size={16}
@@ -404,19 +457,25 @@ const Receptionist = () => {
                                 />
                                 <input
                                     placeholder="Search by patient name or phone"
-                                    aria-label="Search appointments"
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
                                     className="w-full rounded-lg border outline-none border-border bg-background py-2 pl-9 pr-3 text-sm text-foreground  focus:border-primary 
                                     focus:ring-2 focus:ring-primary/10"
                                 />
                             </div>
 
                             <select
-                                aria-label="Filter by doctor"
                                 className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                                onChange={(e) => setSearch(e.target.value)}
                             >
-                                <option value="all">All doctors</option>
+                                <option value="">All doctors</option>
+
                                 {doctors.map((d) => (
-                                    <option key={d._id} value={d._id}>
+                                    <option
+                                        key={d._id}
+                                        value={d.name}
+                                    >
+
                                         {d.name}
                                     </option>
                                 ))}
@@ -434,10 +493,7 @@ const Receptionist = () => {
                         )}
 
                         {appointments.map((appt) => {
-                            const status = STATUS_CONFIG[appt.status] || STATUS_CONFIG.scheduled;
-                            const canCheckIn = appt.status === 'scheduled' || appt.status === 'confirmed';
-                            const canCancel = canCheckIn || appt.status === 'waiting';
-
+                            const status = STATUS_CONFIG[appt.status]
                             return (
                                 <div
                                     key={appt._id}
@@ -450,16 +506,12 @@ const Receptionist = () => {
 
                                         <div>
                                             <h3 className="text-sm font-medium text-card-foreground">
-                                                {appt.patient}
-                                                {appt.token && (
-                                                    <span className="ml-2 rounded-md bg-secondary px-1.5 py-0.5 text-xs font-medium text-primary">
-                                                        #{appt.token}
-                                                    </span>
-                                                )}
+                                                {appt.name}
+
                                             </h3>
                                             <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
                                                 <Stethoscope size={12} />
-                                                {appt.doctorName} · {appt.type}
+                                                {appt.doctorName}
                                             </p>
                                             <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
                                                 <Phone size={12} />
@@ -471,7 +523,14 @@ const Receptionist = () => {
                                     <div className="flex flex-wrap items-center gap-3 sm:justify-end">
                                         <div className="text-right">
                                             <p className="text-sm font-medium text-card-foreground">
-                                                {formatTime(appt.time)}
+                                                {new Date(appt.date).toLocaleString("en-PK", {
+                                                    day: "2-digit",
+                                                    month: "short",
+                                                    year: "numeric",
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                    hour12: true
+                                                })}
                                             </p>
                                             <div className="mt-1 flex items-center justify-end gap-1.5">
                                                 <span
@@ -482,36 +541,43 @@ const Receptionist = () => {
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-1">
-                                            {canCheckIn && (
-                                                <button
-                                                    className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90"
-                                                >
-                                                    <UserCheck size={14} />
-                                                    Check in
-                                                </button>
-                                            )}
-                                            {canCancel && (
-                                                <button
-                                                    title="Cancel appointment"
-                                                    aria-label={`Cancel appointment for ${appt.patient}`}
-                                                    className="rounded-lg border border-border p-2 text-muted-foreground hover:bg-muted"
-                                                >
-                                                    <Ban size={14} />
-                                                </button>
-                                            )}
-                                        </div>
                                     </div>
                                 </div>
                             );
                         })}
                     </div>
-                    <div className='flex justify-center gap-3 '>
-                        <button className='h-9 px-3 rounded-lg border border-border text-sm text-muted-foreground disabled:opacity-50'>previous</button>
-                        <button className="h-9 w-9 px-3 rounded-lg bg-primary text-primary-foreground text-sm">
-                            {page}
-                        </button>
-                        <button className='h-9 px-3 rounded-lg border border-border text-sm text-muted-foreground disabled:opacity-50'>next</button>
+
+                    <div className='px-8 py-4 flex items-center justify-between gap-3 border-border border-t '>
+                        <p className="text-sm text-muted-foreground">
+                            <span className="font-medium text-foreground">
+                                Showing {appointments.length} </span> {' '}
+                            <span className="font-medium text-foreground">of</span> {' '}
+                            <span className='font-medium text-foreground'> {totalAppointments}{" "} </span>
+                        </p>
+
+                        <div className=' flex gap-3'>
+
+                            <button className='h-9 px-3 rounded-lg border border-border text-sm text-muted-foreground disabled:opacity-50 cursor-pointer'
+                                onClick={handlePreviousPage}
+                                disabled={page === 1}
+                            >previous</button>
+                            <button className="h-9 w-9 px-3 rounded-lg bg-primary text-primary-foreground text-sm "
+
+                            >
+                                {page}
+
+
+                            </button>
+                            <button className='h-9 px-3 rounded-lg border border-border text-sm text-muted-foreground  cursor-pointer disabled:opacity-50'
+                                onClick={handleNextPage}
+                                disabled={page === totalPages}
+
+                            >next</button>
+                        </div>
+
+
+
+
                     </div>
                 </div>
 
@@ -600,6 +666,7 @@ const Receptionist = () => {
                 onSubmit={handleAppointment}
                 isSubmitting={isBooking}
                 submitError={bookingError}
+                onDoctorSearch={setDoctorSearch}
             />
         </div>
     );

@@ -4,6 +4,6 @@ import { handleAppointment, handleGetAppointments } from "../controllers/recepti
 
 export const receptionistRouter = Router()
 
-receptionistRouter.get('/appointment/get/all',handleGetAppointments)
+receptionistRouter.get('/appointment/get/all',verifyUser, handleGetAppointments)
 receptionistRouter.post('/appointment/create',verifyUser, handleAppointment)  
 
