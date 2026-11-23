@@ -308,10 +308,10 @@ export const getAllDoctors = async (req, res) => {
         ]);
 
         const doctors = result[0]?.doctors || [];
-
         const totalDoctors = result[0]?.total[0]?.count || 0;
-
         const totalPages = Math.ceil(totalDoctors / limit);
+
+        
 
 
 

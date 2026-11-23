@@ -260,13 +260,13 @@ const Receptionist = () => {
     const [totalPages, setTotalPages] = useState(0)
     const [totalAppointments, setTotalAppointments] = useState(0)
     const [doctorSearch, setDoctorSearch] = useState('');
-    const [sideDoctorSearch,setSideDoctorSearch] = useState('')
+    const [sideDoctorSearch,setSideDoctorSearch] = useState([])
     const [sideDoctors,setSideDoctors] = useState([])
     const [sideTotalDoctors,setSideTotalDoctors] = useState('')
-    const [sidePage,setSidPage] = useState(0)
     const [sideShowingDoctors,setSideShowingDoctors] = useState(0)
     const [sideTotalPages,setSideTotalPages] = useState(0)
     const [loading,setLoading] = useState(false)
+    const [sidePage,setSidePage] = useState(1)
 
 
 
@@ -284,6 +284,8 @@ const Receptionist = () => {
         try {
             const response = await api.get(`/staff/get-all/doctors?page=${page}&limit=${limit}&search=${doctorSearch}`);
             setDoctors(response.doctors)
+            console.log(response.totalDoctors)
+            setSideTotalDoctors(response.totalDoctors)
             console.log(response)
         } catch (error) {
             console.log(error)
@@ -308,7 +310,8 @@ const Receptionist = () => {
             const response = await api.get(`/staff/get-all/doctors?page=${sidePage}&limit=${limit}&search=${sideDoctorSearch}`)
             console.log(response)
             setSideDoctors(response.doctors)
-            setSideTotalDoctors(response.doctors)
+            setSideTotalDoctors(response.totalDoctors)
+            setSideTotalPages(response.totalPages)
         } catch (error) {
             console.log(error)   
         }
@@ -321,15 +324,16 @@ const Receptionist = () => {
         }, 500);
 
         return ()=> clearTimeout(timer)
-    },[sideDoctorSearch])
+    },[sideDoctorSearch,sidePage])
 
 
     const previousSidePage = ()=>{
-
+        setSidePage((prev) => prev - 1)
+        
     }
 
     const nextSidePage = ()=>{
-
+        setSidePage((prev) => prev + 1)
     }
  
 
@@ -601,7 +605,8 @@ const Receptionist = () => {
                             <span className="font-medium text-foreground">
                                 Showing {appointments.length} </span> {' '}
                             <span className="font-medium text-foreground">of</span> {' '}
-                            <span className='font-medium text-foreground'> {totalAppointments}{" "} </span>
+                            <span className='font-medium text-foreground'> 
+                                {totalAppointments}{" "} </span>
                         </p>
 
                         <div className=' flex gap-3'>
@@ -663,22 +668,32 @@ const Receptionist = () => {
                                         <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-card-foreground">
                                             <span className={`h-2 w-2 rounded-full ${availability.dot}`} />
                                             {availability.label}
-                                        </span>
+                                        </span> 
                                     </div>
                                 );
                             })}
                         </div>
  
-                        <div className='flex items-center justify-between my-4'>
+                        <div className='flex items-center justify-between my-4 ' >
                             <div>
-                                showing 3 of 1
+                                showing {sideDoctors?.length} of {sideTotalDoctors}
                             </div>
 
-                            <div>
-                        <button>page</button>
-                        <button>nextpage</button>
-                            </div>
+                            <div className='flex items-center gap-2'>
+                                
+                        <button onClick={previousSidePage}
+                        className='h-9 px-3 rounded-lg border border-border text-sm text-muted-foreground disabled:opacity-50 cursor-pointer'
+                        disabled={sidePage === 1}
+                        >
+                            previous
+                            </button>
+                        {sidePage}
+                        <button onClick={nextSidePage} 
+                        className='h-9 px-3 rounded-lg border border-border text-sm text-muted-foreground disabled:opacity-50 cursor-pointer'
+                        disabled={sidePage === sideTotalPages}
 
+                        >nextpage</button>
+                            </div>
 
                         </div>
                     </div>
