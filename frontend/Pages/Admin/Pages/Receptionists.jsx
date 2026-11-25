@@ -124,7 +124,21 @@ const Receptionists = () => {
   }, [search, page])
 
 
+  const getAllReceptionistsStats = async () => {
+    try {
+      const result = await api.get (`/staff/get/all/stats/receptionists`)
+      console.log(result)
+    } catch (error) {
+      console.log(error)
+      
+    }
 
+  }
+
+
+    useEffect(()=>{
+      getAllReceptionistsStats()
+    },[])
 
 
   // previous-next pages

@@ -207,7 +207,8 @@ export const loginStaff = async (req, res) => {
 };
 
 
-// get all doctors
+
+// get all doctors - paginated
 export const getAllDoctors = async (req, res) => {
     try {
         const { userId, role } = req;
@@ -220,6 +221,8 @@ export const getAllDoctors = async (req, res) => {
         if (role === "admin") {
             const clinic = await Clinic.findOne({ ownerId: userId }).select("_id");
             clinicId = clinic?._id;
+
+
         } else if (role === "receptionist") {
             const receptionist = await Receptionist.findOne({ userId }).select("clinicId");
             clinicId = receptionist?.clinicId;
@@ -241,7 +244,7 @@ export const getAllDoctors = async (req, res) => {
             {
                 $match: {
                     clinicId: new mongoose.Types.ObjectId(clinicId)
-                }   
+                }
             },
             {
                 $lookup: {
@@ -277,41 +280,41 @@ export const getAllDoctors = async (req, res) => {
                 ]
                 : []),
 
-                {
-                    $facet: {
-                        doctors: [
-                            { $sort: { createdAt: -1 } },
-                            { $skip: skip },
-                            { $limit: limit },
-                            {
-                                $project: {
-                                    _id: "$user._id",
-                                    name: "$user.name",
-                                    email: "$user.email",
-                                    phone: "$phone",
-                                    consultationFee: "$consultationFee",
-                                    specialization: "$specialization",
-                                    experience: "$experience",
-                                    availability: { $ifNull: ["$availability", "off"] },
-                                    date: "$user.createdAt"
-                                }
+            {
+                $facet: {
+                    doctors: [
+                        { $sort: { createdAt: -1 } },
+                        { $skip: skip },
+                        { $limit: limit },
+                        {
+                            $project: {
+                                _id: "$user._id",
+                                name: "$user.name",
+                                email: "$user.email",
+                                phone: "$phone",
+                                consultationFee: "$consultationFee",
+                                specialization: "$specialization",
+                                experience: "$experience",
+                                availability: { $ifNull: ["$availability", "off"] },
+                                date: "$user.createdAt"
                             }
-                        ],
+                        }
+                    ],
 
-                        total: [
-                            {
-                                $count: "count"
-                            }
-                        ]
-                    }
+                    total: [
+                        {
+                            $count: "count"
+                        }
+                    ]
                 }
+            }
         ]);
 
         const doctors = result[0]?.doctors || [];
         const totalDoctors = result[0]?.total[0]?.count || 0;
         const totalPages = Math.ceil(totalDoctors / limit);
 
-        
+
 
 
 
@@ -332,7 +335,147 @@ export const getAllDoctors = async (req, res) => {
 
 
 
-// get all receptionists
+// get all doctors - no pagination
+export const getDoctorStats = async (req, res) => {
+    try {
+        const { userId, role } = req;
+
+        let clinicId;
+
+        if (role === "admin") {
+            const clinic = await Clinic.findOne({
+                ownerId: userId
+            }).select("_id");
+
+            clinicId = clinic?._id;
+        }
+        else if (role === "receptionist") {
+            const receptionist = await Receptionist.findOne({
+                userId
+            }).select("clinicId");
+
+            clinicId = receptionist?.clinicId;
+        }
+        else {
+            return res.status(403).json({
+                error: "Unauthorized"
+            });
+        }
+
+        if (!clinicId) {
+            return res.status(404).json({
+                error: "Clinic not found"
+            });
+        }
+
+        const stats = await Doctor.aggregate([
+            {
+                $match: {
+                    clinicId: new mongoose.Types.ObjectId(clinicId)
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+
+                    totalDoctors: {
+                        $sum: 1
+                    },
+
+                    activeDoctors: {
+                        $sum: {
+                            $cond: [
+                                { $eq: ["$availability", "available"] },
+                                1,
+                                0
+                            ]
+                        }
+                    },
+
+                    inactiveDoctors: {
+                        $sum: {
+                            $cond: [
+                                {
+                                    $in: [
+                                        "$availability",
+                                        ["off", "on leave", "break"]
+                                    ]
+                                },
+                                1,
+                                0
+                            ]
+                        }
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    totalDoctors: 1,
+                    activeDoctors: 1,
+                    inactiveDoctors: 1
+                }
+            }
+        ]);
+
+        return res.status(200).json({
+            stats: stats[0] || {
+                totalDoctors: 0,
+                activeDoctors: 0,
+                inactiveDoctors: 0
+            }
+        });
+
+    } catch (error) {
+        console.log(error);
+
+        return res.status(500).json({
+            error: error.message
+        });
+    }
+};
+
+
+
+// get all receptionists - no pagination
+export const getReceptionistsStats = async (req, res) => {
+
+    const { userId } = req
+    try {
+        const receptionist = await Clinic.findOne({ ownerId: userId })
+        const clinicId = receptionist._id
+
+        const result = await Receptionist.aggregate([
+            {
+                $match: {
+                    clinicId: new mongoose.Types.ObjectId(clinicId)
+                },
+
+
+            },
+            {
+                $group: {
+                    _id: null
+                },
+
+                totalReceptionists: {
+                    $sum: 1
+                },
+            }
+        ])
+
+        console.log(result)
+
+        res.status(200).json({ result: result })
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+
+
+
+// get all receptionists - paginated
 export const getAllReceptionists = async (req, res) => {
     try {
         const { userId } = req
@@ -624,3 +767,37 @@ export const deleteStaff = async (req, res) => {
 
     }
 }
+
+
+
+//  get single receptionist
+export const getReceptionist = async (req, res) => {
+
+    const { userId } = req
+    console.log(userId)
+
+
+    try {
+        const receptionist = await User.findById(userId).select('name email role')
+        console.log(receptionist)
+
+
+        if (!receptionist) {
+            return res.status(404).json({
+                error: "Receptionist not found"
+            });
+        }
+
+        res.status(200).json({
+            name: receptionist.name,
+            email: receptionist.email,
+            role: receptionist.role
+        })
+
+
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+

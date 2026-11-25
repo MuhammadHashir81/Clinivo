@@ -34,6 +34,10 @@ const Doctors = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [page, setPage] = useState(1);
   const [totalDoctors, setTotalDoctors] = useState(0);
+
+  const [totalStatDoctors,setTotalStatDoctors] = useState('')
+  const [activeDoctors,setActiveDoctors] = useState('')
+  const [inactiveDoctors,setInactiveDoctors] = useState('')
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [debouncedSearch,setDebouncedSearch] = useState('')
@@ -232,7 +236,24 @@ const Doctors = () => {
       console.log(error);
     }
   };
+
+  const handleGetStatDoctors = async()=>{
+    try {
+      const response = await api.get(`/staff/get/all/stats/doctors/`)
+      console.log(response)
+      setTotalStatDoctors(response.stats.totalDoctors)
+      setActiveDoctors(response.stats.activeDoctors)
+      setInactiveDoctors(response.stats.inactiveDoctors)
+      
+    } catch (error) {
+      console.log(error)
+      
+    }
+  }
   
+  useEffect(()=>{
+    handleGetStatDoctors()
+  },[doctors])
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -252,8 +273,6 @@ const Doctors = () => {
   
 
 
-  const activeDoctors = doctors.filter((doctor) => doctor.availability === "available").length;
-  const inactiveDoctors = doctors.filter((doctor) => doctor.availability !== "available").length;
 
 
   // ================= CREATE DOCTOR =================
@@ -451,7 +470,7 @@ const Doctors = () => {
                         aria-label={showPassword ? "Hide password" : "Show password"}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition cursor-pointer"
                       >
-                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        {showPassword ? <Eye size={18} />:  <EyeOff size={18} /> }
                       </button>
                     </div>
                   </div>
@@ -835,7 +854,7 @@ const Doctors = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 mb-6">
         <StatCard
           title="Total Doctors"
-          value={totalDoctors}
+          value={totalStatDoctors}
           icon={Stethoscope}
         />
 

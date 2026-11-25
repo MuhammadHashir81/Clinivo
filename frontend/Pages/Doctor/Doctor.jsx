@@ -23,7 +23,8 @@ import {
     CalendarClock,
     Activity,
     Timer,
-    Send
+    Send,
+    LogOut 
 } from 'lucide-react';
 
 /* -------------------------------------------------------------------------- */
@@ -489,11 +490,7 @@ const Doctor = ({ doctorName = 'Doctor' }) => {
             { title: "Today's Appointments", value: active.length, icon: CalendarDays },
             { title: 'Waiting Now', value: appointments.filter((a) => a.status === 'waiting').length, icon: Hourglass },
             { title: 'Completed', value: appointments.filter((a) => a.status === 'completed').length, icon: CheckCircle },
-            {
-                title: 'Pending',
-                value: appointments.filter((a) => UPCOMING_STATUSES.includes(a.status)).length,
-                icon: Clock,
-            },
+            
         ];
     }, [appointments]);
 
@@ -605,7 +602,7 @@ const Doctor = ({ doctorName = 'Doctor' }) => {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid  gap-5 grid-cols-3">
                 {stats.map((stat) => {
                     const Icon = stat.icon;
                     return (

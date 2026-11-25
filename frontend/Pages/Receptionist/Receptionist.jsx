@@ -11,6 +11,7 @@ import {
     Phone,
     ClipboardList,
     Stethoscope,
+    LogOut,
     CheckCheck
 } from 'lucide-react';
 import { api } from '../../services/api';
@@ -245,7 +246,7 @@ const Receptionist = () => {
     const [showBooking, setShowBooking] = useState(false);
     const [isBooking, setIsBooking] = useState(false);
     const [bookingError, setBookingError] = useState('');
-    const [receptionistName, setReceptionistName] = useState('Sarah');
+    const [receptionistName, setReceptionistName] = useState('');
     const [statCards, setStatCards] = useState([
         { title: "Today's Appointments", value: 12, icon: CalendarDays },
         { title: 'Waiting Now', value: 5, icon: Hourglass },
@@ -260,13 +261,13 @@ const Receptionist = () => {
     const [totalPages, setTotalPages] = useState(0)
     const [totalAppointments, setTotalAppointments] = useState(0)
     const [doctorSearch, setDoctorSearch] = useState('');
-    const [sideDoctorSearch,setSideDoctorSearch] = useState([])
-    const [sideDoctors,setSideDoctors] = useState([])
-    const [sideTotalDoctors,setSideTotalDoctors] = useState('')
-    const [sideShowingDoctors,setSideShowingDoctors] = useState(0)
-    const [sideTotalPages,setSideTotalPages] = useState(0)
-    const [loading,setLoading] = useState(false)
-    const [sidePage,setSidePage] = useState(1)
+    const [sideDoctorSearch, setSideDoctorSearch] = useState([])
+    const [sideDoctors, setSideDoctors] = useState([])
+    const [sideTotalDoctors, setSideTotalDoctors] = useState('')
+    const [sideShowingDoctors, setSideShowingDoctors] = useState(0)
+    const [sideTotalPages, setSideTotalPages] = useState(0)
+    const [loading, setLoading] = useState(false)
+    const [sidePage, setSidePage] = useState(1)
 
 
 
@@ -277,6 +278,23 @@ const Receptionist = () => {
         year: 'numeric',
     });
 
+
+
+    // get receptionist 
+
+    const getReceptionist = async () => {
+        try {
+            const response = await api.get(`/staff/get/receptionist`)
+            setReceptionistName(response.name)
+            
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(()=>{
+        getReceptionist()
+    },[])
 
 
     // get all doctors
@@ -304,38 +322,38 @@ const Receptionist = () => {
     }, [doctorSearch])
 
 
-    const getAllSideDoctors = async()=>{
+    const getAllSideDoctors = async () => {
         try {
-            
+
             const response = await api.get(`/staff/get-all/doctors?page=${sidePage}&limit=${limit}&search=${sideDoctorSearch}`)
             console.log(response)
             setSideDoctors(response.doctors)
             setSideTotalDoctors(response.totalDoctors)
             setSideTotalPages(response.totalPages)
         } catch (error) {
-            console.log(error)   
+            console.log(error)
         }
     }
 
-    useEffect(()=>{
+    useEffect(() => {
 
         const timer = setTimeout(() => {
             getAllSideDoctors()
         }, 500);
 
-        return ()=> clearTimeout(timer)
-    },[sideDoctorSearch,sidePage])
+        return () => clearTimeout(timer)
+    }, [sideDoctorSearch, sidePage])
 
 
-    const previousSidePage = ()=>{
+    const previousSidePage = () => {
         setSidePage((prev) => prev - 1)
-        
+
     }
 
-    const nextSidePage = ()=>{
+    const nextSidePage = () => {
         setSidePage((prev) => prev + 1)
     }
- 
+
 
     // appointment api call
     const handleAppointment = async (appointmentData) => {
@@ -371,7 +389,7 @@ const Receptionist = () => {
                 appt.status === 'waiting'
             ))
 
-            
+
             const getCompletedStatus = response.getStatus.filter((appt) => (
                 appt.status === 'completed'
             ))
@@ -465,8 +483,17 @@ const Receptionist = () => {
                         <CalendarPlus size={16} />
                         New appointment
                     </button>
-                    <button onClick={handleLogout}
-                        className='text-sm font-primary cursor-pointer border-border rounded-lg px-3 bg-background '>logout</button>
+                    <button
+                        onClick={handleLogout}
+                        aria-label="Log out"
+                        className="group ml-2 flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 transition-all duration-200  focus:outline-none  cursor-pointer"
+                    >
+                        <LogOut
+                            size={16}
+                            className="transition-transform duration-200 group-hover:translate-x-0.5"
+                        />
+                        Logout
+                    </button>
                 </div>
             </div>
 
@@ -605,7 +632,7 @@ const Receptionist = () => {
                             <span className="font-medium text-foreground">
                                 Showing {appointments.length} </span> {' '}
                             <span className="font-medium text-foreground">of</span> {' '}
-                            <span className='font-medium text-foreground'> 
+                            <span className='font-medium text-foreground'>
                                 {totalAppointments}{" "} </span>
                         </p>
 
@@ -642,12 +669,12 @@ const Receptionist = () => {
                         <h2 className="font-semibold text-card-foreground">Doctors on Duty</h2>
                         <p className="mt-1 text-sm text-muted-foreground">Availability is set by each doctor.</p>
                         <input type="text" placeholder='search doctors'
-                        className='rounded-lg outline-none border border-border text-sm font-primary 
-                        bg-background px-4 py-1 mt-3 w-full
+                            className='rounded-lg outline-none border border-border text-sm font-primary focus:border-primary focus:ring-2 focus:ring-primary/10
+                        bg-background px-4 py-1 mt-3 w-full 
                         '
-                        value={sideDoctorSearch}
-                        onChange={(e)=>setSideDoctorSearch(e.target.value)}
-                         />
+                            value={sideDoctorSearch}
+                            onChange={(e) => setSideDoctorSearch(e.target.value)}
+                        />
 
                         <div className="mt-4 space-y-4">
                             {sideDoctors.map((d) => {
@@ -662,37 +689,37 @@ const Receptionist = () => {
                                                 {d.specialization} · {formatPKR(d.consultationFee)}
                                             </p>
                                             <p className="mt-1 text-xs text-muted-foreground">
-                                                {d.waiting ?? 0} waiting 
+                                                {d.waiting ?? 0} waiting
                                             </p>
                                         </div>
                                         <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-card-foreground">
                                             <span className={`h-2 w-2 rounded-full ${availability.dot}`} />
                                             {availability.label}
-                                        </span> 
+                                        </span>
                                     </div>
                                 );
                             })}
                         </div>
- 
+
                         <div className='flex items-center justify-between my-4 ' >
                             <div>
                                 showing {sideDoctors?.length} of {sideTotalDoctors}
                             </div>
 
                             <div className='flex items-center gap-2'>
-                                
-                        <button onClick={previousSidePage}
-                        className='h-9 px-3 rounded-lg border border-border text-sm text-muted-foreground disabled:opacity-50 cursor-pointer'
-                        disabled={sidePage === 1}
-                        >
-                            previous
-                            </button>
-                        {sidePage}
-                        <button onClick={nextSidePage} 
-                        className='h-9 px-3 rounded-lg border border-border text-sm text-muted-foreground disabled:opacity-50 cursor-pointer'
-                        disabled={sidePage === sideTotalPages}
 
-                        >nextpage</button>
+                                <button onClick={previousSidePage}
+                                    className='h-9 px-3 rounded-lg border border-border text-sm text-muted-foreground disabled:opacity-50 cursor-pointer'
+                                    disabled={sidePage === 1}
+                                >
+                                    previous
+                                </button>
+                                {sidePage}
+                                <button onClick={nextSidePage}
+                                    className='h-9 px-3 rounded-lg border border-border text-sm text-muted-foreground disabled:opacity-50 cursor-pointer'
+                                    disabled={sidePage === sideTotalPages}
+
+                                >nextpage</button>
                             </div>
 
                         </div>
